@@ -592,19 +592,27 @@ const MOCK_CYCLES = [
 ];
 
 function computePredictions() {
-  // Last period date: preference user > onboardData > safe dynamic default (TODAY)
-  let raw = (state && state.user && state.user.lastPeriodDate) 
-    ? state.user.lastPeriodDate 
-    : (state && state.onboardData && state.onboardData.lastPeriodDate)
-    ? state.onboardData.lastPeriodDate
-    : null;
+  // Last period date: most recent logged cycle > user state > onboardData > safe dynamic default (August 3, 2026)
+  let lastPeriodDate = null;
 
-  let lastPeriodDate;
-  if (raw) {
-    lastPeriodDate = new Date(raw + (raw.includes('T') ? '' : 'T00:00:00'));
+  // Check state.cycles for the most recent logged start date
+  if (state && state.cycles && state.cycles.length > 0) {
+    const sorted = [...state.cycles].sort((a,b) => new Date(b.startDate) - new Date(a.startDate));
+    if (sorted[0] && sorted[0].startDate) {
+      lastPeriodDate = new Date(sorted[0].startDate);
+    }
   }
+
   if (!lastPeriodDate || isNaN(lastPeriodDate.getTime())) {
-    // Dynamic default: start of current month cycle (August 3, 2026)
+    let raw = (state && state.user && state.user.lastPeriodDate) 
+      ? state.user.lastPeriodDate 
+      : (state && state.onboardData && state.onboardData.lastPeriodDate)
+      ? state.onboardData.lastPeriodDate
+      : null;
+    if (raw) lastPeriodDate = new Date(raw + (raw.includes('T') ? '' : 'T00:00:00'));
+  }
+
+  if (!lastPeriodDate || isNaN(lastPeriodDate.getTime())) {
     lastPeriodDate = new Date(TODAY.getFullYear(), TODAY.getMonth(), 3);
   }
 
@@ -629,13 +637,20 @@ function computePredictions() {
   const diffDays  = Math.round((todayZero - lastZero) / 86400000);
   const cycleDay  = Math.max(1, diffDays + 1);
 
-    // Standard ACOG Medical Cycle Calculation:
-  // For 28-day cycle: Period = Days 1-5, Follicular Gap = Days 6-9 (4 days empty),
-  // Fertile Window = Days 10-14 (5 light green days), Ovulation Day = Day 15 (1 dark green day)
-  const ovulationDayNum = avgCycle - 13;  // Day 15 of 28-day cycle (Day 14 in 0-indexed offset = Day 15)
-  const ovulationDate  = addDays(lastPeriodDate, ovulationDayNum - 1); // Peak Ovulation Day (1 Dark Green)
-  const fertileStart   = addDays(ovulationDate, -5);                   // Fertile Window Start (5 Light Green)
-  const fertileEnd     = addDays(ovulationDate, -1);                   // Fertile Window End
+    // Standard ACOG Medical Cycle Calculation with GUARANTEED 3-4 DAY GAP AFTER PERIOD END:
+  const periodEnd = addDays(lastPeriodDate, effectivePeriodLength - 1);
+  let ovulationDayNum = avgCycle - 13;  // Day 15 of 28-day cycle
+  let ovulationDate  = addDays(lastPeriodDate, ovulationDayNum - 1);
+  let fertileStart   = addDays(ovulationDate, -5);
+  let fertileEnd     = addDays(ovulationDate, -1);
+
+  // Guarantee at least 3-4 uncolored gap days after period end
+  const minFertileStart = addDays(periodEnd, 4); // 3-4 days after period end
+  if (fertileStart < minFertileStart) {
+    fertileStart = minFertileStart;
+    fertileEnd = addDays(fertileStart, 4);
+    ovulationDate = addDays(fertileEnd, 1);
+  }
 
   // Next period dates
   const nextPeriodStart = addDays(lastPeriodDate, avgCycle);
@@ -1213,13 +1228,36 @@ function getDateClass(year, month, day) {
     ? state.actualPeriodLength 
     : (P.avgPeriod || 5);
 
-  // 1. Current Cycle Period Days (Pembe)
+  // 1. Current Cycle Period Days (Pembe) & Historical Period Entries
+  let isPeriod = false;
+  let activePeriodEnd = null;
+
   if (P.lastPeriodDate) {
-    const periodEnd = addDays(P.lastPeriodDate, pLen - 1);
-    if (dateInRange(date, P.lastPeriodDate, periodEnd)) {
+    const pEnd = addDays(P.lastPeriodDate, pLen - 1);
+    if (dateInRange(date, P.lastPeriodDate, pEnd)) {
       classes.push('period');
-      return classes.join(' ');
+      isPeriod = true;
     }
+    if (!activePeriodEnd || pEnd > activePeriodEnd) activePeriodEnd = pEnd;
+  }
+
+  (state.cycles || []).forEach(c => {
+    if (c.startDate && c.endDate) {
+      let cStart = new Date(c.startDate);
+      let cEnd = new Date(c.endDate);
+      if (dateInRange(date, cStart, cEnd)) {
+        if (!classes.includes('period')) classes.push('period');
+        isPeriod = true;
+      }
+      if (!activePeriodEnd || cEnd > activePeriodEnd) activePeriodEnd = cEnd;
+    }
+  });
+
+  if (isPeriod) return classes.join(' ');
+
+  // STRICT 3-DAY GAP RULE: The 3 days immediately following ANY period end MUST remain 100% uncolored/blank!
+  if (activePeriodEnd && date > activePeriodEnd && date <= addDays(activePeriodEnd, 3)) {
+    return classes.join(' '); // Force 3 blank gap days after period end!
   }
 
   // 2. Current Cycle Ovulation (1 Koyu Yeşil) & Fertile Window (5 Açık Yeşil)
@@ -1239,6 +1277,12 @@ function getDateClass(year, month, day) {
         classes.push('predicted');
         return classes.join(' ');
       }
+
+      // Check gap rule for predicted future periods as well
+      if (fp.end && date > fp.end && date <= addDays(fp.end, 3)) {
+        return classes.join(' ');
+      }
+
       if (fp.ovulationDate && isSameDay(date, fp.ovulationDate)) {
         classes.push('ovulation');
         return classes.join(' ');
