@@ -762,9 +762,10 @@ select option {
   cursor: pointer; transition: var(--t-spring); font-size: 10px; font-weight: 500;
   color: var(--text-2); text-align: center;
 }
-.symptom-chip:hover { border-color: var(--secondary); background: var(--secondary-light); }
-.symptom-chip.selected { border-color: var(--secondary); background: var(--secondary-light); color: var(--secondary); font-weight: 600; }
-.symptom-chip .chip-icon { font-size: 22px; }
+.symptom-chip:hover { border-color: var(--primary); background: rgba(232,120,154,0.08); transform: translateY(-2px); }
+.symptom-chip.selected { border-color: var(--primary); background: linear-gradient(135deg, rgba(232,120,154,0.22), rgba(156,39,176,0.15)); color: var(--primary-dark); font-weight: 700; box-shadow: 0 4px 12px rgba(232,120,154,0.25); transform: translateY(-2px); }
+.symptom-chip .chip-icon { font-size: 22px; transition: transform 0.2s ease; }
+.symptom-chip.selected .chip-icon { transform: scale(1.18); }
 .symptom-section-title { font-size: 13px; font-weight: 600; color: var(--text-2); margin-bottom: 10px; margin-top: 4px; }
 
 /* Severity Bar */

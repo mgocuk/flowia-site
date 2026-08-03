@@ -112,7 +112,7 @@ const PHASES = {
 const SYMPTOMS_PHYSICAL = [
   { id: 'cramps',    label: 'Cramps',         icon: '🔥' },
   { id: 'headache',  label: 'Headache',       icon: '🤯' },
-  { id: 'bloating',  label: 'Bloating',       icon: '🫃' },
+  { id: 'bloating',  label: 'Bloating',       icon: '🎈' },
   { id: 'fatigue',   label: 'Fatigue',        icon: '😴' },
   { id: 'nausea',    label: 'Nausea',         icon: '🤢' },
   { id: 'breast',    label: 'Breast',         icon: '🩹' },
@@ -3409,6 +3409,25 @@ function renderSymptoms() {
       </button>
     </div>
   </div>`;
+}
+
+function toggleSymptom(id, el) {
+  if (!state.selectedSymptoms) state.selectedSymptoms = [];
+  const idx = state.selectedSymptoms.indexOf(id);
+  if (idx !== -1) {
+    state.selectedSymptoms.splice(idx, 1);
+    if (el) el.classList.remove('selected');
+  } else {
+    state.selectedSymptoms.push(id);
+    if (el) el.classList.add('selected');
+  }
+}
+
+function selectMoodItem(id, el) {
+  state.selectedMood = id;
+  const btns = document.querySelectorAll('.mood-emoji-btn');
+  btns.forEach(b => b.classList.remove('selected'));
+  if (el) el.classList.add('selected');
 }
 
 function saveSymptomsLog() {
