@@ -4861,26 +4861,99 @@ function renderSettings() {
 
     <div class="settings-section">
       <div class="settings-section-title">${t('notifications_title')}</div>
-      ${[
-        { icon:'🔔', label:t('notif_period_lbl'), desc:t('notif_period_desc'), key:'notif_period' },
-        { icon:'📅', label:t('notif_ovulation_lbl'), desc:t('notif_ovulation_desc'), key:'notif_ovulation' },
-        { icon:'💊', label:t('notif_daily_lbl'), desc:t('notif_daily_desc'), key:'notif_daily' },
-        { icon:'💡', label:t('notif_insight_lbl'), desc:t('notif_insight_desc'), key:'notif_insight' },
-        { icon:'📋', label:t('notif_report_lbl'), desc:t('notif_report_desc'), key:'notif_report' },
-      ].map(item => `
-        <div class="settings-item">
-          <div class="settings-item-left">
-            <div class="settings-item-icon" style="background:var(--surface-2)">${item.icon}</div>
-            <div class="settings-item-text">
-              <div class="settings-item-label">${item.label}</div>
-              <div class="settings-item-desc">${item.desc}</div>
-            </div>
+      
+      <!-- 1. Adet Anımsatıcıları -->
+      <div class="settings-item" style="flex-wrap:wrap;gap:10px">
+        <div class="settings-item-left" style="flex:1">
+          <div class="settings-item-icon" style="background:var(--surface-2)">🔔</div>
+          <div class="settings-item-text">
+            <div class="settings-item-label">${t('notif_period_lbl')}</div>
+            <div class="settings-item-desc">Tahmini başlangıçtan ${state.notifPeriodDays || 2} gün önce</div>
           </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <select class="input-field" style="width:auto;padding:4px 8px;font-size:12px;border-radius:12px" onchange="setNotifPeriodDays(this.value)">
+            <option value="1" ${(state.notifPeriodDays || 2) == 1 ? 'selected' : ''}>1 Gün Önce</option>
+            <option value="2" ${(state.notifPeriodDays || 2) == 2 ? 'selected' : ''}>2 Gün Önce</option>
+            <option value="3" ${(state.notifPeriodDays || 2) == 3 ? 'selected' : ''}>3 Gün Önce</option>
+          </select>
           <label class="toggle">
-            <input type="checkbox" ${item.key === 'notif_period' || item.key === 'notif_daily' ? 'checked' : ''}/>
+            <input type="checkbox" ${state.notif_period !== false ? 'checked' : ''} onchange="toggleSetting('notif_period', this.checked)"/>
             <span class="toggle-track"></span>
           </label>
-        </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- 2. Yumurtlama Uyarıları -->
+      <div class="settings-item" style="flex-wrap:wrap;gap:10px">
+        <div class="settings-item-left" style="flex:1">
+          <div class="settings-item-icon" style="background:var(--surface-2)">📅</div>
+          <div class="settings-item-text">
+            <div class="settings-item-label">${t('notif_ovulation_lbl')}</div>
+            <div class="settings-item-desc">Yumurtlama gününden ${state.notifOvulationDays || 1} gün önce</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <select class="input-field" style="width:auto;padding:4px 8px;font-size:12px;border-radius:12px" onchange="setNotifOvulationDays(this.value)">
+            <option value="1" ${(state.notifOvulationDays || 1) == 1 ? 'selected' : ''}>1 Gün Önce</option>
+            <option value="2" ${(state.notifOvulationDays || 1) == 2 ? 'selected' : ''}>2 Gün Önce</option>
+            <option value="3" ${(state.notifOvulationDays || 1) == 3 ? 'selected' : ''}>3 Gün Önce</option>
+          </select>
+          <label class="toggle">
+            <input type="checkbox" ${state.notif_ovulation !== false ? 'checked' : ''} onchange="toggleSetting('notif_ovulation', this.checked)"/>
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 3. Günlük Kayıt Anımsatıcısı -->
+      <div class="settings-item" style="flex-wrap:wrap;gap:10px">
+        <div class="settings-item-left" style="flex:1">
+          <div class="settings-item-icon" style="background:var(--surface-2)">💊</div>
+          <div class="settings-item-text">
+            <div class="settings-item-label">${t('notif_daily_lbl')}</div>
+            <div class="settings-item-desc">Anımsatma saati: ${state.notifDailyTime || '20:00'}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="time" class="input-field" style="width:auto;padding:4px 8px;font-size:12px;border-radius:12px" value="${state.notifDailyTime || '20:00'}" onchange="setNotifDailyTime(this.value)" />
+          <label class="toggle">
+            <input type="checkbox" ${state.notif_daily !== false ? 'checked' : ''} onchange="toggleSetting('notif_daily', this.checked)"/>
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 4. İçgörü Bildirimleri -->
+      <div class="settings-item">
+        <div class="settings-item-left">
+          <div class="settings-item-icon" style="background:var(--surface-2)">💡</div>
+          <div class="settings-item-text">
+            <div class="settings-item-label">${t('notif_insight_lbl')}</div>
+            <div class="settings-item-desc">${t('notif_insight_desc')}</div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" ${state.notif_insight !== false ? 'checked' : ''} onchange="toggleSetting('notif_insight', this.checked)"/>
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+
+      <!-- 5. Aylık Rapor -->
+      <div class="settings-item">
+        <div class="settings-item-left">
+          <div class="settings-item-icon" style="background:var(--surface-2)">📋</div>
+          <div class="settings-item-text">
+            <div class="settings-item-label">${t('notif_report_lbl')}</div>
+            <div class="settings-item-desc">${t('notif_report_desc')}</div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" ${state.notif_report !== false ? 'checked' : ''} onchange="toggleSetting('notif_report', this.checked)"/>
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+
     </div>
 
     <div class="settings-section">
