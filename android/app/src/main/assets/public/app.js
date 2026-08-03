@@ -260,7 +260,7 @@ const I18N = {
   symptoms: { en:'Symptoms', tr:'Semptomlar', ru:'Симптомы', zh:'症状', es:'Síntomas', hi:'लक्षण', fr:'Symptômes', ar:'الأعراض', bn:'লক্ষণ', pt:'Sintomas', ur:'علامات', de:'Symptome' },
   mood: { en:'Mood', tr:'Ruh Hali', ru:'Настроение', zh:'心情', es:'Estado de ánimo', hi:'मनोदशा', fr:'Humeur', ar:'المزاج', bn:'মেজাজ', pt:'Humor', ur:'مزاج', de:'Stimmung' },
   journal: { en:'Journal', tr:'Günlük', ru:'Дневник', zh:'日记', es:'Diario', hi:'डायरी', fr:'Journal', ar:'اليوميات', bn:'জার্নাল', pt:'Diário', ur:'ڈائری', de:'Tagebuch' },
-  save_entry: { en:'🪷 Save Entry', tr:'🪷 Kaydı Kaydet', ru:'🪷 Сохранить запись', zh:'🪷 保存记录', es:'🪷 Guardar entrada', hi:'🪷 प्रविष्टि सहेजें', fr:'🪷 Enregistrer', ar:'🪷 حفظ الإدخال', bn:'🪷 এন্ট্রি সংরক্ষণ', pt:'🪷 Salvar registro', ur:'🪷 اندراج محفوظ کریں', de:'🪷 Eintrag speichern' },
+  save_entry: { en:' Save Entry', tr:' Kaydı Kaydet', ru:' Сохранить запись', zh:' 保存记录', es:' Guardar entrada', hi:' प्रविष्टि सहेजें', fr:' Enregistrer', ar:' حفظ الإدخال', bn:' এন্ট্রি সংরক্ষণ', pt:' Salvar registro', ur:' اندراج محفوظ کریں', de:' Eintrag speichern' },
   flow_intensity: { en:'💧 Flow Intensity', tr:'💧 Akış Yoğunluğu', ru:'💧 Интенсивность выделений', zh:'💧 流量强度', es:'💧 Intensidad del flujo', hi:'💧 प्रवाह की तीव्रता', fr:'💧 Intensité du flux', ar:'💧 كثافة التدفق', bn:'💧 প্রবাহের তীব্রতা', pt:'💧 Intensidade do fluxo', ur:'💧 بہاؤ کی شدت', de:'💧 Blutungsstärke' },
   pain_level: { en:'😣 Pain Level', tr:'😣 Ağrı Seviyesi', ru:'😣 Уровень боли', zh:'😣 疼痛级别', es:'😣 Nivel de dolor', hi:'😣 दर्द का स्तर', fr:'😣 Niveau de douleur', ar:'😣 مستوى الألم', bn:'😣 ব্যথার মাত্রা', pt:'😣 Nível de dor', ur:'😣 درد کی سطح', de:'😣 Schmerzlevel' },
   notes: { en:'📝 Notes', tr:'📝 Notlar', ru:'📝 Заметки', zh:'📝 备注', es:'📝 Notas', hi:'📝 नोट्स', fr:'📝 Notes', ar:'📝 ملاحظات', bn:'📝 নোটস', pt:'📝 Notas', ur:'📝 نوٹس', de:'📝 Notizen' },
@@ -404,7 +404,7 @@ const I18N = {
   period_ended_early_title: { en:'Did your period end early?', tr:'Adetiniz erken mi bitti?', ur:'کیا آپ کا حیض جلدی ختم ہو گیا؟', de:'Hat Ihre Periode früher aufgehört?', es:'¿Tu período terminó antes de tiempo?', fr:'Vos règles ont-elles terminé plus tôt ?', ru:'Месячные закончились раньше?', zh:'您的月经提前结束了吗？', hi:'क्या आपका मासिक धर्म जल्दी समाप्त हो गया?', ar:'هل انتهت دورتك الشهرية مبكراً؟', bn:'আপনার পিরিয়ড কি নির্ধারিত সময়ের আগেই শেষ হয়েছে?', pt:'Sua menstruação terminou mais cedo?' },
   period_ended_early_sub: { en:'Tap to mark period ended, update average duration & switch to Follicular Phase.', tr:'Adet evresinden çıkıp Foliküler Evreye geçmek ve takvimi güncellemek için tıklayın.', ur:'حیض کے ختم ہونے کا نشان لگائیں اور کیلنڈر کو اپ ڈیٹ کریں۔', de:'Tippen zum Beenden der Periode & Aktualisieren des Kalenders.', es:'Toca para marcar el fin del período y actualizar el calendario.', fr:'Appuyez pour marquer la fin des règles et mettre à jour le calendrier.', ru:'Нажмите, чтобы отметить окончание месячных и обновить календарь.', zh:'点击标记月经结束并更新日历。', hi:'मासिक धर्म की समाप्ति चिह्नित करने के लिए टैप करें。', ar:'انقر لتحديد نهاية الدورة وتحديث التقويم.', bn:'পিরিয়ড সমাপ্তি চিহ্নিত করতে এবং ক্যালেন্ডার আপডেট করতে চাপুন。', pt:'Toque para marcar o fim da menstruação e atualizar o calendário.' },
   mark_period_ended_btn: { en:'Period Ended ✨', tr:'Adetim Bitti ✨', ur:'حیض ختم ہو گیا ✨', de:'Periode Beendet ✨', es:'Período finalizado ✨', fr:'Règles terminées ✨', ru:'Месячные завершились ✨', zh:'月经已结束 ✨', hi:'मासिक धर्म समाप्त ✨', ar:'انتهت الدورة ✨', bn:'পিরিয়ড শেষ হয়েছে ✨', pt:'Menstruação terminada ✨' },
-  period_ended_toast: { en:'Period end recorded! Average duration updated & switched to Follicular Phase. 🪷', tr:'Adetinizin bittiği kaydedildi! Ortalama adet süreniz güncellendi ve Foliküler Evreye geçildi. 🪷', ur:'حیض کے اختتام کا ریکارڈ محفوظ کر لیا گیا! 🪷', de:'Periodenende gespeichert! Durchschn. Dauer aktualisiert. 🪷', es:'¡Fin del período registrado! Promedio actualizado. 🪷', fr:'Fin des règles enregistrée ! Durée moyenne mise à jour. 🪷', ru:'Конец месячных записан! Средняя длительность обновлена. 🪷', zh:'已记录经期结束！已更新平均天数。 🪷', hi:'मासिक धर्म का अंत रिकॉर्ड किया गया! 🪷', ar:'تم تسجيل نهاية الدورة! 🪷', bn:'পিরিয়ড সমাপ্তি রেকর্ড করা হয়েছে! 🪷', pt:'Fim da menstruação registrado! Média atualizada. 🪷' },
+  period_ended_toast: { en:'Period end recorded! Average duration updated & switched to Follicular Phase. ', tr:'Adetinizin bittiği kaydedildi! Ortalama adet süreniz güncellendi ve Foliküler Evreye geçildi. ', ur:'حیض کے اختتام کا ریکارڈ محفوظ کر لیا گیا! ', de:'Periodenende gespeichert! Durchschn. Dauer aktualisiert. ', es:'¡Fin del período registrado! Promedio actualizado. ', fr:'Fin des règles enregistrée ! Durée moyenne mise à jour. ', ru:'Конец месячных записан! Средняя длительность обновлена. ', zh:'已记录经期结束！已更新平均天数。 ', hi:'मासिक धर्म का अंत रिकॉर्ड किया गया! ', ar:'تم تسجيل نهاية الدورة! ', bn:'পিরিয়ড সমাপ্তি রেকর্ড করা হয়েছে! ', pt:'Fim da menstruação registrado! Média atualizada. ' },
   period_ended_badge: { en:'Early Period End', tr:'Erken Adet Bitişi', ur:'حیض کا جلدی اختتام', de:'Frühes Periodenende', es:'Fin prematuro del período', fr:'Fin précoce des règles', ru:'Раннее окончание месячных', zh:'月经提前结束', hi:'प्रारंभिक अवधि अंत', ar:'نهاية الدورة المبكرة', bn:'প্রাথমিক পিরিয়ড সমাপ্তি', pt:'Fim precoce da menstruação' },
   resume_period_btn: { en:'Resume Period Log', tr:'Adet Kaydına Devam Et', ur:'حیض کے لاگ کو جاری رکھیں', de:'Periodeneintrag fortsetzen', es:'Reanudar registro de período', fr:'Reprendre le suivi des règles', ru:'Возобновить запись месячных', zh:'恢复经期记录', hi:'मासिक धर्म लॉग फिर से शुरू करें', ar:'استئناف سجل الدورة', bn:'পিরিয়ড লগ আবার شروع করুন', pt:'Retomar registro de menstruação' },
   badge_new: { en:'NEW', tr:'YENİ', ru:'НОВОЕ', zh:'最新', es:'NUEVO', hi:'नया', fr:'NOUVEAU', ar:'جديد', bn:'নতুন', pt:'NOVO', ur:'نیا', de:'NEU' },
@@ -464,7 +464,7 @@ const I18N = {
   period_ended_early_title: { en:'Did your period end early?', tr:'Adetiniz erken mi bitti?', ur:'کیا آپ کا حیض جلدی ختم ہو گیا؟', de:'Hat Ihre Periode früher aufgehört?', es:'¿Tu período terminó antes de tiempo?', fr:'Vos règles ont-elles terminé plus tôt ?', ru:'Месячные закончились раньше?', zh:'您的月经提前结束了吗？', hi:'क्या आपका मासिक धर्म जल्दी समाप्त हो गया?', ar:'هل انتهت دورتك الشهرية مبكراً؟', bn:'আপনার পিরিয়ড কি নির্ধারিত সময়ের আগেই শেষ হয়েছে?', pt:'Sua menstruação terminou mais cedo?' },
   period_ended_early_sub: { en:'Tap to mark period ended, update average duration & switch to Follicular Phase.', tr:'Adet evresinden çıkıp Foliküler Evreye geçmek ve takvimi güncellemek için tıklayın.', ur:'حیض کے ختم ہونے کا نشان لگائیں اور کیلنڈر کو اپ ڈیٹ کریں۔', de:'Tippen zum Beenden der Periode & Aktualisieren des Kalenders.', es:'Toca para marcar el fin del período y actualizar el calendario.', fr:'Appuyez pour marquer la fin des règles et mettre à jour le calendrier.', ru:'Нажмите, чтобы отметить окончание месячных и обновить календарь.', zh:'点击标记月经结束并更新日历。', hi:'मासिक धर्म की समाप्ति चिह्नित करने के लिए टैप करें।', ar:'انقر لتحديد نهاية الدورة وتحديث التقويم.', bn:'পিরিয়ড সমাপ্তি চিহ্নিত করতে এবং ক্যালেন্ডার আপডেট করতে চাপুন।', pt:'Toque para marcar o fim da menstruação e atualizar o calendário.' },
   mark_period_ended_btn: { en:'Period Ended ✨', tr:'Adetim Bitti ✨', ur:'حیض ختم ہو گیا ✨', de:'Periode Beendet ✨', es:'Período finalizado ✨', fr:'Règles terminées ✨', ru:'Месячные завершились ✨', zh:'月经已结束 ✨', hi:'मासिक धर्म समाप्त ✨', ar:'انتهت الدورة ✨', bn:'পিরিয়ড শেষ হয়েছে ✨', pt:'Menstruação terminada ✨' },
-  period_ended_toast: { en:'Period end recorded! Average duration updated & switched to Follicular Phase. 🪷', tr:'Adetinizin bittiği kaydedildi! Ortalama adet süreniz güncellendi ve Foliküler Evreye geçildi. 🪷', ur:'حیض کے اختتام کا ریکارڈ محفوظ کر لیا گیا! 🪷', de:'Periodenende gespeichert! Durchschn. Dauer aktualisiert. 🪷', es:'¡Fin del período registrado! Promedio actualizado. 🪷', fr:'Fin des règles enregistrée ! Durée moyenne mise à jour. 🪷', ru:'Конец месячных записан! Средняя длительность обновлена. 🪷', zh:'已记录经期结束！已更新平均天数。 🪷', hi:'मासिक धर्म का अंत रिकॉर्ड किया गया! 🪷', ar:'تم تسجيل نهاية الدورة! 🪷', bn:'পিরিয়ড সমাপ্তি রেকর্ড করা হয়েছে! 🪷', pt:'Fim da menstruação registrado! Média atualizada. 🪷' },
+  period_ended_toast: { en:'Period end recorded! Average duration updated & switched to Follicular Phase. ', tr:'Adetinizin bittiği kaydedildi! Ortalama adet süreniz güncellendi ve Foliküler Evreye geçildi. ', ur:'حیض کے اختتام کا ریکارڈ محفوظ کر لیا گیا! ', de:'Periodenende gespeichert! Durchschn. Dauer aktualisiert. ', es:'¡Fin del período registrado! Promedio actualizado. ', fr:'Fin des règles enregistrée ! Durée moyenne mise à jour. ', ru:'Конец месячных записан! Средняя длительность обновлена. ', zh:'已记录经期结束！已更新平均天数。 ', hi:'मासिक धर्म का अंत रिकॉर्ड किया गया! ', ar:'تم تسجيل نهاية الدورة! ', bn:'পিরিয়ড সমাপ্তি রেকর্ড করা হয়েছে! ', pt:'Fim da menstruação registrado! Média atualizada. ' },
   period_ended_badge: { en:'Early Period End', tr:'Erken Adet Bitişi', ur:'حیض کا جلدی اختتام', de:'Frühes Periodenende', es:'Fin prematuro del período', fr:'Fin précoce des règles', ru:'Раннее окончание месячных', zh:'月经提前结束', hi:'प्रारंभिक अवधि अंत', ar:'نهاية الدورة المبكرة', bn:'প্রাথমিক পিরিয়ড সমাপ্তি', pt:'Fim precoce da menstruação' },
   resume_period_btn: { en:'Resume Period Log', tr:'Adet Kaydına Devam Et', ur:'حیض کے لاگ کو جاری رکھیں', de:'Periodeneintrag fortsetzen', es:'Reanudar registro de período', fr:'Reprendre le suivi des règles', ru:'Возобновить запись месячных', zh:'恢复经期记录', hi:'मासिक धर्म लॉग फिर से शुरू करें', ar:'استئناف سجل الدورة', bn:'পিরিয়ড লগ আবার শুরু করুন', pt:'Retomar registro de menstruação' },
   mood_tracker_title: { tr:'Ruh Hali Takibi', ru:'Отслеживание настроения', zh:'情绪追踪', es:'Rastreador de ánimo', hi:'मनोदशा ट्रैकर', fr:'Suivi de l\'humeur', ar:'تتبع المزاج', bn:'মেজাজ ট্র্যাকার', pt:'Rastreamento de humor', ur:'مزاج کا ٹریکر', de:'Stimmungs-Tracker' },
@@ -698,7 +698,7 @@ const MOCK_JOURNALS = [
   { id: 1, date: '2026-07-22', content: "Feeling a bit off today. My bloating is more than usual. Going to try cutting down on salt this week. Also tried that new chamomile tea before bed and slept really well!", tags: ['wellness','sleep'] },
   { id: 2, date: '2026-07-19', content: "Amazing workout! Did 5K in the morning. Energy levels are through the roof right now — this must be the ovulation phase energy boost I've read about. Tracking really is helping me understand my body.", tags: ['exercise','energy'] },
   { id: 3, date: '2026-07-15', content: "Started noticing the usual pre-ovulation signs. Cervical mucus changing, BBT still low. Feeling hopeful and taking my supplements.", tags: ['fertility','tracking'] },
-  { id: 4, date: '2026-07-08', content: "Day 3 of my period. Cramps were pretty bad yesterday but today it's more manageable. Hot water bottle and Netflix are my best friends right now. 🪷", tags: ['period','selfcare'] },
+  { id: 4, date: '2026-07-08', content: "Day 3 of my period. Cramps were pretty bad yesterday but today it's more manageable. Hot water bottle and Netflix are my best friends right now. ", tags: ['period','selfcare'] },
 ];
 const MOCK_NOTIFICATIONS = [
   { id: 1, type: 'prediction', icon: '📅', title: 'Period in 11 days', body: 'Your next period is predicted to start on August 3rd.', time: '2 hours ago', read: false },
@@ -1410,7 +1410,7 @@ function renderSplash() {
   return `
   <div class="splash-screen">
     <div class="splash-logo-wrapper">
-      <div class="splash-logo-circle">🪷</div>
+      <div class="splash-logo-circle"></div>
       <div class="splash-app-name">Flowia</div>
     </div>
     <p class="splash-tagline">Your cycle, your story.<br>Know yourself better.</p>
@@ -1451,7 +1451,7 @@ function showErrorModal(title, message, icon = '⚠️', onCloseCallback = null)
         ${message}
       </div>
       <button class="btn btn-primary" style="padding:12px" onclick="if(window._errorModalCallback){window._errorModalCallback();}else{closeProfileEditModal();}">
-        🪷 ${isTr ? 'Anladım, Tekrar Dene' : 'Got it, Try Again'}
+         ${isTr ? 'Anladım, Tekrar Dene' : 'Got it, Try Again'}
       </button>
     </div>`;
 
@@ -1522,7 +1522,7 @@ function doLogin() {
   loadUserSession(email);
   state.isLoggedIn = true;
   saveToStorage();
-  showToast(isTr ? 'Başarıyla giriş yapıldı! 🪷' : 'Login successful! 🪷');
+  showToast(isTr ? 'Başarıyla giriş yapıldı! ' : 'Login successful! ');
   navigate('home', 'refresh');
   return true;
 }
@@ -1561,7 +1561,7 @@ function renderLogin() {
           ${LANGUAGES.map(l => `<option value="${l.code}" style="background:#2D2638;color:#FFFFFF;padding:8px" ${(state.lang||'tr') === l.code ? 'selected' : ''}>${l.flag} ${l.name} (${l.code.toUpperCase()})</option>`).join('')}
         </select>
       </div>
-      <div class="auth-logo-sm">🪷</div>
+      <div class="auth-logo-sm"></div>
       <div class="auth-title">${t('welcome_back')}</div>
       <div class="auth-subtitle">${t('sign_in_sub')}</div>
     </div>
@@ -2037,7 +2037,7 @@ function completePasswordReset() {
   }
 
   closeProfileEditModal();
-  showToast(isTr ? 'Şifreniz başarıyla güncellendi! Yeni şifrenizle giriş yapabilirsiniz. 🪷' : 'Password updated successfully! You can now log in. 🪷');
+  showToast(isTr ? 'Şifreniz başarıyla güncellendi! Yeni şifrenizle giriş yapabilirsiniz. ' : 'Password updated successfully! You can now log in. ');
 
   setTimeout(() => {
     const emailField = document.getElementById('login-email');
@@ -2060,12 +2060,12 @@ function renderRegister() {
           ${LANGUAGES.map(l => `<option value="${l.code}" style="background:#2D2638;color:#FFFFFF;padding:8px" ${(state.lang||'tr') === l.code ? 'selected' : ''}>${l.flag} ${l.name} (${l.code.toUpperCase()})</option>`).join('')}
         </select>
       </div>
-      <div class="auth-logo-sm">🪷</div>
+      <div class="auth-logo-sm"></div>
       <div class="auth-title">${(state.lang||'tr')==='tr'?'Hesap Oluştur':'Create Account'}</div>
       <div class="auth-subtitle">${(state.lang||'tr')==='tr'?'Kişisel döngü yolculuğunuza hemen başlayın':'Start your cycle tracking journey'}</div>
     </div>
     <div class="auth-body">
-      <button class="btn btn-primary mt-4" onclick="openRegisterModal()">🪷 ${(state.lang||'tr')==='tr'?'Hesap Oluşturma Penceresini Aç':'Open Registration Modal'}</button>
+      <button class="btn btn-primary mt-4" onclick="openRegisterModal()"> ${(state.lang||'tr')==='tr'?'Hesap Oluşturma Penceresini Aç':'Open Registration Modal'}</button>
       <div class="auth-footer mt-4">
         ${(state.lang||'tr')==='tr'?'Zaten hesabınız var mı?':'Already have an account?'} <a class="auth-link" onclick="closeProfileEditModal(); resetTempAuthFields(); navigate('login','back')">${(state.lang||'tr')==='tr'?'Giriş Yap':'Log In'}</a>
       </div>
@@ -2125,13 +2125,13 @@ function openRegisterStep1() {
       </div>
     </div>`;
 
-  openProfileEditModal('🪷', title, sub, bodyHtml, () => {
+  openProfileEditModal('', title, sub, bodyHtml, () => {
     return proceedToEmailVerification();
   });
 
   const saveBtn = document.getElementById('pem-save-btn');
   if (saveBtn) {
-    saveBtn.innerHTML = `🪷 ${t('continue_email_verification')}`;
+    saveBtn.innerHTML = ` ${t('continue_email_verification')}`;
     saveBtn.style.display = 'block';
   }
 }
@@ -2474,7 +2474,7 @@ function renderOnboarding() {
     <div class="onboard-nav">
       ${step > 1 ? `<button class="btn btn-outline" style="flex:1" onclick="state.onboardStep--; navigate('onboarding','back')">${isTr ? 'Geri' : 'Back'}</button>` : ''}
       <button class="btn btn-primary" style="flex:2" onclick="nextOnboardStep()">
-        ${step < 4 ? (isTr ? 'Devam Et' : 'Continue') : (isTr ? '🪷 Başlayalım' : 'Get Started 🪷')}
+        ${step < 4 ? (isTr ? 'Devam Et' : 'Continue') : (isTr ? ' Başlayalım' : 'Get Started ')}
       </button>
     </div>
     <div style="text-align:center;margin-top:16px;font-size:12px;color:var(--text-3)">${isTr ? `Adım ${step} / 4` : `Step ${step} of 4`}</div>
@@ -2506,7 +2506,7 @@ function nextOnboardStep() {
     state.onboardStep = 1;
     PREDICTIONS = computePredictions();
     saveToStorage();
-    showToast((state.lang || 'tr') === 'tr' ? 'Profiliniz ve döngü tahminleriniz hazırlandı! 🪷' : 'Your profile and cycle predictions are ready! 🪷');
+    showToast((state.lang || 'tr') === 'tr' ? 'Profiliniz ve döngü tahminleriniz hazırlandı! ' : 'Your profile and cycle predictions are ready! ');
     navigate('home', 'refresh');
   }
 }
@@ -2560,7 +2560,7 @@ function resumePeriodLog() {
   state.actualPeriodLength = null;
   PREDICTIONS = computePredictions();
   saveToStorage();
-  showToast((state.lang || 'tr') === 'tr' ? 'Adet takibi varsayılan süresine döndürüldü. 🪷' : 'Period tracking reset to default length. 🪷');
+  showToast((state.lang || 'tr') === 'tr' ? 'Adet takibi varsayılan süresine döndürüldü. ' : 'Period tracking reset to default length. ');
   navigate(state.screen || 'home', 'refresh');
 }
 
@@ -2602,7 +2602,7 @@ function renderHome() {
     <div class="home-header">
       <div class="home-header-top">
         <div>
-          <div class="greeting-name">${greeting}, ${state.user.name} 🪷</div>
+          <div class="greeting-name">${greeting}, ${state.user.name} </div>
           <div class="greeting-date">${dateStr}</div>
         </div>
         <div class="notif-btn" onclick="navigate('notifications')">
@@ -3095,7 +3095,7 @@ function savePeriodLog() {
   PREDICTIONS = computePredictions();
   saveToStorage();
   updateDynamicNotifications();
-  showToast(isTr ? 'Adet kaydı başarıyla eklendi! 🪷' : 'Period logged successfully! 🪷');
+  showToast(isTr ? 'Adet kaydı başarıyla eklendi! ' : 'Period logged successfully! ');
   navigate('home', 'back');
 }
 
@@ -3555,7 +3555,7 @@ function openNewJournalModal() {
 
     saveToStorage();
     navigate('journal', 'refresh');
-    showToast((isTr ? 'Günlük yazısı başarıyla eklendi!' : 'Journal entry saved!') + ' 📝🪷');
+    showToast((isTr ? 'Günlük yazısı başarıyla eklendi!' : 'Journal entry saved!') + ' 📝');
     return true;
   });
 }
@@ -3608,7 +3608,7 @@ function renderReports() {
         <div class="hs-value">84</div>
         <div class="hs-desc">${t('health_score_desc')}</div>
       </div>
-      <div class="hs-circle">🪷</div>
+      <div class="hs-circle"></div>
     </div>
 
     <!-- Stats Row (100% Dynamic from user entries) -->
@@ -3706,7 +3706,7 @@ function generateHealthReportPDF() {
       <!-- Report Document Header -->
       <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #E8789A;padding-bottom:14px;margin-bottom:16px">
         <div>
-          <div style="font-size:22px;font-weight:800;color:#E8789A;display:flex;align-items:center;gap:8px">🪷 Flowia</div>
+          <div style="font-size:22px;font-weight:800;color:#E8789A;display:flex;align-items:center;gap:8px"> Flowia</div>
           <div style="font-size:11px;font-weight:700;color:#64748B;letter-spacing:0.5px;margin-top:2px">${reportTitle}</div>
         </div>
         <div style="text-align:right;font-size:11px;color:#64748B">
@@ -4063,7 +4063,7 @@ function openProfileEditModal(icon, title, sub, bodyHtml, saveCallback = null) {
 
   if (hasValidCallback) {
     saveBtn.style.display = 'block';
-    saveBtn.textContent = (state.lang || 'tr') === 'tr' ? '🪷 Değişiklikleri Kaydet' : '🪷 Save Changes';
+    saveBtn.textContent = (state.lang || 'tr') === 'tr' ? ' Değişiklikleri Kaydet' : ' Save Changes';
     saveBtn.onclick = () => {
       const res = saveCallback();
       if (res !== false) {
@@ -4129,7 +4129,7 @@ function editUserName() {
     state.user.initials = val.charAt(0).toUpperCase();
     saveToStorage();
     navigate('profile', 'refresh');
-    showToast((isTr ? 'İsim ve Soyad başarıyla güncellendi!' : 'Full name updated successfully!') + ' 👤🪷');
+    showToast((isTr ? 'İsim ve Soyad başarıyla güncellendi!' : 'Full name updated successfully!') + ' 👤');
     return true;
   });
 }
@@ -4361,7 +4361,7 @@ function editGoals() {
   const sub = isTr ? 'Uygulamayı kullanma amaçlarınızı seçin' : 'Select your goals for using the app';
 
   const goalsList = [
-    { key: 'Track my cycle', label: isTr ? '🪷 Döngümü takip etmek istiyorum' : '🪷 Track my menstrual cycle' },
+    { key: 'Track my cycle', label: isTr ? ' Döngümü takip etmek istiyorum' : ' Track my menstrual cycle' },
     { key: 'Manage PCOS', label: isTr ? '🎀 Polikistik Over (PCOS) Yönetimi' : '🎀 Manage PCOS symptoms' },
     { key: 'Fertility tracking', label: isTr ? '👶 Gebe Kalma / Doğurganlık Takibi' : '👶 Fertility & Conception tracking' },
     { key: 'Symptom & mood tracking', label: isTr ? '📊 Semptom ve Ruh Hali Takibi' : '📊 Symptom & mood tracking' }
@@ -4439,7 +4439,7 @@ function manageSubscriptionModal() {
     
     const bodyHtml = `
       <div style="text-align:center;padding:16px 8px">
-        <div style="font-size:42px;margin-bottom:10px">🪷</div>
+        <div style="font-size:42px;margin-bottom:10px"></div>
         <div style="font-size:16px;font-weight:700;color:var(--text-1);margin-bottom:6px">${isTr ? 'Şu anda Ücretsiz Plan Kullanıyorsunuz' : 'You are currently on the Free Plan'}</div>
         <div style="font-size:13px;color:var(--text-2);line-height:1.4;margin-bottom:20px">${isTr ? 'Yapay zeka içgörülerine, detaylı grafiklere ve sınırsız geçmiş takibine erişmek için Premium\'a geçin.' : 'Upgrade to access AI insights, advanced charts, and full cycle history.'}</div>
         <button class="btn btn-primary" onclick="closeProfileEditModal(); navigate('premium')">${isTr ? '✨ Şimdi Premium\'a Yükselt' : '✨ Upgrade Now'}</button>
@@ -4481,7 +4481,7 @@ function cancelSubscription() {
           ${isTr ? '❌ Otomatik Yenilemeyi İptal Et' : '❌ Confirm Cancellation'}
         </button>
         <button class="btn btn-primary" style="padding:10px;font-size:13px;font-weight:700" onclick="closeProfileEditModal()">
-          ${isTr ? '🪷 İptal Etmekten Vazgeç (Premium Kalsın)' : '🪷 Keep My Premium Subscription'}
+          ${isTr ? ' İptal Etmekten Vazgeç (Premium Kalsın)' : ' Keep My Premium Subscription'}
         </button>
       </div>
     </div>`;
@@ -4994,7 +4994,7 @@ function openDeleteDataModal() {
           ${isTr ? '🗑️ Evet, Tüm Verilerimi Kalıcı Olarak Sil' : '🗑️ Yes, Permanently Delete All Data'}
         </button>
         <button class="btn btn-primary" style="padding:10px;font-size:13px;font-weight:700" onclick="closeProfileEditModal()">
-          ${isTr ? '🪷 İptal Et (Verilerimi Koru)' : '🪷 Cancel (Keep My Data)'}
+          ${isTr ? ' İptal Et (Verilerimi Koru)' : ' Cancel (Keep My Data)'}
         </button>
       </div>
     </div>`;
@@ -5184,7 +5184,7 @@ function renderPremium() {
 
   const btnText = isAnnual 
     ? (isTr ? '🌟 Yıllık Planı Başlat' : '🌟 Start Annual Plan')
-    : (isTr ? '🪷 Aylık Planı Başlat' : '🪷 Start Monthly Plan');
+    : (isTr ? ' Aylık Planı Başlat' : ' Start Monthly Plan');
 
   const subCommit = isTr 
     ? '7 gün ücretsiz deneme • İstediğin zaman iptal et • Taahhüt yok' 
@@ -5287,7 +5287,7 @@ function openPaymentCheckoutModal() {
     <div style="background:var(--surface-2);border-radius:var(--r-xl);padding:14px;border:1px solid var(--border-light);margin-bottom:14px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:22px">🪷</span>
+          <span style="font-size:22px"></span>
           <div>
             <div style="font-size:14px;font-weight:700;color:var(--text-1)">Flowia Premium</div>
             <div style="font-size:11px;color:var(--text-2);margin-top:2px">${planName}</div>
@@ -5389,7 +5389,7 @@ function openPremiumWelcomeModal() {
 
   const bodyHtml = `
     <div style="background:linear-gradient(135deg,rgba(255,215,0,0.18),rgba(232,120,154,0.18));padding:16px;border-radius:var(--r-xl);text-align:center;margin-bottom:16px;border:1px solid rgba(255,215,0,0.4)">
-      <div style="font-size:32px;margin-bottom:4px">🎉 🪷 ⭐</div>
+      <div style="font-size:32px;margin-bottom:4px">🎉  ⭐</div>
       <div style="font-size:16px;font-weight:800;color:var(--text-1)">${isTr ? 'Tebrikler! Üyeliğiniz Aktif Edildi' : 'Congratulations! Premium Activated'}</div>
       <div style="font-size:12px;color:var(--text-2);margin-top:4px">${isTr ? 'Artık uygulamanın tüm gelişmiş yapay zeka gücüne sahipsiniz.' : 'You now have full access to all AI health analytics.'}</div>
     </div>
@@ -5409,7 +5409,7 @@ function openPremiumWelcomeModal() {
     </div>
 
     <button class="btn btn-primary" style="width:100%;font-weight:700;padding:12px" onclick="closeProfileEditModal(); navigate('home', 'refresh'); showToast('${isTr ? '🌟 Premium Ayrıcalıkları Aktif!' : '🌟 Premium Benefits Active!'}')">
-      ${isTr ? '🪷 Ayrıcalıkları Keşfetmeye Başla' : '🪷 Start Exploring Benefits'}
+      ${isTr ? ' Ayrıcalıkları Keşfetmeye Başla' : ' Start Exploring Benefits'}
     </button>`;
 
   openProfileEditModal('⭐', title, sub, bodyHtml, () => {});
