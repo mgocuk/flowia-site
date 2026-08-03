@@ -595,7 +595,7 @@ function computePredictions() {
 
   // Average cycle: computed from actual logged cycles if ≥3 exist
   let avgCycle = (state && state.onboardData && state.onboardData.cycleLength) || 28;
-  let avgPeriod = (state && state.user && state.user.avgPeriod) || (state && state.onboardData && state.onboardData.periodLength) || 5;
+  let avgPeriod = (state && state.user && (state && state.user && state.user.avgPeriod ? state.user.avgPeriod : 5)) || (state && state.onboardData && state.onboardData.periodLength) || 5;
   let effectivePeriodLength = (state && state.periodEndedEarly && state.actualPeriodLength) ? state.actualPeriodLength : avgPeriod;
 
   if (state && state.cycles && state.cycles.length >= 3) {
@@ -1054,7 +1054,7 @@ function loadUserSession(email, name = '', dob = '') {
         state.user.initials = name.trim().charAt(0).toUpperCase();
       }
 
-      PREDICTIONS = computePredictions(state.user.lastPeriodDate || TODAY_STR, state.user.avgCycle || 28, state.user.avgPeriod || 5);
+      PREDICTIONS = computePredictions(state.user.lastPeriodDate || TODAY_STR, state.user.avgCycle || 28, (state && state.user && state.user.avgPeriod ? state.user.avgPeriod : 5) || 5);
       CloudSync.startAutoSync(email);
       saveToStorage();
       return true;
@@ -1072,7 +1072,7 @@ function loadUserSession(email, name = '', dob = '') {
   state.journals = [];
   state.isLoggedIn = true;
 
-  PREDICTIONS = computePredictions(state.user.lastPeriodDate || TODAY_STR, state.user.avgCycle, state.user.avgPeriod);
+  PREDICTIONS = computePredictions(state.user.lastPeriodDate || TODAY_STR, state.user.avgCycle, (state && state.user && state.user.avgPeriod ? state.user.avgPeriod : 5));
   saveToStorage();
   return true;
 }
@@ -2535,7 +2535,8 @@ function markPeriodEndedToday() {
   state.actualPeriodLength = cDay;
 
   if (!state.user) state.user = {};
-  if (!state.user.avgPeriod) state.user.avgPeriod = 5;
+  if (!state.user) state.user = { name: 'Flowia Kullanıcısı', email: '', avgCycle: 28, avgPeriod: 5, initials: 'F' };
+  if (!(state && state.user && state.user.avgPeriod ? state.user.avgPeriod : 5)) state.user.avgPeriod = 5;
 
   // Update matching cycle in state.cycles so its recorded endDate matches early period end
   if (PREDICTIONS && PREDICTIONS.lastPeriodDate && state.cycles) {
@@ -2602,7 +2603,7 @@ function renderHome() {
     <div class="home-header">
       <div class="home-header-top">
         <div>
-          <div class="greeting-name">${greeting}, ${state.user.name} </div>
+          <div class="greeting-name">${greeting}, ${(state && state.user && state.user.name) ? state.user.name : 'Flowia Kullanıcısı'} </div>
           <div class="greeting-date">${dateStr}</div>
         </div>
         <div class="notif-btn" onclick="navigate('notifications')">
@@ -2666,7 +2667,7 @@ function renderHome() {
     <div style="margin: -4px 16px 16px; background: rgba(102,187,106,0.12); border: 1px solid rgba(102,187,106,0.3); border-radius: var(--r-md); padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; animation: fadeInUp 0.3s ease both">
       <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--success); font-weight: 600;">
         <span>✨</span>
-        <span>${t('period_ended_badge')}: ${state.actualPeriodLength} ${t('days_label')} (${t('avg_period_length')}: ${state.user.avgPeriod} ${t('days_label')})</span>
+        <span>${t('period_ended_badge')}: ${state.actualPeriodLength} ${t('days_label')} (${t('avg_period_length')}: ${(state && state.user && (state && state.user && state.user.avgPeriod ? state.user.avgPeriod : 5)) ? (state && state.user && state.user.avgPeriod ? state.user.avgPeriod : 5) : 5} ${t('days_label')})</span>
       </div>
       <button class="btn-link" onclick="resumePeriodLog()" style="font-size: 11px; color: var(--text-2); text-decoration: underline;">
         ${t('resume_period_btn')}
@@ -3056,7 +3057,7 @@ function savePeriodLog() {
 
     // Append to historical cycles list without overwriting history
     const newLogDate = new Date(state.logDate + 'T00:00:00');
-    const defaultPeriodDays = (state.user && state.user.avgPeriod) ? state.user.avgPeriod : 5;
+    const defaultPeriodDays = (state.user && (state && state.user && state.user.avgPeriod ? state.user.avgPeriod : 5)) ? (state && state.user && state.user.avgPeriod ? state.user.avgPeriod : 5) : 5;
     const endDate = addDays(newLogDate, defaultPeriodDays - 1);
     
     if (!state.cycles) state.cycles = [];
@@ -3571,7 +3572,7 @@ function renderReports() {
 
   // 2. Dynamic Period Length
   const cycleList = state.cycles || [];
-  let avgPeriodVal = (state.user && state.user.avgPeriod) || 5;
+  let avgPeriodVal = (state.user && (state && state.user && state.user.avgPeriod ? state.user.avgPeriod : 5)) || 5;
   if (cycleList.length > 0) {
     const pSum = cycleList.reduce((acc, c) => acc + (c.periodDays || 5), 0);
     avgPeriodVal = Math.round(pSum / cycleList.length);
@@ -3837,7 +3838,7 @@ function runAIInsightEngine() {
     tagColor: '#2E7D32',
     premium: false,
     title: t('ai_title_cycle_steady'),
-    body: `${namePrefix}${t('ai_title_cycle_steady')} (${t('avg_cycle_length')}: ${state.user.avgCycle || 28} ${t('days_label')}, ${t('avg_period_length')}: ${state.user.avgPeriod || 5} ${t('days_label')}, ${t('cycle_variation')}: ${cycleVar} ${t('days_label')}).`
+    body: `${namePrefix}${t('ai_title_cycle_steady')} (${t('avg_cycle_length')}: ${state.user.avgCycle || 28} ${t('days_label')}, ${t('avg_period_length')}: ${(state && state.user && state.user.avgPeriod ? state.user.avgPeriod : 5) || 5} ${t('days_label')}, ${t('cycle_variation')}: ${cycleVar} ${t('days_label')}).`
   });
 
   // 2. Real-time Symptom Guidance AI Engine (Adapts dynamically to newly logged symptoms)
@@ -4192,7 +4193,7 @@ function editAvgCycle() {
       if (!isNaN(num)) {
         state.user.avgCycle = num;
         if (state.onboardData) state.onboardData.cycleLength = num;
-        PREDICTIONS = computePredictions(state.user.lastPeriodDate || TODAY_STR, state.user.avgCycle, state.user.avgPeriod);
+        PREDICTIONS = computePredictions(state.user.lastPeriodDate || TODAY_STR, state.user.avgCycle, (state && state.user && state.user.avgPeriod ? state.user.avgPeriod : 5));
         saveToStorage();
         navigate('profile', 'refresh');
         showToast((isTr ? `Ortalama döngü ${num} gün olarak güncellendi!` : `Avg cycle updated to ${num} days!`) + ' 🔄');
@@ -4203,7 +4204,7 @@ function editAvgCycle() {
 
 function editAvgPeriod() {
   const isTr = (state.lang || 'tr') === 'tr';
-  const current = state.user.avgPeriod || 5;
+  const current = (state && state.user && state.user.avgPeriod ? state.user.avgPeriod : 5) || 5;
 
   const title = isTr ? 'Ortalama Adet Süresi' : 'Average Period Duration';
   const sub = isTr ? '2 ile 10 gün arasında adet süresi ayarlayın' : 'Set your period duration between 2 and 10 days';
@@ -4227,7 +4228,7 @@ function editAvgPeriod() {
       if (!isNaN(num)) {
         state.user.avgPeriod = num;
         if (state.onboardData) state.onboardData.periodLength = num;
-        PREDICTIONS = computePredictions(state.user.lastPeriodDate || TODAY_STR, state.user.avgCycle, state.user.avgPeriod);
+        PREDICTIONS = computePredictions(state.user.lastPeriodDate || TODAY_STR, state.user.avgCycle, (state && state.user && state.user.avgPeriod ? state.user.avgPeriod : 5));
         saveToStorage();
         navigate('profile', 'refresh');
         showToast((isTr ? `Ortalama adet süresi ${num} gün olarak güncellendi!` : `Avg period updated to ${num} days!`) + ' 🩸');
@@ -5690,8 +5691,8 @@ function initCharts() {
         datasets: [{
           label: 'Period Days',
           data: isMonthly 
-            ? [5, 5, 4, 5, 5, (state.periodEndedEarly && state.actualPeriodLength) ? state.actualPeriodLength : (state.user.avgPeriod || 5)] 
-            : [5.2, 5.0, 4.8, 5.1, 5.0, (state.user.avgPeriod || 5)],
+            ? [5, 5, 4, 5, 5, (state.periodEndedEarly && state.actualPeriodLength) ? state.actualPeriodLength : ((state && state.user && state.user.avgPeriod ? state.user.avgPeriod : 5) || 5)] 
+            : [5.2, 5.0, 4.8, 5.1, 5.0, ((state && state.user && state.user.avgPeriod ? state.user.avgPeriod : 5) || 5)],
           backgroundColor: 'rgba(239, 83, 80, 0.75)',
           borderColor: '#EF5350',
           borderWidth: 1.5,
@@ -5826,7 +5827,8 @@ function init() {
   } catch(e) {}
 
   try {
-    if (!state.user || !state.user.email || !state.isLoggedIn) {
+    if (!state.user) state.user = { name: 'Flowia Kullanıcısı', email: '', avgCycle: 28, avgPeriod: 5, initials: 'F' };
+    if (!state.user.email || !state.isLoggedIn) {
       state.isLoggedIn = false;
       if (!state.cycles) state.cycles = [];
       if (!state.symptoms) state.symptoms = [];
