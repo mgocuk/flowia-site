@@ -615,11 +615,23 @@ function computePredictions() {
   const cycleDay  = Math.max(1, diffDays + 1);
 
   // Ovulation: luteal phase is fixed at ~14 days before next period
-  const ovulationDayNum = avgCycle - 14;  // day-in-cycle when ovulation occurs
-  // addDays is hoisted (function declaration), safe to call here
-  const ovulationDate  = addDays(lastPeriodDate, ovulationDayNum - 1);
-  const fertileStart   = addDays(ovulationDate, -5);    // sperm survival window
-  const fertileEnd     = ovulationDate;                  // peak day
+  let ovulationDayNum = avgCycle - 14;
+  let fertileStartDayNum = ovulationDayNum - 5;
+  let fertileEndDayNum = ovulationDayNum + 1;
+
+  if (state && state.periodEndedEarly && state.actualPeriodLength) {
+    const savedDays = avgPeriod - state.actualPeriodLength;
+    if (savedDays > 0) {
+      const shift = Math.floor(savedDays / 2);
+      ovulationDayNum = Math.max(state.actualPeriodLength + 5, ovulationDayNum - shift);
+      fertileStartDayNum = state.actualPeriodLength + 1;
+      fertileEndDayNum = ovulationDayNum + 1;
+    }
+  }
+
+  const ovulationDate = addDays(lastPeriodDate, ovulationDayNum - 1);
+  const fertileStart  = addDays(lastPeriodDate, fertileStartDayNum - 1);
+  const fertileEnd    = addDays(lastPeriodDate, fertileEndDayNum - 1);
 
   // Next period dates
   const nextPeriodStart = addDays(lastPeriodDate, avgCycle);
