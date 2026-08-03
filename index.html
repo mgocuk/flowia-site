@@ -1,225 +1,841 @@
 <!DOCTYPE html>
-<html lang="tr" dir="ltr">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-
-  <!-- =====================================================================
-       SEO & Meta Description
-       ===================================================================== -->
-  <title>Flowia — Akıllı Döngü Takipçisi</title>
-  <meta name="description" content="Flowia — AI destekli adet döngüsü takibi, doğurganlık içgörüleri ve kadın sağlığı analitiği. Güvenli, özel ve kişiselleştirilmiş." />
-  <meta name="keywords" content="adet takibi, döngü takipçisi, doğurganlık, kadın sağlığı, period tracker" />
-  <meta name="author" content="Flowia" />
-  <meta name="robots" content="index, follow" />
-
-  <!-- =====================================================================
-       PWA Core
-       ===================================================================== -->
-  <link rel="manifest" href="./manifest.json" />
-  <meta name="theme-color" content="#E8789A" media="(prefers-color-scheme: light)" />
-  <meta name="theme-color" content="#1a0a12" media="(prefers-color-scheme: dark)" />
-  <meta name="mobile-web-app-capable" content="yes" />
-
-  <!-- =====================================================================
-       iOS / Safari PWA — Full App Store PWA Compliance
-       ===================================================================== -->
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Flowia" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png" />
-  <link rel="apple-touch-icon" sizes="152x152" href="./icon-152.png" />
-  <link rel="apple-touch-icon" sizes="120x120" href="./icon.png" />
-
-  <!-- iOS Splash Screens (portrait — common sizes) -->
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)"
-    href="./splash-1290x2796.png" />
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)"
-    href="./splash-1179x2556.png" />
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)"
-    href="./splash-1170x2532.png" />
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)"
-    href="./splash-1125x2436.png" />
-
-  <!-- =====================================================================
-       Microsoft / Windows Tile
-       ===================================================================== -->
-  <meta name="msapplication-TileColor" content="#E8789A" />
-  <meta name="msapplication-TileImage" content="./icon.png" />
-  <meta name="msapplication-tap-highlight" content="no" />
-
-  <!-- =====================================================================
-       Open Graph / Social Sharing
-       ===================================================================== -->
-  <meta property="og:title" content="Flowia — Döngünüz, Sizin Yolunuzla" />
-  <meta property="og:description" content="AI destekli adet döngüsü takibi, doğurganlık içgörüleri ve kadın sağlığı analitiği." />
-  <meta property="og:type" content="website" />
-  <meta property="og:image" content="./icon.png" />
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Flowia" />
-  <meta name="twitter:description" content="AI destekli kadın sağlığı uygulaması." />
-
-  <!-- =====================================================================
-       Security Headers (CSP) — XSS ve injection koruması
-       ===================================================================== -->
-  <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self' https:;
-             script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
-             style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-             font-src 'self' https://fonts.gstatic.com;
-             img-src 'self' data: blob: https:;
-             connect-src 'self' https:;
-             frame-ancestors 'self';" />
-  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
-
-  <!-- =====================================================================
-       Icons & Favicon
-       ===================================================================== -->
-  <link rel="icon" type="image/png" sizes="32x32" href="./favicon.png" />
-  <link rel="shortcut icon" href="./favicon.png" />
-
-  <!-- =====================================================================
-       Fonts (preloaded for performance)
-       ===================================================================== -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flowia – Your Cycle, Your Story</title>
+  <meta name="description" content="Flowia is the beautiful, private period & fertility tracker. Track your cycle, understand your body, and embrace every phase of your journey." />
+  <meta name="keywords" content="period tracker, cycle tracking, fertility, menstrual health, women health, Flowia" />
+  <meta property="og:title" content="Flowia – Your Cycle, Your Story" />
+  <meta property="og:description" content="Beautiful, private period & fertility tracking for every woman." />
+  <meta property="og:image" content="lily-logo.png" />
+  <link rel="icon" href="favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ===================== RESET & TOKENS ===================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --rose:       #e91e8c;
+      --rose-mid:   #f06292;
+      --rose-light: #f8bbd0;
+      --rose-pale:  #fce4ec;
+      --rose-paler: #fff0f5;
+      --white:      #ffffff;
+      --blush:      #fff5f8;
+      --text-dark:  #1a1a2e;
+      --text-mid:   #4a4060;
+      --text-soft:  #8b7ba0;
+      --border:     rgba(233, 30, 140, 0.12);
+      --shadow-sm:  0 2px 16px rgba(233,30,140,0.08);
+      --shadow-md:  0 8px 40px rgba(233,30,140,0.14);
+      --shadow-lg:  0 20px 80px rgba(233,30,140,0.18);
+      --radius-sm:  12px;
+      --radius-md:  20px;
+      --radius-lg:  32px;
+      --radius-xl:  48px;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--white);
+      color: var(--text-dark);
+      overflow-x: hidden;
+    }
 
-  <!-- =====================================================================
-       Chart.js (deferred for performance)
-       ===================================================================== -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+    /* ===================== NAV ===================== */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5%;
+      height: 72px;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      transition: box-shadow 0.3s;
+    }
+    nav.scrolled { box-shadow: var(--shadow-sm); }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-brand img { width: 38px; height: 38px; border-radius: 10px; }
+    .nav-brand span { font-size: 22px; font-weight: 800; background: linear-gradient(135deg, var(--rose), var(--rose-mid)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .nav-links { display: flex; align-items: center; gap: 32px; }
+    .nav-links a { text-decoration: none; color: var(--text-mid); font-size: 15px; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--rose); }
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .lang-switcher {
+      display: flex; align-items: center; gap: 4px;
+      background: var(--rose-pale); border: 1px solid var(--border);
+      border-radius: 20px; padding: 4px 6px;
+    }
+    .lang-btn {
+      padding: 4px 12px; border-radius: 14px; border: none;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; color: var(--text-soft); background: transparent;
+    }
+    .lang-btn.active { background: var(--rose); color: #fff; }
+    .nav-cta {
+      padding: 10px 22px; border-radius: 24px; border: none;
+      background: linear-gradient(135deg, var(--rose), var(--rose-mid));
+      color: #fff; font-size: 14px; font-weight: 700;
+      cursor: pointer; text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(233,30,140,0.3);
+    }
+    .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(233,30,140,0.4); }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+    .hamburger span { width: 24px; height: 2px; background: var(--text-mid); border-radius: 2px; transition: all 0.3s; }
 
-  <link rel="stylesheet" href="styles.css" />
+    /* ===================== HERO ===================== */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 100px 5% 60px;
+      background: linear-gradient(160deg, var(--blush) 0%, var(--white) 50%, var(--rose-paler) 100%);
+      position: relative; overflow: hidden;
+    }
+    .hero-bg-circle {
+      position: absolute; border-radius: 50%; pointer-events: none;
+    }
+    .hero-bg-circle.c1 {
+      width: 600px; height: 600px; top: -200px; right: -200px;
+      background: radial-gradient(circle, rgba(240,98,146,0.08) 0%, transparent 70%);
+    }
+    .hero-bg-circle.c2 {
+      width: 400px; height: 400px; bottom: -100px; left: -100px;
+      background: radial-gradient(circle, rgba(233,30,140,0.06) 0%, transparent 70%);
+    }
+    .hero-inner {
+      max-width: 1200px; width: 100%;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+      align-items: center; z-index: 1;
+    }
+    .hero-content { display: flex; flex-direction: column; gap: 28px; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, var(--rose-pale), var(--rose-paler));
+      border: 1px solid var(--rose-light); border-radius: 40px;
+      padding: 8px 18px; width: fit-content;
+    }
+    .hero-badge span { font-size: 13px; font-weight: 600; color: var(--rose); }
+    .hero-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--rose); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(40px, 5vw, 68px);
+      font-weight: 700; line-height: 1.12;
+      color: var(--text-dark);
+    }
+    .hero-title em { font-style: normal; background: linear-gradient(135deg, var(--rose), var(--rose-mid)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-subtitle { font-size: 18px; color: var(--text-mid); line-height: 1.7; max-width: 480px; }
+    .hero-store-row { display: flex; gap: 14px; flex-wrap: wrap; }
+    .store-btn {
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 22px; border-radius: var(--radius-md);
+      text-decoration: none; transition: all 0.25s;
+      border: 2px solid var(--border);
+    }
+    .store-btn.dark { background: #1a1a1a; border-color: #1a1a1a; }
+    .store-btn.light { background: var(--white); border-color: var(--border); }
+    .store-btn:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+    .store-btn.dark:hover { box-shadow: 0 10px 40px rgba(0,0,0,0.25); }
+    .store-btn-icon { font-size: 28px; line-height: 1; }
+    .store-btn-text { display: flex; flex-direction: column; }
+    .store-btn-sub { font-size: 11px; font-weight: 500; }
+    .store-btn-name { font-size: 17px; font-weight: 700; }
+    .store-btn.dark .store-btn-sub,
+    .store-btn.dark .store-btn-name { color: #fff; }
+    .store-btn.light .store-btn-sub { color: var(--text-soft); }
+    .store-btn.light .store-btn-name { color: var(--text-dark); }
+    .hero-stats { display: flex; gap: 32px; }
+    .hero-stat { display: flex; flex-direction: column; }
+    .hero-stat-num { font-size: 26px; font-weight: 800; color: var(--rose); }
+    .hero-stat-lbl { font-size: 13px; color: var(--text-soft); font-weight: 500; }
+
+    .hero-visual { display: flex; justify-content: center; align-items: center; position: relative; }
+    .hero-phone-wrap {
+      position: relative; width: 280px;
+    }
+    .hero-phone-glow {
+      position: absolute; inset: -40px;
+      background: radial-gradient(circle, rgba(233,30,140,0.15) 0%, transparent 70%);
+      border-radius: 50%; pointer-events: none;
+    }
+    .hero-phone {
+      width: 280px; height: 560px;
+      background: linear-gradient(160deg, #fff 0%, var(--rose-pale) 100%);
+      border-radius: 40px;
+      box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,0.8);
+      border: 1px solid var(--border);
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: space-around; padding: 30px 20px;
+      position: relative; overflow: hidden;
+    }
+    .hero-phone::before {
+      content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 100px; height: 28px; background: #1a1a1a; border-radius: 0 0 18px 18px;
+    }
+    .phone-logo { width: 80px; height: 80px; border-radius: 20px; box-shadow: var(--shadow-sm); margin-top: 16px; }
+    .phone-app-name { font-size: 22px; font-weight: 800; background: linear-gradient(135deg, var(--rose), var(--rose-mid)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .phone-calendar {
+      width: 100%; background: rgba(255,255,255,0.7); border-radius: 16px;
+      padding: 12px; border: 1px solid var(--border);
+    }
+    .cal-header { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-soft); margin-bottom: 8px; }
+    .cal-row { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
+    .cal-day {
+      aspect-ratio: 1; border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; font-size: 9px; font-weight: 500; color: var(--text-mid);
+    }
+    .cal-day.period { background: var(--rose); color: #fff; }
+    .cal-day.fertile { background: rgba(76,175,80,0.18); color: #2e7d32; }
+    .cal-day.ovulation { background: #4caf50; color: #fff; }
+    .cal-day.today { border: 2px solid var(--rose); color: var(--rose); font-weight: 700; }
+    .cal-day.predicted { background: rgba(233,30,140,0.1); color: var(--rose); }
+    .phone-phase {
+      background: linear-gradient(135deg, var(--rose), var(--rose-mid));
+      border-radius: 14px; padding: 10px 16px; width: 100%;
+      color: #fff; font-size: 12px; font-weight: 600;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .floating-card {
+      position: absolute; background: white; border-radius: 14px;
+      box-shadow: var(--shadow-md); border: 1px solid var(--border);
+      padding: 10px 14px; display: flex; align-items: center; gap: 8px;
+      font-size: 12px; font-weight: 600; white-space: nowrap;
+    }
+    .floating-card.fc1 { top: 80px; right: -80px; color: var(--rose); }
+    .floating-card.fc2 { bottom: 120px; left: -80px; color: #4caf50; }
+
+    /* ===================== FEATURES ===================== */
+    section { padding: 100px 5%; }
+    .section-label { font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--rose); margin-bottom: 14px; }
+    .section-title { font-family: 'Playfair Display', serif; font-size: clamp(30px, 3.5vw, 48px); font-weight: 700; line-height: 1.2; color: var(--text-dark); max-width: 600px; }
+    .section-sub { font-size: 17px; color: var(--text-mid); line-height: 1.7; max-width: 560px; margin-top: 16px; }
+    .section-header { text-align: center; margin-bottom: 64px; display: flex; flex-direction: column; align-items: center; }
+
+    .features-bg { background: var(--blush); }
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; max-width: 1200px; margin: 0 auto; }
+    .feature-card {
+      background: var(--white); border-radius: var(--radius-lg); padding: 36px 28px;
+      border: 1px solid var(--border);
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .feature-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--rose), var(--rose-mid));
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .feature-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-icon {
+      width: 56px; height: 56px; border-radius: 16px;
+      background: linear-gradient(135deg, var(--rose-pale), var(--rose-paler));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; margin-bottom: 20px;
+    }
+    .feature-title { font-size: 18px; font-weight: 700; color: var(--text-dark); margin-bottom: 10px; }
+    .feature-desc { font-size: 15px; color: var(--text-mid); line-height: 1.65; }
+
+    /* ===================== PRIVACY ===================== */
+    .privacy-section { background: var(--white); }
+    .privacy-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+    .privacy-visual {
+      background: linear-gradient(160deg, var(--rose-pale), var(--rose-paler));
+      border-radius: var(--radius-xl); padding: 48px 40px;
+      display: flex; flex-direction: column; gap: 20px;
+      border: 1px solid var(--border);
+    }
+    .privacy-item {
+      background: var(--white); border-radius: var(--radius-md); padding: 18px 20px;
+      display: flex; align-items: center; gap: 14px;
+      border: 1px solid var(--border);
+      transition: transform 0.2s;
+    }
+    .privacy-item:hover { transform: translateX(6px); }
+    .privacy-item-icon { font-size: 24px; }
+    .privacy-item-text { display: flex; flex-direction: column; gap: 2px; }
+    .privacy-item-title { font-size: 14px; font-weight: 700; color: var(--text-dark); }
+    .privacy-item-desc { font-size: 13px; color: var(--text-soft); }
+    .privacy-badge { display: flex; align-items: center; gap: 10px; padding: 14px 20px; background: linear-gradient(135deg, var(--rose), var(--rose-mid)); border-radius: var(--radius-md); color: #fff; }
+    .privacy-badge-icon { font-size: 24px; }
+    .privacy-badge-text { font-size: 14px; font-weight: 600; }
+    .privacy-links-row { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 24px; }
+    .privacy-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 20px; border-radius: 24px; text-decoration: none;
+      font-size: 14px; font-weight: 600;
+      border: 2px solid var(--rose-light);
+      color: var(--rose); background: var(--rose-paler);
+      transition: all 0.2s;
+    }
+    .privacy-link:hover { background: var(--rose); color: #fff; border-color: var(--rose); }
+
+    /* ===================== HOW IT WORKS ===================== */
+    .how-section { background: var(--blush); }
+    .steps-row { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; position: relative; }
+    .steps-row::before {
+      content: ''; position: absolute; top: 32px; left: 10%; right: 10%;
+      height: 2px; background: linear-gradient(90deg, var(--rose-light), var(--rose), var(--rose-light));
+      z-index: 0;
+    }
+    .step-card { display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; z-index: 1; }
+    .step-num {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--rose), var(--rose-mid));
+      color: #fff; font-size: 22px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(233,30,140,0.35);
+    }
+    .step-title { font-size: 16px; font-weight: 700; color: var(--text-dark); }
+    .step-desc { font-size: 14px; color: var(--text-soft); line-height: 1.6; }
+
+    /* ===================== DOWNLOAD CTA ===================== */
+    .download-section {
+      background: linear-gradient(160deg, #1a1a2e 0%, #2d1b3e 100%);
+      padding: 100px 5%;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .download-section::before {
+      content: ''; position: absolute; top: -150px; left: 50%; transform: translateX(-50%);
+      width: 700px; height: 700px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(233,30,140,0.15) 0%, transparent 70%);
+    }
+    .download-section .section-title { color: #fff; margin: 0 auto; text-align: center; }
+    .download-section .section-sub { color: rgba(255,255,255,0.65); text-align: center; margin: 16px auto 0; }
+    .download-btns { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 48px; }
+    .dl-btn {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px 28px; border-radius: var(--radius-md);
+      text-decoration: none; transition: all 0.25s;
+      font-size: 15px; font-weight: 700;
+    }
+    .dl-btn.apple { background: #fff; color: #1a1a1a; }
+    .dl-btn.google { background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.25); color: #fff; }
+    .dl-btn:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+    .dl-btn-icon { font-size: 30px; }
+    .dl-btn-text { display: flex; flex-direction: column; text-align: left; }
+    .dl-btn-sub { font-size: 11px; font-weight: 500; opacity: 0.7; }
+
+    /* ===================== FOOTER ===================== */
+    footer {
+      background: #1a1a1a; color: rgba(255,255,255,0.6);
+      padding: 60px 5% 32px;
+    }
+    .footer-inner { max-width: 1200px; margin: 0 auto; }
+    .footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+    .footer-brand { display: flex; flex-direction: column; gap: 14px; }
+    .footer-brand-row { display: flex; align-items: center; gap: 10px; }
+    .footer-brand-row img { width: 36px; height: 36px; border-radius: 9px; }
+    .footer-brand-row span { font-size: 20px; font-weight: 800; color: #fff; }
+    .footer-desc { font-size: 14px; line-height: 1.7; max-width: 260px; }
+    .footer-col h4 { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
+    .footer-col a { display: block; font-size: 14px; color: rgba(255,255,255,0.5); text-decoration: none; margin-bottom: 10px; transition: color 0.2s; }
+    .footer-col a:hover { color: var(--rose-mid); }
+    .footer-divider { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin-bottom: 24px; }
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .footer-bottom-text { font-size: 13px; }
+    .footer-bottom-heart { color: var(--rose-mid); }
+    .footer-langs { display: flex; gap: 8px; }
+    .footer-lang-btn { padding: 4px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); background: transparent; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); cursor: pointer; transition: all 0.2s; }
+    .footer-lang-btn:hover, .footer-lang-btn.active { border-color: var(--rose-mid); color: var(--rose-mid); }
+
+    /* ===================== TESTIMONIALS ===================== */
+    .testimonials-section { background: var(--white); }
+    .testimonials-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .testimonial-card {
+      background: var(--blush); border-radius: var(--radius-lg); padding: 28px;
+      border: 1px solid var(--border);
+      transition: transform 0.25s;
+    }
+    .testimonial-card:hover { transform: translateY(-4px); }
+    .stars { color: #ffc107; font-size: 14px; margin-bottom: 12px; }
+    .testimonial-text { font-size: 15px; color: var(--text-mid); line-height: 1.7; font-style: italic; margin-bottom: 20px; }
+    .testimonial-author { display: flex; align-items: center; gap: 10px; }
+    .author-avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--rose), var(--rose-mid)); display: flex; align-items: center; justify-content: center; font-size: 16px; color: #fff; font-weight: 700; }
+    .author-name { font-size: 14px; font-weight: 700; color: var(--text-dark); }
+    .author-country { font-size: 12px; color: var(--text-soft); }
+
+    /* ===================== RESPONSIVE ===================== */
+    @media(max-width:1024px) {
+      .hero-inner { grid-template-columns: 1fr; text-align: center; gap: 48px; }
+      .hero-content { align-items: center; }
+      .hero-subtitle { text-align: center; }
+      .hero-stats { justify-content: center; }
+      .hero-visual { display: none; }
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .privacy-inner { grid-template-columns: 1fr; }
+      .steps-row { grid-template-columns: repeat(2, 1fr); }
+      .steps-row::before { display: none; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+    }
+    @media(max-width:768px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .features-grid { grid-template-columns: 1fr; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .steps-row { grid-template-columns: 1fr 1fr; }
+      .footer-top { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+    }
+
+    /* ===================== ANIMATIONS ===================== */
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* Mobile nav drawer */
+    .mobile-nav { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 999; background: rgba(255,255,255,0.98); flex-direction: column; align-items: center; justify-content: center; gap: 32px; }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a { font-size: 24px; font-weight: 700; color: var(--text-dark); text-decoration: none; }
+    .mobile-nav-close { position: absolute; top: 24px; right: 24px; font-size: 28px; cursor: pointer; color: var(--text-mid); background: none; border: none; }
+  </style>
 </head>
 <body>
-  <!-- Skip to main content link for screen readers -->
-  <a href="#screen" class="skip-link" tabindex="0">Ana içeriğe geç</a>
 
-  <div id="app" role="application" aria-label="Flowia Uygulaması">
-    <div class="device-frame">
-      <!-- Status Bar -->
-      <div class="status-bar" role="banner" aria-hidden="true">
-        <span class="status-time" id="status-time" aria-live="off">11:06</span>
-        <div class="status-icons">
-          <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" aria-label="Sinyal gücü">
-            <rect x="0" y="3" width="3" height="9" rx="1"/>
-            <rect x="4.5" y="2" width="3" height="10" rx="1"/>
-            <rect x="9" y="0" width="3" height="12" rx="1"/>
-            <rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.3"/>
-          </svg>
-          <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" aria-label="WiFi">
-            <path d="M8 2C5.2 2 2.7 3.1 0.9 4.9L2.3 6.3C3.7 4.9 5.7 4 8 4s4.3.9 5.7 2.3l1.4-1.4C13.3 3.1 10.8 2 8 2z"/>
-            <path d="M8 6C6.3 6 4.8 6.7 3.7 7.8L5.1 9.2C5.8 8.5 6.9 8 8 8s2.2.5 2.9 1.2l1.4-1.4C11.2 6.7 9.7 6 8 6z"/>
-            <circle cx="8" cy="11" r="1.5"/>
-          </svg>
-          <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor" aria-label="Batarya">
-            <rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/>
-            <rect x="22.5" y="3.5" width="2" height="5" rx="1"/>
-            <rect x="1.5" y="2.5" width="16" height="7" rx="1" fill="currentColor"/>
-          </svg>
+  <!-- ===== NAV ===== -->
+  <nav id="main-nav">
+    <a class="nav-brand" href="#hero">
+      <img src="lily-logo.png" alt="Flowia Logo" />
+      <span>Flowia</span>
+    </a>
+    <div class="nav-links">
+      <a href="#features" data-tr="Özellikler" data-en="Features">Özellikler</a>
+      <a href="#privacy" data-tr="Gizlilik" data-en="Privacy">Gizlilik</a>
+      <a href="#how-it-works" data-tr="Nasıl Çalışır?" data-en="How It Works">Nasıl Çalışır?</a>
+      <a href="#reviews" data-tr="Yorumlar" data-en="Reviews">Yorumlar</a>
+    </div>
+    <div class="nav-actions">
+      <div class="lang-switcher">
+        <button class="lang-btn" onclick="setLang('tr')">🇹🇷 TR</button>
+        <button class="lang-btn" onclick="setLang('en')">🇬🇧 EN</button>
+      </div>
+      <a href="#download" class="nav-cta" data-tr="İndir" data-en="Download">İndir</a>
+    </div>
+    <div class="hamburger" id="hamburger" onclick="openMobileNav()">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- Mobile Nav -->
+  <div class="mobile-nav" id="mobile-nav">
+    <button class="mobile-nav-close" onclick="closeMobileNav()">✕</button>
+    <a href="#features" onclick="closeMobileNav()" data-tr="Özellikler" data-en="Features">Özellikler</a>
+    <a href="#privacy" onclick="closeMobileNav()" data-tr="Gizlilik" data-en="Privacy">Gizlilik</a>
+    <a href="#how-it-works" onclick="closeMobileNav()" data-tr="Nasıl Çalışır?" data-en="How It Works">Nasıl Çalışır?</a>
+    <a href="#reviews" onclick="closeMobileNav()" data-tr="Yorumlar" data-en="Reviews">Yorumlar</a>
+    <a href="#download" onclick="closeMobileNav()" class="nav-cta" data-tr="İndir" data-en="Download">İndir</a>
+  </div>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero" id="hero">
+    <div class="hero-bg-circle c1"></div>
+    <div class="hero-bg-circle c2"></div>
+    <div class="hero-inner">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <div class="dot"></div>
+          <span data-tr="Sağlığınız, Gizliliğiniz" data-en="Your Health, Your Privacy">Sağlığınız, Gizliliğiniz</span>
+        </div>
+        <h1 class="hero-title">
+          <span data-tr="Döngünüzü<br>Anlayın," data-en="Understand<br>Your Cycle,">Döngünüzü<br>Anlayın,</span><br>
+          <em data-tr="Kendinizi Keşfedin" data-en="Know Yourself">Kendinizi Keşfedin</em>
+        </h1>
+        <p class="hero-subtitle" data-tr="Flowia, sağlığınızı takip etmenin en zarif yolu. Adet takibi, doğurganlık penceresi, semptom kaydı ve yapay zeka ile kişiselleştirilmiş içgörüler — tamamen gizli ve güvende." data-en="Flowia is the most elegant way to track your health. Period tracking, fertility window, symptom log, and AI-personalized insights — completely private and secure.">
+          Flowia, sağlığınızı takip etmenin en zarif yolu. Adet takibi, doğurganlık penceresi, semptom kaydı ve yapay zeka ile kişiselleştirilmiş içgörüler — tamamen gizli ve güvende.
+        </p>
+        <div class="hero-store-row">
+          <a href="https://apps.apple.com/app/flowia" target="_blank" class="store-btn dark" id="hero-appstore">
+            <div class="store-btn-icon">🍎</div>
+            <div class="store-btn-text">
+              <span class="store-btn-sub" data-tr="App Store'dan İndir" data-en="Download on the">App Store'dan İndir</span>
+              <span class="store-btn-name">App Store</span>
+            </div>
+          </a>
+          <a href="https://play.google.com/store/apps/details?id=com.flowia.app" target="_blank" class="store-btn light" id="hero-playstore">
+            <div class="store-btn-icon">▶️</div>
+            <div class="store-btn-text">
+              <span class="store-btn-sub" data-tr="Google Play'den İndir" data-en="Get it on">Google Play'den İndir</span>
+              <span class="store-btn-name">Google Play</span>
+            </div>
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <span class="hero-stat-num">50K+</span>
+            <span class="hero-stat-lbl" data-tr="Aktif Kullanıcı" data-en="Active Users">Aktif Kullanıcı</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-num">4.9★</span>
+            <span class="hero-stat-lbl" data-tr="Kullanıcı Puanı" data-en="User Rating">Kullanıcı Puanı</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-num">%100</span>
+            <span class="hero-stat-lbl" data-tr="Gizlilik Odaklı" data-en="Privacy First">Gizlilik Odaklı</span>
+          </div>
         </div>
       </div>
 
-      <!-- Main screen container -->
-      <main id="screen" role="main" tabindex="-1"></main>
-
-      <!-- Bottom Navigation -->
-      <nav id="bottom-nav" style="display:none" aria-label="Ana Navigasyon">
-        <button class="nav-item active" id="nav-home" onclick="navigate('home')" aria-label="Ana Sayfa" aria-current="page">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-          <span>Home</span>
-        </button>
-        <button class="nav-item" id="nav-calendar" onclick="navigate('calendar')" aria-label="Takvim">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/></svg>
-          <span>Calendar</span>
-        </button>
-        <button class="nav-item nav-fab" id="nav-log" onclick="openLogSheet()" aria-label="Kayıt Ekle">
-          <div class="fab-inner" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      <!-- Phone mockup -->
+      <div class="hero-visual">
+        <div class="hero-phone-wrap">
+          <div class="hero-phone-glow"></div>
+          <div class="hero-phone">
+            <img src="lily-logo.png" alt="Flowia" class="phone-logo" />
+            <div class="phone-app-name">Flowia</div>
+            <div class="phone-calendar">
+              <div class="cal-header">
+                <span>Ağustos 2026</span>
+                <span>August 2026</span>
+              </div>
+              <div class="cal-row" style="font-weight:700;color:var(--text-soft);font-size:8px;margin-bottom:4px;">
+                <span style="text-align:center">Pz</span>
+                <span style="text-align:center">Pt</span>
+                <span style="text-align:center">Sa</span>
+                <span style="text-align:center">Ça</span>
+                <span style="text-align:center">Pe</span>
+                <span style="text-align:center">Cu</span>
+                <span style="text-align:center">Ct</span>
+              </div>
+              <div class="cal-row">
+                <div class="cal-day"></div>
+                <div class="cal-day"></div>
+                <div class="cal-day"></div>
+                <div class="cal-day"></div>
+                <div class="cal-day"></div>
+                <div class="cal-day today">1</div>
+                <div class="cal-day period">2</div>
+              </div>
+              <div class="cal-row">
+                <div class="cal-day period">3</div>
+                <div class="cal-day period">4</div>
+                <div class="cal-day period">5</div>
+                <div class="cal-day"></div>
+                <div class="cal-day"></div>
+                <div class="cal-day"></div>
+                <div class="cal-day fertile">9</div>
+              </div>
+              <div class="cal-row">
+                <div class="cal-day fertile">10</div>
+                <div class="cal-day fertile">11</div>
+                <div class="cal-day fertile">12</div>
+                <div class="cal-day fertile">13</div>
+                <div class="cal-day ovulation">14</div>
+                <div class="cal-day">15</div>
+                <div class="cal-day">16</div>
+              </div>
+              <div class="cal-row">
+                <div class="cal-day">17</div>
+                <div class="cal-day">18</div>
+                <div class="cal-day">19</div>
+                <div class="cal-day">20</div>
+                <div class="cal-day">21</div>
+                <div class="cal-day">22</div>
+                <div class="cal-day">23</div>
+              </div>
+              <div class="cal-row">
+                <div class="cal-day predicted">29</div>
+                <div class="cal-day predicted">30</div>
+                <div class="cal-day predicted">31</div>
+              </div>
+            </div>
+            <div class="phone-phase">
+              <span>🌸 Foliküler Evre</span>
+              <span>14 gün</span>
+            </div>
           </div>
-        </button>
-        <button class="nav-item" id="nav-reports" onclick="navigate('reports')" aria-label="Raporlar">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm5-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-          <span>Reports</span>
-        </button>
-        <button class="nav-item" id="nav-profile" onclick="navigate('profile')" aria-label="Profil">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-          <span>Profile</span>
-        </button>
-      </nav>
+          <div class="floating-card fc1">🔔 <span data-tr="3 güne kadar adet" data-en="Period in 3 days">3 güne kadar adet</span></div>
+          <div class="floating-card fc2">🌿 <span data-tr="Doğurganlık penceresi" data-en="Fertility window">Doğurganlık penceresi</span></div>
+        </div>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Log Bottom Sheet -->
-  <div id="log-sheet-overlay" class="sheet-overlay" onclick="closeLogSheet()" aria-hidden="true"></div>
-  <div id="log-sheet" class="bottom-sheet" role="dialog" aria-modal="true" aria-label="Günlük Kayıt Seçenekleri">
-    <div class="sheet-handle" aria-hidden="true"></div>
-    <h3 class="sheet-title">Log Today</h3>
-    <div class="log-options">
-      <button class="log-option" onclick="closeLogSheet(); navigate('log-period')" aria-label="Adet Kaydet">
-        <div class="log-option-icon" style="background:linear-gradient(135deg,#FF6B9D,#FF4081)" aria-hidden="true">🩸</div>
-        <div class="log-option-info">
-          <span class="log-option-label">Log Period</span>
-          <span class="log-option-desc">Track your flow</span>
-        </div>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="#ccc" aria-hidden="true"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
-      </button>
-      <button class="log-option" onclick="closeLogSheet(); navigate('symptoms')" aria-label="Semptom Kaydet">
-        <div class="log-option-icon" style="background:linear-gradient(135deg,#9B72CF,#7C4DFF)" aria-hidden="true">💊</div>
-        <div class="log-option-info">
-          <span class="log-option-label">Log Symptoms</span>
-          <span class="log-option-desc">Physical &amp; emotional</span>
-        </div>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="#ccc" aria-hidden="true"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
-      </button>
-      <button class="log-option" onclick="closeLogSheet(); navigate('mood')" aria-label="Ruh Hali Kaydet">
-        <div class="log-option-icon" style="background:linear-gradient(135deg,#FFA726,#FF6D00)" aria-hidden="true">😊</div>
-        <div class="log-option-info">
-          <span class="log-option-label">Log Mood</span>
-          <span class="log-option-desc">How are you feeling?</span>
-        </div>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="#ccc" aria-hidden="true"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
-      </button>
-      <button class="log-option" onclick="closeLogSheet(); navigate('journal')" aria-label="Günlük Yaz">
-        <div class="log-option-icon" style="background:linear-gradient(135deg,#66BB6A,#2E7D32)" aria-hidden="true">📝</div>
-        <div class="log-option-info">
-          <span class="log-option-label">Journal Entry</span>
-          <span class="log-option-desc">Write your thoughts</span>
-        </div>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="#ccc" aria-hidden="true"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
-      </button>
+  <!-- ===== FEATURES ===== -->
+  <section class="features-bg" id="features">
+    <div class="section-header reveal">
+      <div class="section-label" data-tr="ÖZELLİKLER" data-en="FEATURES">ÖZELLİKLER</div>
+      <h2 class="section-title" data-tr="Sağlığınıza özel tasarlandı" data-en="Designed for your health">Sağlığınıza özel tasarlandı</h2>
+      <p class="section-sub" data-tr="Flowia, döngünüzü anlamak ve bedeninizi dinlemek için ihtiyacınız olan her şeyi sunar." data-en="Flowia provides everything you need to understand your cycle and listen to your body.">Flowia, döngünüzü anlamak ve bedeninizi dinlemek için ihtiyacınız olan her şeyi sunar.</p>
     </div>
-  </div>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon">📅</div>
+        <div class="feature-title" data-tr="Döngü Takvimi" data-en="Cycle Calendar">Döngü Takvimi</div>
+        <div class="feature-desc" data-tr="Adet günlerinizi, doğurganlık pencerenizi ve ovülasyon günü renkli ve sezgisel bir takvimde takip edin." data-en="Track your period days, fertility window, and ovulation day on a beautiful, color-coded calendar.">Adet günlerinizi, doğurganlık pencerenizi ve ovülasyon günü renkli ve sezgisel bir takvimde takip edin.</div>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon">🌿</div>
+        <div class="feature-title" data-tr="Doğurganlık Takibi" data-en="Fertility Tracking">Doğurganlık Takibi</div>
+        <div class="feature-desc" data-tr="Tıbbi ACOG standartlarına göre doğurganlık pencerenizi ve yumurtlama gününüzü hassas biçimde öğrenin." data-en="Know your fertility window and ovulation day with precision, based on ACOG medical standards.">Tıbbi ACOG standartlarına göre doğurganlık pencerenizi ve yumurtlama gününüzü hassas biçimde öğrenin.</div>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon">🧠</div>
+        <div class="feature-title" data-tr="Yapay Zeka İçgörüleri" data-en="AI Health Insights">Yapay Zeka İçgörüleri</div>
+        <div class="feature-desc" data-tr="Kişiselleştirilmiş yapay zeka analizleriyle döngünüz hakkında anlamlı içgörüler edinin." data-en="Get meaningful personalized insights about your cycle with AI-powered analysis.">Kişiselleştirilmiş yapay zeka analizleriyle döngünüz hakkında anlamlı içgörüler edinin.</div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">💊</div>
+        <div class="feature-title" data-tr="Semptom & Ruh Hali Kaydı" data-en="Symptom & Mood Log">Semptom & Ruh Hali Kaydı</div>
+        <div class="feature-desc" data-tr="Her gün nasıl hissettğinizi kaydedin; ağrı, ruh hali, enerji seviyenizi ve daha fazlasını takip edin." data-en="Log how you feel every day — pain, mood, energy levels and more.">Her gün nasıl hissettğinizi kaydedin; ağrı, ruh hali, enerji seviyenizi ve daha fazlasını takip edin.</div>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon">📊</div>
+        <div class="feature-title" data-tr="Sağlık Raporları" data-en="Health Reports">Sağlık Raporları</div>
+        <div class="feature-desc" data-tr="Döngü uzunluğu, semptom örüntüleri ve trend analizlerini içeren detaylı aylık raporlar." data-en="Detailed monthly reports with cycle length, symptom patterns, and trend analysis.">Döngü uzunluğu, semptom örüntüleri ve trend analizlerini içeren detaylı aylık raporlar.</div>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon">🔔</div>
+        <div class="feature-title" data-tr="Akıllı Bildirimler" data-en="Smart Reminders">Akıllı Bildirimler</div>
+        <div class="feature-desc" data-tr="Adet başlangıcı, doğurganlık penceresi ve günlük kayıt için kişiselleştirilmiş, nazik bildirimler." data-en="Personalized, gentle reminders for period start, fertility window, and daily logging.">Adet başlangıcı, doğurganlık penceresi ve günlük kayıt için kişiselleştirilmiş, nazik bildirimler.</div>
+      </div>
+    </div>
+  </section>
 
-  <!-- Profile Edit Modal -->
-  <div id="profile-edit-modal-overlay" class="custom-modal-overlay" onclick="closeProfileEditModal()" role="presentation">
-    <div class="custom-modal-box" onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="pem-title">
-      <div class="sheet-handle" aria-hidden="true"></div>
-      <div class="modal-header-row">
-        <div class="modal-title-wrap">
-          <div class="modal-icon-badge" id="pem-icon" aria-hidden="true">📅</div>
+  <!-- ===== PRIVACY ===== -->
+  <section class="privacy-section" id="privacy">
+    <div class="privacy-inner">
+      <div class="reveal">
+        <div class="section-label" data-tr="GİZLİLİK" data-en="PRIVACY">GİZLİLİK</div>
+        <h2 class="section-title" data-tr="Verileriniz sizin, başkasının değil" data-en="Your data is yours — no one else's">Verileriniz sizin, başkasının değil</h2>
+        <p class="section-sub" data-tr="Flowia ile sağlık bilgileriniz cihazınızda güvende. Sunucularımıza hiçbir özel veri gönderilmez. KVKK ve GDPR ile tam uyumlu." data-en="With Flowia, your health data stays safe on your device. No private data is ever sent to our servers. Fully compliant with GDPR and KVKK.">Flowia ile sağlık bilgileriniz cihazınızda güvende. Sunucularımıza hiçbir özel veri gönderilmez. KVKK ve GDPR ile tam uyumlu.</p>
+        <div class="privacy-links-row">
+          <a href="privacy-policy.html" class="privacy-link">🛡️ <span data-tr="Gizlilik Politikası" data-en="Privacy Policy">Gizlilik Politikası</span></a>
+          <a href="terms-of-service.html" class="privacy-link">📄 <span data-tr="Kullanım Koşulları" data-en="Terms of Service">Kullanım Koşulları</span></a>
+        </div>
+      </div>
+      <div class="privacy-visual reveal reveal-delay-1">
+        <div class="privacy-item">
+          <div class="privacy-item-icon">📱</div>
+          <div class="privacy-item-text">
+            <div class="privacy-item-title" data-tr="Cihaz İçi Depolama" data-en="On-Device Storage">Cihaz İçi Depolama</div>
+            <div class="privacy-item-desc" data-tr="Verileriniz yalnızca telefonunuzda saklanır" data-en="Your data is stored only on your phone">Verileriniz yalnızca telefonunuzda saklanır</div>
+          </div>
+        </div>
+        <div class="privacy-item">
+          <div class="privacy-item-icon">🚫</div>
+          <div class="privacy-item-text">
+            <div class="privacy-item-title" data-tr="Üçüncü Taraf Paylaşımı Yok" data-en="No Third-Party Sharing">Üçüncü Taraf Paylaşımı Yok</div>
+            <div class="privacy-item-desc" data-tr="Sağlık verileriniz asla satılmaz veya paylaşılmaz" data-en="Your health data is never sold or shared">Sağlık verileriniz asla satılmaz veya paylaşılmaz</div>
+          </div>
+        </div>
+        <div class="privacy-item">
+          <div class="privacy-item-icon">🔐</div>
+          <div class="privacy-item-text">
+            <div class="privacy-item-title" data-tr="Şifreli & Güvenli" data-en="Encrypted & Secure">Şifreli & Güvenli</div>
+            <div class="privacy-item-desc" data-tr="Tüm veriler uçtan uca şifreleme ile korunur" data-en="All data is protected with end-to-end encryption">Tüm veriler uçtan uca şifreleme ile korunur</div>
+          </div>
+        </div>
+        <div class="privacy-item">
+          <div class="privacy-item-icon">⚖️</div>
+          <div class="privacy-item-text">
+            <div class="privacy-item-title" data-tr="KVKK & GDPR Uyumlu" data-en="GDPR & KVKK Compliant">KVKK & GDPR Uyumlu</div>
+            <div class="privacy-item-desc" data-tr="Tüm yasal veri koruma standartlarını karşılar" data-en="Meets all legal data protection standards">Tüm yasal veri koruma standartlarını karşılar</div>
+          </div>
+        </div>
+        <div class="privacy-badge">
+          <div class="privacy-badge-icon">🛡️</div>
+          <div class="privacy-badge-text" data-tr="Flowia hiçbir zaman kişisel sağlık verilerinizi sunucularımıza göndermez." data-en="Flowia never sends your personal health data to our servers.">Flowia hiçbir zaman kişisel sağlık verilerinizi sunucularımıza göndermez.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HOW IT WORKS ===== -->
+  <section class="how-section" id="how-it-works">
+    <div class="section-header reveal">
+      <div class="section-label" data-tr="NASIL ÇALIŞIR?" data-en="HOW IT WORKS">NASIL ÇALIŞIR?</div>
+      <h2 class="section-title" data-tr="4 adımda başlayın" data-en="Get started in 4 steps">4 adımda başlayın</h2>
+    </div>
+    <div class="steps-row">
+      <div class="step-card reveal">
+        <div class="step-num">1</div>
+        <div class="step-title" data-tr="İndirin" data-en="Download">İndirin</div>
+        <div class="step-desc" data-tr="App Store veya Google Play'den ücretsiz indirin." data-en="Download free from the App Store or Google Play.">App Store veya Google Play'den ücretsiz indirin.</div>
+      </div>
+      <div class="step-card reveal reveal-delay-1">
+        <div class="step-num">2</div>
+        <div class="step-title" data-tr="Profilinizi Oluşturun" data-en="Create Your Profile">Profilinizi Oluşturun</div>
+        <div class="step-desc" data-tr="Döngü uzunluğunuzu ve son adet tarihinizi girin." data-en="Enter your cycle length and last period date.">Döngü uzunluğunuzu ve son adet tarihinizi girin.</div>
+      </div>
+      <div class="step-card reveal reveal-delay-2">
+        <div class="step-num">3</div>
+        <div class="step-title" data-tr="Takibe Başlayın" data-en="Start Tracking">Takibe Başlayın</div>
+        <div class="step-desc" data-tr="Günlük semptomlarınızı, ruh halinizi ve gözlemlerinizi kaydedin." data-en="Log your daily symptoms, mood, and observations.">Günlük semptomlarınızı, ruh halinizi ve gözlemlerinizi kaydedin.</div>
+      </div>
+      <div class="step-card reveal reveal-delay-3">
+        <div class="step-num">4</div>
+        <div class="step-title" data-tr="İçgörüleri Keşfedin" data-en="Discover Insights">İçgörüleri Keşfedin</div>
+        <div class="step-desc" data-tr="Yapay zeka destekli içgörüler ve sağlık raporlarınızı inceleyin." data-en="Explore AI-powered insights and your personalized health reports.">Yapay zeka destekli içgörüler ve sağlık raporlarınızı inceleyin.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== REVIEWS ===== -->
+  <section class="testimonials-section" id="reviews">
+    <div class="section-header reveal">
+      <div class="section-label" data-tr="KULLANICI YORUMLARI" data-en="USER REVIEWS">KULLANICI YORUMLARI</div>
+      <h2 class="section-title" data-tr="Kullanıcılarımız ne diyor?" data-en="What our users say">Kullanıcılarımız ne diyor?</h2>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card reveal">
+        <div class="stars">★★★★★</div>
+        <div class="testimonial-text" data-tr='"Flowia hayatımı değiştirdi. Artık döngümü çok daha iyi anlıyorum ve her evreyi sabırsızlıkla bekliyorum."' data-en='"Flowia changed my life. I understand my cycle so much better now, and I look forward to each phase."'>"Flowia hayatımı değiştirdi. Artık döngümü çok daha iyi anlıyorum ve her evreyi sabırsızlıkla bekliyorum."</div>
+        <div class="testimonial-author">
+          <div class="author-avatar">A</div>
           <div>
-            <div class="modal-title-text" id="pem-title">Doğum Tarihi</div>
-            <div class="modal-sub-text" id="pem-sub">Düzenlemek için seçim yapın</div>
+            <div class="author-name">Ayşe K.</div>
+            <div class="author-country">🇹🇷 Türkiye</div>
           </div>
         </div>
-        <button class="modal-close-btn" onclick="closeProfileEditModal()" aria-label="Kapat">✕</button>
       </div>
-      <div class="modal-content-body" id="pem-body"></div>
-      <button class="btn btn-primary" id="pem-save-btn">Kaydet</button>
+      <div class="testimonial-card reveal reveal-delay-1">
+        <div class="stars">★★★★★</div>
+        <div class="testimonial-text" data-tr='"Gizlilik odaklı yapısı beni çok etkiledi. Sağlık verilerimin güvende olduğunu bilmek çok önemli."' data-en='"The privacy-first approach impressed me so much. Knowing my health data is safe matters so much."'>"The privacy-first approach impressed me so much. Knowing my health data is safe matters so much."</div>
+        <div class="testimonial-author">
+          <div class="author-avatar">S</div>
+          <div>
+            <div class="author-name">Sarah M.</div>
+            <div class="author-country">🇬🇧 United Kingdom</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal reveal-delay-2">
+        <div class="stars">★★★★★</div>
+        <div class="testimonial-text" data-tr='"Arayüzü çok zarif ve kullanımı çok kolay. Her kadın bu uygulamayı kullanmalı!"' data-en='"The interface is so elegant and easy to use. Every woman should have this app!"'>"The interface is so elegant and easy to use. Every woman should have this app!"</div>
+        <div class="testimonial-author">
+          <div class="author-avatar">M</div>
+          <div>
+            <div class="author-name">María G.</div>
+            <div class="author-country">🇪🇸 España</div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <!-- ARIA Live Region for screen readers -->
-  <div id="aria-live-region" class="sr-only" aria-live="polite" aria-atomic="true" role="status"></div>
+  <!-- ===== DOWNLOAD ===== -->
+  <section class="download-section" id="download">
+    <div class="section-title reveal" style="margin:0 auto">
+      <span data-tr="Bugün ücretsiz indirin" data-en="Download free today">Bugün ücretsiz indirin</span>
+    </div>
+    <p class="section-sub reveal" data-tr="App Store ve Google Play'de mevcut. Binlerce kadınla sağlık yolculuğunuza başlayın." data-en="Available on the App Store and Google Play. Start your health journey with thousands of women.">App Store ve Google Play'de mevcut. Binlerce kadınla sağlık yolculuğunuza başlayın.</p>
+    <div class="download-btns reveal">
+      <a href="https://apps.apple.com/app/flowia" target="_blank" class="dl-btn apple">
+        <div class="dl-btn-icon">🍎</div>
+        <div class="dl-btn-text">
+          <span class="dl-btn-sub" data-tr="App Store'dan İndir" data-en="Download on the">Download on the</span>
+          <span data-tr="App Store" data-en="App Store">App Store</span>
+        </div>
+      </a>
+      <a href="https://play.google.com/store/apps/details?id=com.flowia.app" target="_blank" class="dl-btn google">
+        <div class="dl-btn-icon">▶️</div>
+        <div class="dl-btn-text">
+          <span class="dl-btn-sub" data-tr="Google Play'den İndir" data-en="Get it on">Get it on</span>
+          <span data-tr="Google Play" data-en="Google Play">Google Play</span>
+        </div>
+      </a>
+    </div>
+  </section>
 
-  <!-- App script (defer for faster initial paint) -->
-  <script src="app.js"></script>
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="footer-brand-row">
+            <img src="lily-logo.png" alt="Flowia" />
+            <span>Flowia</span>
+          </div>
+          <p class="footer-desc" data-tr="Her kadın için zarif, gizli ve akıllı döngü takip uygulaması." data-en="The elegant, private, and smart cycle tracking app for every woman.">Her kadın için zarif, gizli ve akıllı döngü takip uygulaması.</p>
+        </div>
+        <div class="footer-col">
+          <h4 data-tr="Uygulama" data-en="App">Uygulama</h4>
+          <a href="https://apps.apple.com/app/flowia" target="_blank" data-tr="App Store" data-en="App Store">App Store</a>
+          <a href="https://play.google.com/store/apps/details?id=com.flowia.app" target="_blank" data-tr="Google Play" data-en="Google Play">Google Play</a>
+          <a href="#features" data-tr="Özellikler" data-en="Features">Özellikler</a>
+          <a href="#how-it-works" data-tr="Nasıl Çalışır?" data-en="How It Works">Nasıl Çalışır?</a>
+        </div>
+        <div class="footer-col">
+          <h4 data-tr="Hukuki" data-en="Legal">Hukuki</h4>
+          <a href="privacy-policy.html" data-tr="Gizlilik Politikası" data-en="Privacy Policy">Gizlilik Politikası</a>
+          <a href="terms-of-service.html" data-tr="Kullanım Koşulları" data-en="Terms of Service">Kullanım Koşulları</a>
+          <a href="#privacy" data-tr="Veri Güvenliği" data-en="Data Security">Veri Güvenliği</a>
+        </div>
+        <div class="footer-col">
+          <h4 data-tr="İletişim" data-en="Contact">İletişim</h4>
+          <a href="mailto:support@flowia.app">support@flowia.app</a>
+          <a href="#" data-tr="Instagram" data-en="Instagram">Instagram</a>
+          <a href="#" data-tr="Twitter / X" data-en="Twitter / X">Twitter / X</a>
+        </div>
+      </div>
+      <hr class="footer-divider" />
+      <div class="footer-bottom">
+        <div class="footer-bottom-text">
+          © 2026 Flowia. <span data-tr="Tüm hakları saklıdır." data-en="All rights reserved.">Tüm hakları saklıdır.</span>
+          <span class="footer-bottom-heart"> ♥ </span>
+          <span data-tr="Sevgiyle yapıldı" data-en="Made with love">Sevgiyle yapıldı</span>
+        </div>
+        <div class="footer-langs">
+          <button class="footer-lang-btn" onclick="setLang('tr')">🇹🇷 Türkçe</button>
+          <button class="footer-lang-btn" onclick="setLang('en')">🇬🇧 English</button>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* ===== LANGUAGE SYSTEM ===== */
+    let currentLang = localStorage.getItem('flowia-lang') || 'tr';
+
+    function setLang(lang) {
+      currentLang = lang;
+      localStorage.setItem('flowia-lang', lang);
+      document.documentElement.lang = lang;
+
+      document.querySelectorAll('[data-tr]').forEach(el => {
+        const text = el.getAttribute('data-' + lang);
+        if (text) {
+          if (el.tagName === 'INPUT' && el.type === 'placeholder') {
+            el.placeholder = text;
+          } else {
+            el.innerHTML = text;
+          }
+        }
+      });
+
+      // Update active lang buttons
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.includes(lang.toUpperCase()));
+      });
+      document.querySelectorAll('.footer-lang-btn').forEach(btn => {
+        btn.classList.toggle('active',
+          (lang === 'tr' && btn.textContent.includes('Türkçe')) ||
+          (lang === 'en' && btn.textContent.includes('English'))
+        );
+      });
+    }
+
+    /* ===== NAV SCROLL ===== */
+    window.addEventListener('scroll', () => {
+      document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+
+    /* ===== MOBILE NAV ===== */
+    function openMobileNav() { document.getElementById('mobile-nav').classList.add('open'); }
+    function closeMobileNav() { document.getElementById('mobile-nav').classList.remove('open'); }
+
+    /* ===== REVEAL ON SCROLL ===== */
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    /* ===== INIT ===== */
+    setLang(currentLang);
+  </script>
 </body>
 </html>
