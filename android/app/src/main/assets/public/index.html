@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="tr" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+
+  <!-- =====================================================================
+       SEO & Meta Description
+       ===================================================================== -->
+  <title>Flowia — Akıllı Döngü Takipçisi</title>
+  <meta name="description" content="Flowia — AI destekli adet döngüsü takibi, doğurganlık içgörüleri ve kadın sağlığı analitiği. Güvenli, özel ve kişiselleştirilmiş." />
+  <meta name="keywords" content="adet takibi, döngü takipçisi, doğurganlık, kadın sağlığı, period tracker" />
+  <meta name="author" content="Flowia" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- =====================================================================
+       PWA Core
+       ===================================================================== -->
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#E8789A" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#1a0a12" media="(prefers-color-scheme: dark)" />
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <!-- =====================================================================
+       iOS / Safari PWA — Full App Store PWA Compliance
+       ===================================================================== -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Flowia" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="./icon-152.png" />
+  <link rel="apple-touch-icon" sizes="120x120" href="./icon.png" />
+
+  <!-- iOS Splash Screens (portrait — common sizes) -->
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)"
+    href="./splash-1290x2796.png" />
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)"
+    href="./splash-1179x2556.png" />
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)"
+    href="./splash-1170x2532.png" />
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)"
+    href="./splash-1125x2436.png" />
+
+  <!-- =====================================================================
+       Microsoft / Windows Tile
+       ===================================================================== -->
+  <meta name="msapplication-TileColor" content="#E8789A" />
+  <meta name="msapplication-TileImage" content="./icon.png" />
+  <meta name="msapplication-tap-highlight" content="no" />
+
+  <!-- =====================================================================
+       Open Graph / Social Sharing
+       ===================================================================== -->
+  <meta property="og:title" content="Flowia — Döngünüz, Sizin Yolunuzla" />
+  <meta property="og:description" content="AI destekli adet döngüsü takibi, doğurganlık içgörüleri ve kadın sağlığı analitiği." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="./icon.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Flowia" />
+  <meta name="twitter:description" content="AI destekli kadın sağlığı uygulaması." />
+
+  <!-- =====================================================================
+       Security Headers (CSP) — XSS ve injection koruması
+       ===================================================================== -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self' https:;
+             script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
+             style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+             font-src 'self' https://fonts.gstatic.com;
+             img-src 'self' data: blob: https:;
+             connect-src 'self' https:;
+             frame-ancestors 'none';" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+
+  <!-- =====================================================================
+       Icons & Favicon
+       ===================================================================== -->
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon.png" />
+  <link rel="shortcut icon" href="./favicon.png" />
+
+  <!-- =====================================================================
+       Fonts (preloaded for performance)
+       ===================================================================== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- =====================================================================
+       Chart.js (deferred for performance)
+       ===================================================================== -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Skip to main content link for screen readers -->
+  <a href="#screen" class="skip-link" tabindex="0">Ana içeriğe geç</a>
+
+  <div id="app" role="application" aria-label="Flowia Uygulaması">
+    <div class="device-frame">
+      <!-- Status Bar -->
+      <div class="status-bar" role="banner" aria-hidden="true">
+        <span class="status-time" id="status-time" aria-live="off">11:06</span>
+        <div class="status-icons">
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" aria-label="Sinyal gücü">
+            <rect x="0" y="3" width="3" height="9" rx="1"/>
+            <rect x="4.5" y="2" width="3" height="10" rx="1"/>
+            <rect x="9" y="0" width="3" height="12" rx="1"/>
+            <rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.3"/>
+          </svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" aria-label="WiFi">
+            <path d="M8 2C5.2 2 2.7 3.1 0.9 4.9L2.3 6.3C3.7 4.9 5.7 4 8 4s4.3.9 5.7 2.3l1.4-1.4C13.3 3.1 10.8 2 8 2z"/>
+            <path d="M8 6C6.3 6 4.8 6.7 3.7 7.8L5.1 9.2C5.8 8.5 6.9 8 8 8s2.2.5 2.9 1.2l1.4-1.4C11.2 6.7 9.7 6 8 6z"/>
+            <circle cx="8" cy="11" r="1.5"/>
+          </svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor" aria-label="Batarya">
+            <rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/>
+            <rect x="22.5" y="3.5" width="2" height="5" rx="1"/>
+            <rect x="1.5" y="2.5" width="16" height="7" rx="1" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Main screen container -->
+      <main id="screen" role="main" tabindex="-1"></main>
+
+      <!-- Bottom Navigation -->
+      <nav id="bottom-nav" style="display:none" aria-label="Ana Navigasyon">
+        <button class="nav-item active" id="nav-home" onclick="navigate('home')" aria-label="Ana Sayfa" aria-current="page">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+          <span>Home</span>
+        </button>
+        <button class="nav-item" id="nav-calendar" onclick="navigate('calendar')" aria-label="Takvim">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/></svg>
+          <span>Calendar</span>
+        </button>
+        <button class="nav-item nav-fab" id="nav-log" onclick="openLogSheet()" aria-label="Kayıt Ekle">
+          <div class="fab-inner" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          </div>
+        </button>
+        <button class="nav-item" id="nav-reports" onclick="navigate('reports')" aria-label="Raporlar">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm5-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+          <span>Reports</span>
+        </button>
+        <button class="nav-item" id="nav-profile" onclick="navigate('profile')" aria-label="Profil">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+          <span>Profile</span>
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Log Bottom Sheet -->
+  <div id="log-sheet-overlay" class="sheet-overlay" onclick="closeLogSheet()" aria-hidden="true"></div>
+  <div id="log-sheet" class="bottom-sheet" role="dialog" aria-modal="true" aria-label="Günlük Kayıt Seçenekleri">
+    <div class="sheet-handle" aria-hidden="true"></div>
+    <h3 class="sheet-title">Log Today</h3>
+    <div class="log-options">
+      <button class="log-option" onclick="closeLogSheet(); navigate('log-period')" aria-label="Adet Kaydet">
+        <div class="log-option-icon" style="background:linear-gradient(135deg,#FF6B9D,#FF4081)" aria-hidden="true">🩸</div>
+        <div class="log-option-info">
+          <span class="log-option-label">Log Period</span>
+          <span class="log-option-desc">Track your flow</span>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#ccc" aria-hidden="true"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+      </button>
+      <button class="log-option" onclick="closeLogSheet(); navigate('symptoms')" aria-label="Semptom Kaydet">
+        <div class="log-option-icon" style="background:linear-gradient(135deg,#9B72CF,#7C4DFF)" aria-hidden="true">💊</div>
+        <div class="log-option-info">
+          <span class="log-option-label">Log Symptoms</span>
+          <span class="log-option-desc">Physical &amp; emotional</span>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#ccc" aria-hidden="true"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+      </button>
+      <button class="log-option" onclick="closeLogSheet(); navigate('mood')" aria-label="Ruh Hali Kaydet">
+        <div class="log-option-icon" style="background:linear-gradient(135deg,#FFA726,#FF6D00)" aria-hidden="true">😊</div>
+        <div class="log-option-info">
+          <span class="log-option-label">Log Mood</span>
+          <span class="log-option-desc">How are you feeling?</span>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#ccc" aria-hidden="true"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+      </button>
+      <button class="log-option" onclick="closeLogSheet(); navigate('journal')" aria-label="Günlük Yaz">
+        <div class="log-option-icon" style="background:linear-gradient(135deg,#66BB6A,#2E7D32)" aria-hidden="true">📝</div>
+        <div class="log-option-info">
+          <span class="log-option-label">Journal Entry</span>
+          <span class="log-option-desc">Write your thoughts</span>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#ccc" aria-hidden="true"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Profile Edit Modal -->
+  <div id="profile-edit-modal-overlay" class="custom-modal-overlay" onclick="closeProfileEditModal()" role="presentation">
+    <div class="custom-modal-box" onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="pem-title">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="modal-header-row">
+        <div class="modal-title-wrap">
+          <div class="modal-icon-badge" id="pem-icon" aria-hidden="true">📅</div>
+          <div>
+            <div class="modal-title-text" id="pem-title">Doğum Tarihi</div>
+            <div class="modal-sub-text" id="pem-sub">Düzenlemek için seçim yapın</div>
+          </div>
+        </div>
+        <button class="modal-close-btn" onclick="closeProfileEditModal()" aria-label="Kapat">✕</button>
+      </div>
+      <div class="modal-content-body" id="pem-body"></div>
+      <button class="btn btn-primary" id="pem-save-btn">Kaydet</button>
+    </div>
+  </div>
+
+  <!-- ARIA Live Region for screen readers -->
+  <div id="aria-live-region" class="sr-only" aria-live="polite" aria-atomic="true" role="status"></div>
+
+  <!-- App script (defer for faster initial paint) -->
+  <script src="app.js"></script>
+</body>
+</html>

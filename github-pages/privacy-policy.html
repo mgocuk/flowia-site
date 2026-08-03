@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gizlilik Politikası — Flowia</title>
+  <meta name="description" content="Flowia uygulaması için KVKK ve GDPR uyumlu gizlilik politikası. Verilerinizin nasıl korunduğunu öğrenin.">
+  <link rel="icon" href="./icon-32.png" type="image/png">
+  <style>
+    :root {
+      --primary: #E8789A;
+      --primary-dark: #C85C7E;
+      --bg: #FDF8FA;
+      --surface: #FFFFFF;
+      --text-1: #2D1B35;
+      --text-2: #7A6B7E;
+      --border: #F0E6EF;
+      --radius: 16px;
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text-1);
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(135deg, var(--primary), #C85C7E);
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    header .logo { font-size: 48px; margin-bottom: 12px; }
+    header h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+    header p { font-size: 15px; opacity: 0.9; }
+    .lang-toggle {
+      display: flex; justify-content: center; gap: 12px;
+      padding: 20px; background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .lang-btn {
+      padding: 8px 20px; border-radius: 20px;
+      border: 2px solid var(--primary); background: transparent;
+      color: var(--primary); font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .lang-btn.active { background: var(--primary); color: white; }
+    .container { max-width: 800px; margin: 0 auto; padding: 40px 20px 80px; }
+    .update-date {
+      background: rgba(232,120,154,0.1);
+      border: 1px solid rgba(232,120,154,0.3);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      font-size: 13px;
+      color: var(--primary-dark);
+      font-weight: 600;
+      margin-bottom: 32px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    section { margin-bottom: 36px; }
+    section h2 {
+      font-size: 20px; font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    section p { font-size: 15px; color: var(--text-2); margin-bottom: 12px; }
+    section ul {
+      padding-left: 20px; color: var(--text-2);
+      font-size: 15px;
+    }
+    section ul li { margin-bottom: 8px; }
+    .rights-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px; margin-top: 16px;
+    }
+    .right-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      text-align: center;
+    }
+    .right-card .icon { font-size: 28px; margin-bottom: 8px; }
+    .right-card h3 { font-size: 14px; font-weight: 700; color: var(--text-1); margin-bottom: 6px; }
+    .right-card p { font-size: 12px; color: var(--text-2); margin: 0; }
+    .contact-card {
+      background: linear-gradient(135deg, rgba(232,120,154,0.12), rgba(156,39,176,0.08));
+      border: 1px solid rgba(232,120,154,0.3);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+      margin-top: 40px;
+    }
+    .contact-card h2 { border: none; justify-content: center; }
+    .contact-card a {
+      color: var(--primary); font-weight: 700; text-decoration: none;
+      font-size: 16px;
+    }
+    footer {
+      text-align: center; padding: 24px;
+      color: var(--text-2); font-size: 13px;
+      border-top: 1px solid var(--border);
+    }
+    footer a { color: var(--primary); text-decoration: none; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🌸</div>
+  <h1>Flowia — Gizlilik Politikası</h1>
+  <p>Privacy Policy</p>
+</header>
+
+<div class="lang-toggle">
+  <button class="lang-btn active" onclick="showLang('tr', this)">🇹🇷 Türkçe</button>
+  <button class="lang-btn" onclick="showLang('en', this)">🇬🇧 English</button>
+</div>
+
+<!-- TURKISH -->
+<div id="lang-tr" class="container">
+  <div class="update-date">📅 Son güncelleme: 3 Ağustos 2026 — Sürüm 1.1</div>
+
+  <section>
+    <h2>📋 Genel Bakış</h2>
+    <p>Flowia ("uygulama", "hizmet"), kadın sağlığı takibi için tasarlanmış bir mobil uygulamadır. Bu Gizlilik Politikası, kişisel verilerinizin nasıl toplandığını, kullanıldığını ve korunduğunu açıklar.</p>
+    <p>Bu uygulamayı kullanarak bu politikayı kabul etmiş olursunuz. 13 yaşından küçükseniz uygulamayı kullanamazsınız.</p>
+  </section>
+
+  <section>
+    <h2>📊 Hangi Veriler Toplanır?</h2>
+    <p><strong>Hesap Bilgileri:</strong></p>
+    <ul>
+      <li>E-posta adresi (giriş için)</li>
+      <li>Görünen ad (opsiyonel)</li>
+      <li>Doğum tarihi (yaş doğrulaması ve kişiselleştirme için)</li>
+    </ul>
+    <p><strong>Sağlık Verileri (tamamen gönüllü):</strong></p>
+    <ul>
+      <li>Adet döngüsü başlangıç ve bitiş tarihleri</li>
+      <li>Semptomlar (kramp, baş ağrısı, şişkinlik vb.)</li>
+      <li>Ruh hali ve enerji seviyeleri</li>
+      <li>Günlük notlar</li>
+    </ul>
+    <p><strong>Teknik Veriler:</strong></p>
+    <ul>
+      <li>Cihaz türü ve işletim sistemi (hata analizi için)</li>
+      <li>Uygulama kullanım istatistikleri (anonim)</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>🏠 Veriler Nerede Saklanır?</h2>
+    <p>Tüm kişisel sağlık verileriniz <strong>yalnızca cihazınızda</strong> yerel olarak saklanır (localStorage). Veriler herhangi bir sunucuya veya üçüncü tarafa gönderilmez. İnternet bağlantısı kesildiğinde bile uygulamanız tam olarak çalışmaya devam eder.</p>
+    <p>Çoklu cihaz senkronizasyonu özelliği kullanılırken, veriler şifrelenmiş olarak cihazlar arasında aktarılır ve hiçbir zaman kalıcı olarak bulut sunucularında depolanmaz.</p>
+  </section>
+
+  <section>
+    <h2>🎯 Veriler Nasıl Kullanılır?</h2>
+    <ul>
+      <li>Adet döngüsü ve doğurganlık tahminleri oluşturmak</li>
+      <li>Kişiselleştirilmiş AI sağlık içgörüleri sunmak</li>
+      <li>Uygulama hatalarını tespit etmek ve düzeltmek</li>
+      <li>Hizmet kalitesini iyileştirmek (anonim istatistikler)</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>🚫 Paylaşılmayan Veriler</h2>
+    <ul>
+      <li>Sağlık verileriniz üçüncü taraflarla asla paylaşılmaz</li>
+      <li>Verileriniz reklam amaçlı kullanılmaz</li>
+      <li>Verileriniz satılmaz veya kiralanmaz</li>
+      <li>Kişisel bilgileriniz anonim istatistiklere bile dahil edilmez</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>⚖️ KVKK ve GDPR Haklarınız</h2>
+    <div class="rights-grid">
+      <div class="right-card">
+        <div class="icon">👁️</div>
+        <h3>Erişim Hakkı</h3>
+        <p>Hakkınızda tutulan tüm verileri görüntüleyebilirsiniz.</p>
+      </div>
+      <div class="right-card">
+        <div class="icon">✏️</div>
+        <h3>Düzeltme Hakkı</h3>
+        <p>Hatalı veya eksik verileri düzeltebilirsiniz.</p>
+      </div>
+      <div class="right-card">
+        <div class="icon">🗑️</div>
+        <h3>Silme Hakkı</h3>
+        <p>Tüm verilerinizi kalıcı olarak silebilirsiniz (Ayarlar → Veri Sil).</p>
+      </div>
+      <div class="right-card">
+        <div class="icon">📤</div>
+        <h3>Taşınabilirlik Hakkı</h3>
+        <p>Verilerinizi CSV formatında dışa aktarabilirsiniz.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>🍪 Çerezler ve İzleme</h2>
+    <p>Flowia, reklamcılık veya izleme amacıyla çerez kullanmaz. Uygulama, verileri yalnızca cihazınızın localStorage özelliğini kullanarak saklar. Analitik veriler tamamen anonimdir ve hiçbir zaman kişisel bilgilerle ilişkilendirilmez.</p>
+  </section>
+
+  <section>
+    <h2>👶 Çocukların Gizliliği (COPPA)</h2>
+    <p>Flowia, 13 yaş altındaki bireyleri hedeflememektedir. Kayıt sırasında yaş doğrulaması yapılır. 13 yaşından küçük bir kullanıcının verilerinin farkında olmadan toplandığını tespit edersek, bu veriler derhal silinir.</p>
+  </section>
+
+  <section>
+    <h2>🔄 Politika Değişiklikleri</h2>
+    <p>Bu politika güncellendiğinde, uygulama içinde ve bu sayfa üzerinde bildirim yapılır. Önemli değişiklikler için e-posta bildirimi gönderilir. Güncellenmiş politikanın yürürlüğe girmesinden sonra uygulamayı kullanmaya devam etmeniz, yeni politikayı kabul ettiğiniz anlamına gelir.</p>
+  </section>
+
+  <div class="contact-card">
+    <h2>📧 İletişim</h2>
+    <p style="margin:12px 0;color:var(--text-2)">Gizlilik haklarınız veya bu politika hakkında sorularınız için:</p>
+    <a href="mailto:privacy@flowia.app">privacy@flowia.app</a>
+    <p style="margin-top:12px;font-size:13px;color:var(--text-2)">Flowia Health · İstanbul, Türkiye</p>
+  </div>
+</div>
+
+<!-- ENGLISH -->
+<div id="lang-en" class="container hidden">
+  <div class="update-date">📅 Last updated: August 3, 2026 — Version 1.1</div>
+
+  <section>
+    <h2>📋 Overview</h2>
+    <p>Flowia ("app", "service") is a mobile application designed for women's health tracking. This Privacy Policy explains how your personal data is collected, used, and protected.</p>
+    <p>By using this application, you agree to this policy. If you are under 13 years of age, you may not use the application.</p>
+  </section>
+
+  <section>
+    <h2>📊 What Data is Collected?</h2>
+    <p><strong>Account Information:</strong></p>
+    <ul>
+      <li>Email address (for login)</li>
+      <li>Display name (optional)</li>
+      <li>Date of birth (for age verification and personalization)</li>
+    </ul>
+    <p><strong>Health Data (completely voluntary):</strong></p>
+    <ul>
+      <li>Menstrual cycle start and end dates</li>
+      <li>Symptoms (cramps, headache, bloating, etc.)</li>
+      <li>Mood and energy levels</li>
+      <li>Daily journal notes</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>🏠 Where is Data Stored?</h2>
+    <p>All your personal health data is stored <strong>locally on your device only</strong> (localStorage). Data is not sent to any server or third party. The app continues to work fully even when offline.</p>
+  </section>
+
+  <section>
+    <h2>⚖️ Your GDPR Rights</h2>
+    <div class="rights-grid">
+      <div class="right-card">
+        <div class="icon">👁️</div>
+        <h3>Right to Access</h3>
+        <p>View all data held about you at any time.</p>
+      </div>
+      <div class="right-card">
+        <div class="icon">🗑️</div>
+        <h3>Right to Erasure</h3>
+        <p>Delete all your data permanently (Settings → Delete Data).</p>
+      </div>
+      <div class="right-card">
+        <div class="icon">📤</div>
+        <h3>Data Portability</h3>
+        <p>Export your data in CSV format at any time.</p>
+      </div>
+      <div class="right-card">
+        <div class="icon">🚫</div>
+        <h3>Right to Object</h3>
+        <p>Object to any processing of your personal data.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>👶 Children's Privacy (COPPA)</h2>
+    <p>Flowia does not target individuals under 13 years of age. Age verification is performed at registration. If we become aware that data from a user under 13 has been collected, it will be immediately deleted.</p>
+  </section>
+
+  <div class="contact-card">
+    <h2>📧 Contact</h2>
+    <p style="margin:12px 0;color:var(--text-2)">For questions about your privacy rights or this policy:</p>
+    <a href="mailto:privacy@flowia.app">privacy@flowia.app</a>
+    <p style="margin-top:12px;font-size:13px;color:var(--text-2)">Flowia Health · Istanbul, Turkey</p>
+  </div>
+</div>
+
+<footer>
+  <p>© 2026 Flowia Health · <a href="./terms-of-service.html">Kullanım Koşulları / Terms of Service</a> · <a href="./index.html">Uygulamaya Dön / Back to App</a></p>
+</footer>
+
+<script>
+function showLang(lang, btn) {
+  document.getElementById('lang-tr').classList.toggle('hidden', lang !== 'tr');
+  document.getElementById('lang-en').classList.toggle('hidden', lang !== 'en');
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

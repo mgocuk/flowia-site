@@ -1,0 +1,28 @@
+<resources>
+    <!-- Base app theme — Material3 compatible, edge-to-edge -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#E8789A</item>
+        <item name="colorPrimaryVariant">#C25375</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSecondary">#9B72CF</item>
+        <item name="colorSecondaryVariant">#7B50B3</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <!-- Transparent status bar for edge-to-edge -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <!-- Prevent white flash on launch -->
+        <item name="android:windowBackground">#FDF8FA</item>
+    </style>
+
+    <!-- Launcher / Splash Screen theme -->
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">#FDF8FA</item>
+    </style>
+</resources>

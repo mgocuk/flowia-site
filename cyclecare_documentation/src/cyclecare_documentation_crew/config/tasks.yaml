@@ -1,0 +1,565 @@
+---
+product_requirements_task:
+  description: |-
+    Create a complete, professional Product Requirements Document for {app_name} — {app_description}.
+
+    Your deliverables must include:
+
+    1. **product_requirements_document.md** — Full PRD including:
+       - Product vision & mission statement
+       - Target user personas (at least 4: teen tracker, TTC user, PCOS user, general wellness user)
+       - Core features list with detailed descriptions (authentication, onboarding, period tracking, calendar, symptom/mood tracking, fertility, notifications, journal, reports, AI insights, subscriptions)
+       - Non-functional requirements (performance, scalability, accessibility, GDPR)
+       - MVP feature set vs Phase 2 vs Phase 3
+
+    2. **competitor_analysis.md** — Research and analysis of Flo, Clue, Period Tracker, Stardust, and Eve including their strengths, weaknesses, ratings, and key differentiators.
+
+    3. **roadmap.md** — A phased product roadmap:
+       - Phase 1: MVP (0–3 months)
+       - Phase 2: Growth (3–9 months)
+       - Phase 3: Scale (9–18 months)
+
+    4. **feature_priority_matrix.md** — Feature prioritization using MoSCoW method (Must Have, Should Have, Could Have, Won't Have for MVP).
+
+    Use real market data where possible. Write as a professional product manager preparing documentation for a development team and investors.
+  expected_output: |-
+    Four professional markdown documents:
+    - product_requirements_document.md: Complete PRD with vision, personas, features, NFRs, and MVP scope
+    - competitor_analysis.md: Detailed analysis of 5 competing apps
+    - roadmap.md: Phased 18-month product roadmap
+    - feature_priority_matrix.md: MoSCoW prioritization matrix for all features
+
+    Each document should be detailed enough for a real software development team to act on.
+  agent: senior_product_manager
+architecture_task:
+  description: |-
+    Design the complete production-ready system architecture for {app_name} — {app_description}.
+
+    Your deliverables must include:
+
+    1. **architecture_design.md** — Full system architecture document:
+       - High-level architecture overview (client → API gateway → services → database → storage)
+       - Technology stack justification: Flutter (mobile), NestJS (backend), PostgreSQL (database), AWS (cloud), Firebase Auth (authentication), FCM (notifications), AWS S3 (storage)
+       - Service layer breakdown (Auth Service, Cycle Service, Notification Service, Report Service, Subscription Service, AI Insights Service)
+       - API gateway configuration (AWS API Gateway or NestJS built-in)
+       - Caching strategy (Redis for sessions and frequent queries)
+       - Background jobs (cycle predictions, report generation, notification scheduling)
+       - Error handling and logging architecture
+
+    2. **system_diagrams.md** — Architecture diagrams in ASCII/Markdown:
+       - Component diagram showing all system parts and their relationships
+       - Data flow diagram for key user journeys (login, log period, view prediction)
+       - Sequence diagrams for: user registration, period logging, notification delivery
+       - Mobile app layer diagram (presentation → domain → data layers)
+
+    3. **deployment_architecture.md** — AWS deployment design:
+       - AWS services used: EC2/ECS, RDS (PostgreSQL), S3, CloudFront, ElastiCache (Redis), SES (email), CloudWatch (monitoring)
+       - Container strategy (Docker + ECS or EKS)
+       - CI/CD pipeline design (GitHub Actions → ECR → ECS)
+       - Environment strategy (dev, staging, production)
+       - Auto-scaling configuration
+       - Backup and disaster recovery plan
+       - Estimated AWS cost breakdown
+  expected_output: |-
+    Three professional markdown documents:
+    - architecture_design.md: Complete system architecture with all services and technology decisions
+    - system_diagrams.md: ASCII/Markdown architecture and sequence diagrams
+    - deployment_architecture.md: Full AWS deployment plan with CI/CD and cost estimates
+  agent: senior_software_cloud_architect
+market_research_task:
+  description: |-
+    Conduct deep market research and competitive analysis for {app_name} — {app_description}.
+
+    USE YOUR SEARCH TOOLS actively. Search for each competitor by name. Search for "femtech market size 2024 2025", "Flo app pricing", "Clue app features", "period tracker app revenue", "femtech investment trends". Do NOT rely solely on prior knowledge.
+
+    Your deliverables must include:
+
+    1. **market_research.md** — Comprehensive femtech market research:
+       - Global femtech market size and growth projections (find real TAM/SAM/SOM numbers — search for them)
+       - Key market trends: AI health features, privacy concerns post-Roe v. Wade, Gen Z adoption patterns
+       - Target demographic breakdown with usage behavior data
+       - App Store Health & Fitness category benchmarks (average ratings, download volumes)
+       - Key success metrics benchmarks for period tracker apps: DAU/MAU ratio, D30 retention, freemium conversion rates
+
+    2. **competitor_gap_analysis.md** — Detailed gap analysis. Research EACH competitor individually:
+       - **Flo**: Search "Flo app features pricing 2024". Document: pricing (Free vs Flo Premium ~$12.99/mo or $59.99/yr), key features, user base (200M+ users), App Store rating, known complaints from reviews (aggressive upselling, privacy concerns)
+       - **Clue**: Search "Clue period tracker app 2024". Document: pricing, science-backed approach, GDPR-strong positioning, UI complaints (slower, less visual)
+       - **Period Tracker (by GP Apps)**: Document: simplicity-first, ad-supported free tier, limited advanced features
+       - **Stardust**: Search "Stardust period tracker". Document: astrology integration, aesthetic appeal, privacy-first post-Roe positioning, limited serious health tracking
+       - **Eve by Glow**: Search "Eve by Glow app". Document: community-first, Gen Z focus, subscription friction
+       - Feature comparison matrix: rows = features, columns = competitors + {app_name}
+       - Identified gaps and underserved user needs (e.g., PCOS-specific tools, endometriosis tracking, healthcare provider sharing)
+       - User sentiment analysis: summarize common 1-star and 5-star review themes
+
+    3. **monetization_strategy.md** — Revenue strategy:
+       - Freemium model: exactly which features are free vs. premium (be specific)
+       - Subscription pricing: $5.99/month, $39.99/year with full feature breakdown
+       - LTV/CAC benchmarks for health app category
+       - Alternative revenue streams: healthcare provider B2B, anonymized research data partnerships, wellness brand co-marketing
+       - Revenue projections: Year 1 (conservative/base/optimistic scenarios), Year 2, Year 3
+       - Conversion funnel optimization tactics specific to femtech
+  expected_output: |-
+    Three professional markdown documents:
+    - market_research.md: Femtech market analysis with real TAM/SAM/SOM figures, trends, and benchmarks sourced from research
+    - competitor_gap_analysis.md: Per-competitor deep dive with feature comparison matrix, pricing, user base, and identified market gaps
+    - monetization_strategy.md: Full monetization strategy with specific pricing, LTV/CAC, 3-year revenue projections, and conversion tactics
+  agent: business_market_research_analyst
+medical_research_task:
+  description: |-
+    Build a comprehensive, evidence-based medical knowledge base for {app_name} — {app_description}.
+
+    Your deliverables must include:
+
+    1. **medical_knowledge_base.md** — Evidence-based educational content covering:
+       - Menstrual cycle phases (menstrual, follicular, ovulation, luteal) with detailed explanations
+       - Hormone changes throughout the cycle (estrogen, progesterone, LH, FSH)
+       - Ovulation prediction and fertility window calculation methods
+       - PCOS: symptoms, prevalence, tracking considerations
+       - Endometriosis: symptoms, impact on tracking
+       - Perimenopause and irregular cycle patterns
+       - Basal Body Temperature (BBT) and cervical mucus tracking
+       - Scientific references and citations for all claims
+
+    2. **symptom_library.md** — Complete symptom reference:
+       - Physical symptoms (cramps, headaches, bloating, fatigue, nausea, breast tenderness, acne, back pain) with medical explanations
+       - Emotional/mood symptoms (anxiety, irritability, sadness, mood swings) linked to hormonal phases
+       - Energy, sleep, and libido patterns across the cycle
+       - Red-flag symptoms that warrant medical consultation
+       - Symptom severity scales and clinical relevance
+
+    3. **health_disclaimer.md** — Legal and ethical safety framework:
+       - App-wide health disclaimer template
+       - When to recommend consulting a healthcare provider
+       - Data sensitivity classification
+       - Safe messaging guidelines for sensitive health topics
+
+    All content must be strictly educational. No diagnoses. Cite peer-reviewed sources where possible.
+  expected_output: |-
+    Three professional markdown documents:
+    - medical_knowledge_base.md: Evidence-based educational content about reproductive health
+    - symptom_library.md: Complete catalogued symptom library with medical context
+    - health_disclaimer.md: Legal/ethical framework and safe messaging guidelines
+  agent: reproductive_health_research_specialist
+prediction_engine_task:
+  description: |-
+    Design the complete cycle prediction and analytics system for {app_name} — {app_description}.
+
+    Your deliverables must include:
+
+    1. **prediction_engine_design.md** — Core prediction system design:
+       - Period prediction algorithm (statistical baseline using average cycle length and standard deviation)
+       - Ovulation prediction model (calendar method + LH surge estimation)
+       - Fertility window calculation (5-day window before ovulation + ovulation day)
+       - Confidence scoring system (High/Medium/Low with thresholds and explanations)
+       - Handling of irregular cycles (outlier detection, adaptive averaging)
+       - Cold-start problem: handling new users with no history (population defaults)
+       - Minimum data requirements before predictions are shown
+       - Algorithm pseudocode and data flow diagrams (in markdown/ASCII)
+
+    2. **analytics_model.md** — In-app analytics architecture:
+       - Cycle metrics computed for the dashboard (average length, variation, period duration)
+       - Symptom correlation analysis (e.g., headaches before menstruation frequency)
+       - Mood trend analysis across cycle phases
+       - Health insight generation rules (rule-based engine for v1)
+       - Data aggregation strategy for reports (monthly/yearly)
+
+    3. **future_ml_roadmap.md** — Machine learning evolution plan:
+       - Phase 1: Rule-based statistical prediction (MVP)
+       - Phase 2: Personalized ML models (per-user Bayesian updating)
+       - Phase 3: Population-level model with transfer learning
+       - Recommended ML frameworks and libraries
+       - Data collection strategy to enable future ML training
+       - Privacy-preserving ML considerations (federated learning)
+  expected_output: |-
+    Three professional markdown documents:
+    - prediction_engine_design.md: Full algorithm design with pseudocode and confidence scoring
+    - analytics_model.md: In-app metrics computation and insight generation rules
+    - future_ml_roadmap.md: 3-phase ML evolution roadmap with technical recommendations
+  agent: data_science_prediction_systems_specialist
+database_schema_task:
+  description: |-
+    Design the complete normalized PostgreSQL database schema for {app_name} — {app_description}.
+
+    Your deliverables must include:
+
+    1. **database_schema.md** — Full schema definition:
+       - Complete CREATE TABLE statements for ALL entities:
+         * users (id, email, password_hash, name, dob, height, weight, timezone, created_at, updated_at, deleted_at)
+         * user_health_profiles (user_id, avg_cycle_length, avg_period_duration, has_pcos, has_endometriosis, birth_control_type, pregnancy_status, goals)
+         * cycles (id, user_id, predicted_start_date, actual_start_date, predicted_end_date, actual_end_date, cycle_length, confidence_score, notes)
+         * period_entries (id, cycle_id, user_id, date, flow_intensity, has_spotting, has_clotting, pain_level, notes)
+         * symptoms (id, user_id, date, symptom_type, severity, notes)
+         * moods (id, user_id, date, mood_emoji, mood_score, notes)
+         * fertility_data (id, cycle_id, user_id, ovulation_date, fertility_window_start, fertility_window_end, conception_chance)
+         * journals (id, user_id, date, content, image_urls, tags)
+         * notifications (id, user_id, type, title, body, scheduled_at, sent_at, is_read)
+         * subscription_plans (id, name, price_monthly, price_annual, features)
+         * user_subscriptions (id, user_id, plan_id, status, started_at, expires_at, platform, transaction_id)
+         * reports (id, user_id, type, period_start, period_end, content_json, generated_at)
+       - All foreign keys, indexes, and constraints
+       - GDPR compliance columns (consent_given_at, data_deletion_requested_at)
+       - Soft delete pattern (deleted_at) on sensitive tables
+
+    2. **er_diagram.md** — Entity Relationship diagram in ASCII/Markdown showing all table relationships and cardinalities.
+
+    3. **migration_plan.md** — Database migration strategy:
+       - Initial migration (v1.0.0): Full schema creation
+       - Versioning strategy using TypeORM migrations
+       - Rollback procedures
+       - Seed data for development
+       - Performance indexes to add post-launch
+  expected_output: |-
+    Three professional markdown documents:
+    - database_schema.md: Complete SQL schema with all tables, columns, constraints, and indexes
+    - er_diagram.md: ASCII entity relationship diagram
+    - migration_plan.md: Versioned migration plan with TypeORM, rollback procedures, and seed data
+  agent: database_design_specialist
+security_task:
+  description: |-
+    Design the complete security and privacy architecture for {app_name} — {app_description}.
+
+    Your deliverables must include:
+
+    1. **security_architecture.md** — Full application security design:
+       - Authentication security: Firebase Auth + JWT token handling, refresh token rotation, token storage on mobile (Flutter Secure Storage)
+       - Authorization: Role-based access control (user, premium_user, admin)
+       - Data encryption at rest: AES-256 for sensitive fields (health data) in PostgreSQL
+       - Data encryption in transit: TLS 1.3 for all API communication
+       - End-to-end encryption design for journal entries and sensitive health data
+       - API security: rate limiting, input validation, SQL injection prevention, CORS policy
+       - Mobile security: certificate pinning, jailbreak/root detection, secure local storage
+       - Audit logging: what events to log, log format, log retention policy
+       - Incident response plan
+
+    2. **privacy_policy_requirements.md** — Privacy policy framework:
+       - Data categories collected and their legal basis (GDPR Article 6)
+       - Data retention periods for each category
+       - User rights: access, rectification, erasure, portability
+       - Data deletion workflow (technical implementation)
+       - Third-party data sharing policy (Firebase, AWS)
+       - Children's data considerations (users under 16)
+       - Cookie and tracking policy
+
+    3. **gdpr_compliance_checklist.md** — Actionable GDPR compliance checklist:
+       - Consent management implementation
+       - Data Processing Agreement (DPA) requirements
+       - Privacy by design principles applied
+       - Data minimization checklist
+       - Breach notification procedure (72-hour rule)
+       - DPO (Data Protection Officer) requirements
+       - International data transfer safeguards (SCCs)
+  expected_output: |-
+    Three professional markdown documents:
+    - security_architecture.md: Complete application security design with encryption, auth, and audit logging
+    - privacy_policy_requirements.md: GDPR-aligned privacy policy framework
+    - gdpr_compliance_checklist.md: Actionable compliance checklist with implementation notes
+  agent: application_security_privacy_engineer
+ux_design_task:
+  description: "Design the complete user experience and design system for {app_name}
+    — {app_description}. Use the product requirements as your foundation.\n\nYour
+    deliverables must include:\n\n1. **user_flows.md** — Complete user flow documentation:\n
+    \  - Onboarding flow (first launch → registration → health profile setup → first
+    prediction)\n   - Core tracking flow (open app → log period → view calendar →
+    see prediction)\n   - Daily logging flow (symptoms, mood, journal)\n   - Reports
+    flow (generate → view → export)\n   - Subscription upgrade flow (free → premium
+    paywall → purchase → confirmation)\n   - Notification interaction flows\n   -
+    Settings and account management flows\n\n2. **wireframes.md** — Detailed wireframe
+    descriptions for all 15 screens:\n   1. Splash Screen\n   2. Login Screen\n   3.
+    Registration Screen\n   4. Onboarding (multi-step)\n   5. Home Dashboard\n   6.
+    Calendar View\n   7. Period Logging\n   8. Symptom Tracker\n   9. Mood Tracker\n
+    \  10. Fertility Tracker\n   11. Reports Screen\n   12. AI Insights Screen\n   13.
+    Profile Screen\n   14. Settings Screen\n   15. Subscription / Premium Screen\n
+    \  \n   For each screen: layout description, key UI components, interactions,
+    navigation.\n\n3. **design_system.md** — Complete design system:\n   - Color palette
+    (primary: soft pink, secondary: lavender, neutral: white/light gray, semantic:
+    success/error/warning)\n   - Dark mode color variants\n   - Typography scale (font
+    family, sizes, weights for headings, body, labels, captions)\n   - Spacing system
+    (4px base grid)\n   - Component library: buttons, cards, input fields, sliders,
+    icon system, bottom navigation, modals, chips/tags\n   - Accessibility guidelines
+    (contrast ratios, touch targets, screen reader labels)\n   - Animation principles
+    (calm, subtle transitions)\n\n4. **screen_specifications.md** — Technical screen
+    specs:\n   - Screen dimensions and safe areas (iOS/Android)\n   - Component specifications
+    with exact measurements\n   - Navigation structure (bottom tabs, stack navigation,
+    modals)\n   - State definitions for each screen (loading, empty, error, populated)"
+  expected_output: |-
+    Four professional markdown documents:
+    - user_flows.md: All user journeys documented with step-by-step flows
+    - wireframes.md: Detailed wireframe descriptions for all 15 screens
+    - design_system.md: Complete design system with colors, typography, components, and accessibility
+    - screen_specifications.md: Technical specifications for all screens
+  agent: senior_ux_ui_designer
+  context:
+  - product_requirements_task
+flutter_structure_task:
+  description: |-
+    Design the complete Flutter mobile project structure for {app_name} — {app_description}. Base your design on the system architecture.
+
+    Your deliverables must include:
+
+    1. **flutter_project_structure.md** — Complete project directory structure:
+       - Full folder tree using Clean Architecture layers (presentation, domain, data)
+       - Feature-first module organization (auth, onboarding, cycle_tracking, calendar, symptoms, moods, fertility, reports, journal, notifications, settings, subscription, ai_insights)
+       - Shared/core directory structure (utils, widgets, theme, constants, router, di)
+       - Full file listing with purpose annotations for key files
+       - pubspec.yaml with all required dependencies (flutter_bloc, get_it, injectable, dio, hive, flutter_secure_storage, go_router, fl_chart, intl, firebase_auth, firebase_messaging, in_app_purchase)
+
+    2. **module_breakdown.md** — Detailed breakdown of each feature module:
+       - For each module: domain layer (entities, use cases, repository interfaces), data layer (models, repository implementations, data sources), presentation layer (BLoC/Cubit, screens, widgets)
+       - State management patterns: BLoC events, states, and transformations
+       - Dependency injection setup (GetIt + Injectable)
+       - Local data caching strategy (Hive for offline support)
+       - Network layer: Dio interceptors (auth token injection, error handling, retry)
+
+    3. **development_guidelines.md** — Coding standards and practices:
+       - Dart naming conventions and code style
+       - Git branching strategy (GitFlow)
+       - Feature development workflow (branch → PR → review → merge)
+       - Widget decomposition principles (when to extract widgets)
+       - Testing conventions (unit tests for BLoCs, widget tests, integration tests)
+       - Error handling patterns
+       - Localization setup (l10n)
+       - CI/CD integration with Flutter (GitHub Actions for build + test)
+  expected_output: |-
+    Three professional markdown documents:
+    - flutter_project_structure.md: Complete directory tree with all files and dependencies
+    - module_breakdown.md: Detailed feature module architecture with BLoC patterns and DI setup
+    - development_guidelines.md: Coding standards, Git workflow, testing conventions, and CI/CD
+  agent: flutter_mobile_lead_developer
+  context:
+  - architecture_task
+api_design_task:
+  description: "Design the complete REST API for {app_name} — {app_description}. Base
+    your design on the system architecture.\n\nYour deliverables must include:\n\n1.
+    **api_specification.md** — Full OpenAPI-style REST API specification:\n   - Base
+    URL structure and versioning (/api/v1/)\n   - Authentication: POST /auth/register,
+    POST /auth/login, POST /auth/logout, POST /auth/refresh, POST /auth/forgot-password,
+    POST /auth/reset-password, DELETE /auth/account\n   - User profile: GET/PUT /users/me,
+    GET/PUT /users/me/health-profile\n   - Cycles: GET/POST /cycles, GET/PUT /cycles/:id,
+    GET /cycles/current, GET /cycles/predictions\n   - Period entries: GET/POST /cycles/:id/periods,
+    PUT/DELETE /cycles/:id/periods/:entryId\n   - Symptoms: GET/POST /symptoms, GET
+    /symptoms?date=YYYY-MM-DD\n   - Moods: GET/POST /moods, GET /moods?month=YYYY-MM\n
+    \  - Fertility: GET /fertility/current, GET /fertility/history\n   - Journal:
+    GET/POST /journals, GET/PUT/DELETE /journals/:id\n   - Notifications: GET /notifications,
+    PUT /notifications/:id/read, PUT /notifications/settings\n   - Reports: POST /reports/generate,
+    GET /reports, GET /reports/:id, GET /reports/:id/export\n   - Subscriptions: GET
+    /subscriptions/plans, POST /subscriptions/purchase, GET /subscriptions/current,
+    POST /subscriptions/cancel\n   - AI Insights: GET /insights/current, GET /insights/history\n
+    \  \n   For each endpoint: method, path, request body, response schema, HTTP status
+    codes, authentication required.\n\n2. **backend_structure.md** — NestJS project
+    structure:\n   - Module organization mirroring the API structure\n   - Full directory
+    tree (modules, controllers, services, repositories, entities, DTOs, guards, interceptors,
+    pipes)\n   - Middleware stack (helmet, cors, rate-limit, compression)\n   - Global
+    exception filter design\n   - Response format standardization\n   - Background
+    job setup (Bull queue for async tasks)\n\n3. **endpoint_catalog.md** — Quick-reference
+    endpoint catalog:\n   - All endpoints in a table format (method, path, description,
+    auth required, premium required)\n   - Rate limits per endpoint group\n   - Pagination
+    strategy for list endpoints\n   - Error codes reference"
+  expected_output: |-
+    Three professional markdown documents:
+    - api_specification.md: Complete OpenAPI-style REST API with all endpoints, request/response schemas
+    - backend_structure.md: Full NestJS project structure with modules, middleware, and patterns
+    - endpoint_catalog.md: Quick-reference table of all endpoints with auth and rate limit info
+  agent: nestjs_backend_lead_developer
+  context:
+  - architecture_task
+startup_strategy_task:
+  description: |-
+    Define the complete startup and go-to-market strategy for {app_name} — {app_description}. Use market research and product requirements as your foundation.
+
+    Your deliverables must include:
+
+    1. **startup_strategy.md** — Overall startup strategy:
+       - Business model canvas
+       - Value proposition statement
+       - Target customer segments and acquisition channels
+       - Pricing strategy rationale
+       - Subscription tier definitions:
+         * Free: cycle tracking, basic predictions, symptom logging (5/day), 3-month history
+         * Premium Monthly ($5.99/mo): unlimited tracking, AI insights, advanced analytics, full history, data export, PDF reports, fertility planning tools
+         * Premium Annual ($39.99/yr = $3.33/mo): all premium features + priority support
+       - Unit economics: LTV, CAC, payback period targets
+       - Break-even analysis
+
+    2. **launch_plan.md** — App Store & Google Play launch plan:
+       - Pre-launch phase (T-8 weeks): beta testing, App Store assets, ASO optimization
+       - Launch phase (T-0): soft launch markets, PR strategy, influencer outreach (femtech/wellness creators)
+       - Post-launch phase (T+4 weeks): review management, iteration plan
+       - App Store Optimization (ASO): keyword strategy, screenshots, preview video guidelines
+       - Social media strategy (Instagram, TikTok, Pinterest for women's health audience)
+       - Community building strategy (Discord/Reddit for beta users)
+
+    3. **growth_strategy.md** — Growth and retention roadmap:
+       - Acquisition channels ranked by priority and cost
+       - Referral/viral loop design
+       - Retention mechanics (streaks, cycle insights, personalized notifications)
+       - Freemium-to-premium conversion funnel optimization
+       - 12-month growth targets (DAU, MAU, paid subscribers, MRR)
+       - Partnership opportunities (OB/GYN clinics, wellness brands, insurance companies)
+
+    4. **investor_pitch_summary.md** — Investor-ready pitch summary:
+       - Problem statement and market opportunity ($50B+ femtech market)
+       - Solution and unique value proposition
+       - Traction milestones to target (pre-revenue)
+       - Team requirements (founding team skills needed)
+       - Funding ask and use of funds (seed round: $500K–$1.5M)
+       - 18-month milestones post-funding
+       - Comparable exits and market comps (Flo raised $200M+, Clue valued at $100M+)
+  expected_output: |-
+    Four professional markdown documents:
+    - startup_strategy.md: Business model, pricing tiers, unit economics, and break-even analysis
+    - launch_plan.md: Complete App Store and Google Play launch plan with ASO and social strategy
+    - growth_strategy.md: Acquisition, retention, conversion funnel, and 12-month growth targets
+    - investor_pitch_summary.md: Investor-ready pitch with market size, solution, and funding ask
+  agent: startup_strategy_growth_advisor
+  context:
+  - market_research_task
+  - product_requirements_task
+qa_strategy_task:
+  description: "Create a comprehensive test strategy for {app_name} — {app_description}.
+    Base your test plans on the Flutter mobile structure and the API design.\n\nYour
+    deliverables must include:\n\n1. **qa_strategy.md** — Overall test strategy:\n
+    \  - Testing pyramid for {app_name} (unit → widget → integration → E2E)\n   -
+    Test coverage targets (unit: 80%+, integration: 60%+, E2E: critical paths)\n   -
+    Flutter testing: flutter_test, bloc_test, mocktail, integration_test packages\n
+    \  - Backend testing: Jest, Supertest for NestJS\n   - Test environments (local,
+    CI, staging)\n   - CI/CD test gates (which tests run on PR, which on merge)\n
+    \  - Performance testing strategy (load testing APIs with k6)\n   - Security testing
+    (OWASP mobile top 10 checklist)\n   - Accessibility testing checklist\n   - Beta
+    testing plan (TestFlight for iOS, Firebase App Distribution for Android)\n\n2.
+    **test_cases.md** — Detailed test cases for critical features:\n   - Authentication:
+    registration, login, logout, password reset, social login\n   - Cycle tracking:
+    start period, end period, edit entry, delete entry\n   - Predictions: first prediction
+    (cold start), prediction after 3 cycles, irregular cycle handling\n   - Symptoms:
+    add symptom, edit, delete, view history\n   - Mood: daily log, monthly trend view\n
+    \  - Notifications: schedule, receive, mark as read\n   - Reports: generate monthly
+    report, generate yearly report, export PDF\n   - Subscription: purchase, verify,
+    expire, restore purchase\n   - Data deletion: GDPR right to erasure flow\n   \n
+    \  For each test: test ID, feature, scenario, preconditions, steps, expected result.\n\n3.
+    **acceptance_tests.md** — BDD-style acceptance criteria:\n   - Gherkin Feature
+    files for all major user stories\n   - Definition of Done checklist for each sprint\n
+    \  - Release criteria (what must pass before App Store submission)\n   - Regression
+    test suite definition\n   - UAT (User Acceptance Testing) plan for beta users"
+  expected_output: |-
+    Three professional markdown documents:
+    - qa_strategy.md: Complete testing pyramid, coverage targets, CI/CD gates, and security testing checklist
+    - test_cases.md: Detailed test cases for all critical features in tabular format
+    - acceptance_tests.md: Gherkin BDD acceptance criteria, Definition of Done, and release criteria
+  agent: qa_test_strategy_engineer
+  context:
+  - flutter_structure_task
+  - api_design_task
+executive_summary_task:
+  description: "Synthesize all team outputs into a single, comprehensive, investor-ready
+    master document for {app_name} — {app_description}. You have access to outputs
+    from all 12 specialist agents. Your ONLY job is to EXPAND and INTEGRATE all of
+    that content — do NOT summarize briefly. Every section must be detailed, specific,
+    and grounded in the actual team outputs you received.\n\nMINIMUM REQUIREMENTS:\n-
+    The final document must be at least 3,000 words.\n- Every section must directly
+    reference specifics from the team outputs (e.g., actual table names, actual endpoints,
+    actual pricing tiers, actual test cases, actual algorithms).\n- Do NOT use placeholder
+    values like \"X weeks\" or \"$X\" — derive real estimates from the team outputs.\n\n---\n\n#
+    {app_name} — Complete Project Documentation\n\n## 1. Executive Summary (minimum
+    400 words)\n- What {app_name} is and what problem it solves (reference the PRD
+    vision statement verbatim)\n- Target market size (use the TAM/SAM/SOM figures
+    from the market research)\n- Business model summary (freemium model, specific
+    pricing from startup strategy)\n- Key differentiators vs. Flo, Clue, Period Tracker,
+    Stardust, and Eve (use the competitor gap analysis specifics)\n- Investment readiness
+    statement with specific funding ask ($500K–$1.5M seed)\n\n## 2. Product Summary
+    (minimum 400 words)\n- Product vision and mission statement (quote directly from
+    PRD)\n- Core MVP feature set with descriptions (list all 7 MVP features from the
+    PRD)\n- All 4 user personas with details (Teen Tracker, TTC User, PCOS User, General
+    Wellness User)\n- UX/Design philosophy: color palette (soft pink #F7D3E0, lavender
+    #E8D6F0), typography (Poppins), design principles\n- Product roadmap: Phase 1
+    (0–3mo MVP), Phase 2 (3–9mo Growth), Phase 3 (9–18mo Scale) with specific features
+    per phase\n\n## 3. Technical Summary (minimum 500 words)\n- Full technology stack:
+    Flutter (mobile), NestJS (backend), PostgreSQL (database), AWS (cloud), Firebase
+    Auth, FCM, AWS S3\n- Architecture: list all 6 services (Auth, Cycle, Notification,
+    Report, Subscription, AI Insights)\n- Database: list all 12 tables by name with
+    their primary relationships\n- API surface: count and list endpoints grouped by
+    module (Auth: 7, Users: 4, Cycles: 6, Periods: 3, Symptoms: 2, Moods: 2, Fertility:
+    2, Journals: 4, Notifications: 3, Reports: 4, Subscriptions: 4, Insights: 2) =
+    43 total endpoints\n- Security: AES-256 at rest, TLS 1.3 in transit, JWT with
+    1hr access / 30d refresh tokens, RBAC (user/premium_user/admin), GDPR compliance\n-
+    Prediction engine: statistical baseline (Gaussian distribution on cycle history),
+    confidence scoring (High >80%, Medium 60–79%, Low <60%), 3-cycle minimum, cold-start
+    population defaults\n- Flutter structure: Clean Architecture, 13 feature modules,
+    BLoC state management, GetIt DI, Hive local caching\n\n## 4. Startup Summary (minimum
+    400 words)\n- Subscription tiers with exact pricing: Free (basic tracking, 5 symptoms/day,
+    3mo history), Premium Monthly ($5.99/mo), Premium Annual ($39.99/yr = $3.33/mo)\n-
+    Unit economics: LTV ($71.88 annual), CAC ($15 target), payback period (3 months),
+    break-even at 6,400 paid users\n- Monthly AWS cost breakdown: EC2/ECS $250, RDS
+    $150, S3 $50, CloudFront $200, ElastiCache $100, SES $20, CloudWatch $30 = $800/month
+    total\n- Launch plan: T-8 weeks (beta 500 users, ASO), T-0 (soft launch US/CA/AU,
+    PR, influencers), T+4 (review mgmt, iteration)\n- Growth targets: 20K DAU, 100K
+    MAU, 5,000 paid subscribers, $50K MRR by month 12\n- Investor pitch: $50B+ femtech
+    market, seed ask $500K–$1.5M, use of funds (40% product, 40% marketing, 20% ops)\n\n##
+    5. Complete Development Roadmap (minimum 600 words — MUST be week-by-week)\nProduce
+    a detailed sprint plan:\n\n**Phase 1: Foundation (Weeks 1–4)**\n- Week 1: Repo
+    setup, CI/CD (GitHub Actions → ECR → ECS), Flutter project scaffold, NestJS scaffold\n-
+    Week 2: PostgreSQL schema migration (all 12 tables), Firebase Auth integration,
+    JWT middleware\n- Week 3: Auth endpoints (register, login, logout, refresh, forgot-password),
+    Flutter auth screens\n- Week 4: User profile endpoints, health profile setup,
+    onboarding screens\n\n**Phase 2: Core Features (Weeks 5–10)**\n- Week 5: Cycles
+    module (CRUD) + period entries API\n- Week 6: Prediction engine v1 (statistical,
+    rule-based), calendar API\n- Week 7: Flutter calendar screen + period logging
+    UI\n- Week 8: Symptoms API + Flutter symptom tracker\n- Week 9: Moods API + Flutter
+    mood tracker\n- Week 10: Home Dashboard with metrics, notifications setup (FCM)\n\n**Phase
+    3: Advanced Features (Weeks 11–16)**\n- Week 11: Fertility API + Flutter fertility
+    tracker\n- Week 12: Journal API (CRUD + image upload to S3)\n- Week 13: Reports
+    API (monthly/yearly generation + PDF/CSV export)\n- Week 14: AI Insights engine
+    (rule-based v1) + insights screen\n- Week 15: Notification scheduling (Bull queues),
+    settings screen\n- Week 16: Profile screen, dark mode, accessibility pass\n\n**Phase
+    4: Monetization & Polish (Weeks 17–20)**\n- Week 17: Subscription plans API, in-app
+    purchase integration (Google Play Billing + Apple IAP)\n- Week 18: Premium feature
+    gating, paywall screen\n- Week 19: Performance optimization (Redis caching, query
+    indexes), error tracking (Sentry)\n- Week 20: Full regression testing, QA pass,
+    bug fixes\n\n**Phase 5: Launch Preparation (Weeks 21–24)**\n- Week 21: Beta testing
+    (TestFlight + Firebase App Distribution, 500 users)\n- Week 22: ASO (keywords,
+    screenshots, preview video), App Store / Play Store assets\n- Week 23: App Store
+    submission (iOS + Android), review management setup\n- Week 24: Launch \U0001F680,
+    monitoring dashboard live, growth campaigns activated\n\n## 6. Project Estimates\nProduce
+    a precise table (DO NOT use X placeholders — use real numbers derived from the
+    roadmap and team outputs):\n| Metric | Estimate |\n|--------|----------|\n| MVP
+    Duration | [derive from roadmap] |\n| Full v1.0 Duration | [derive from roadmap]
+    |\n| Recommended Team Size | [specify roles] |\n| Estimated Development Budget
+    | [calculate based on team size × duration] |\n| Monthly AWS Infrastructure Cost
+    | $800/month |\n| Launch Readiness Score | [score /10 with brief justification]
+    |\n\n## 7. Deliverables Index\nList ALL 30 documents generated by the team, organized
+    by category. Use this EXACT list:\n\n**Product (4 docs)**\n1. product_requirements_document.md\n2.
+    competitor_analysis.md\n3. roadmap.md\n4. feature_priority_matrix.md\n\n**Market
+    & Business (3 docs)**\n5. market_research.md\n6. competitor_gap_analysis.md\n7.
+    monetization_strategy.md\n\n**Medical & Science (3 docs)**\n8. medical_knowledge_base.md\n9.
+    symptom_library.md\n10. health_disclaimer.md\n\n**Data Science (3 docs)**\n11.
+    prediction_engine_design.md\n12. analytics_model.md\n13. future_ml_roadmap.md\n\n**Architecture
+    (3 docs)**\n14. architecture_design.md\n15. system_diagrams.md\n16. deployment_architecture.md\n\n**Database
+    (3 docs)**\n17. database_schema.md\n18. er_diagram.md\n19. migration_plan.md\n\n**Security
+    & Privacy (3 docs)**\n20. security_architecture.md\n21. privacy_policy_requirements.md\n22.
+    gdpr_compliance_checklist.md\n\n**UX/UI Design (4 docs)**\n23. user_flows.md\n24.
+    wireframes.md\n25. design_system.md\n26. screen_specifications.md\n\n**Mobile
+    Development (3 docs)**\n27. flutter_project_structure.md\n28. module_breakdown.md\n29.
+    development_guidelines.md\n\n**Backend Development (3 docs)**\n30. api_specification.md\n31.
+    backend_structure.md\n32. endpoint_catalog.md\n\n**Startup & Growth (4 docs)**\n33.
+    startup_strategy.md\n34. launch_plan.md\n35. growth_strategy.md\n36. investor_pitch_summary.md\n\n**QA
+    & Testing (3 docs)**\n37. qa_strategy.md\n38. test_cases.md\n39. acceptance_tests.md\n\n**Master
+    Document (1 doc)**\n40. executive_summary.md (this document)"
+  expected_output: A single, comprehensive markdown document (executive_summary.md)
+    of at least 3,000 words containing all 7 sections with full depth. Every number,
+    feature name, table name, endpoint, and estimate must be specific and grounded
+    in the team's actual outputs — no placeholders. Section 7 must list all 40 documents
+    by name organized by category. The development roadmap must be week-by-week across
+    all 5 phases (24 weeks total). This document must be presentation-ready for investors,
+    a CTO, or a development agency.
+  agent: technical_project_director
+  context:
+  - product_requirements_task
+  - market_research_task
+  - medical_research_task
+  - prediction_engine_task
+  - architecture_task
+  - database_schema_task
+  - security_task
+  - ux_design_task
+  - flutter_structure_task
+  - api_design_task
+  - startup_strategy_task
+  - qa_strategy_task

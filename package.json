@@ -1,0 +1,15 @@
+{
+  "name": "cyclecare",
+  "version": "1.0.0",
+  "description": "CycleCare — Smart Cycle Tracker & Femtech Mobile Web Application",
+  "main": "app.js",
+  "scripts": {
+    "start": "npx serve .",
+    "cap:init": "npx cap init CycleCare com.cyclecare.app --web-dir .",
+    "cap:add": "npx cap add android",
+    "cap:sync": "npx cap sync"
+  },
+  "keywords": ["cyclecare", "femtech", "pwa", "apk", "capacitor"],
+  "author": "CycleCare Team",
+  "license": "MIT"
+}

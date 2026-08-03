@@ -1,0 +1,128 @@
+{
+  "id": "com.flowia.app",
+  "name": "Flowia — Akıllı Döngü Takipçisi",
+  "short_name": "Flowia",
+  "description": "AI destekli adet döngüsü takibi, doğurganlık içgörüleri ve kadın sağlığı analitiği. Güvenli, özel ve kişiselleştirilmiş.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#FDF8FA",
+  "theme_color": "#E8789A",
+  "lang": "tr",
+  "dir": "ltr",
+  "categories": ["health", "lifestyle", "medical"],
+  "iarc_rating_id": "r-2f1b0e79-c28e-4bd9-9018-4e6a04de5ab1",
+  "icons": [
+    {
+      "src": "./icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-120.png",
+      "sizes": "120x120",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-167.png",
+      "sizes": "167x167",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "label": "Flowia Ana Ekran — Döngü Takibi",
+      "platform": "narrow",
+      "form_factor": "narrow",
+      "src": "./screenshot-home.png",
+      "sizes": "390x844",
+      "type": "image/png"
+    },
+    {
+      "label": "Flowia Takvim — Tahmin ve Geçmiş",
+      "platform": "narrow",
+      "form_factor": "narrow",
+      "src": "./screenshot-calendar.png",
+      "sizes": "390x844",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Adet Kaydet",
+      "short_name": "Adet",
+      "description": "Hızlıca adet başlangıcı kaydet",
+      "url": "./index.html#log-period",
+      "icons": [{ "src": "./icon-96.png", "sizes": "96x96", "type": "image/png" }]
+    },
+    {
+      "name": "Semptom Kaydet",
+      "short_name": "Semptom",
+      "description": "Bugün nasıl hissediyorsun?",
+      "url": "./index.html#symptoms",
+      "icons": [{ "src": "./icon-96.png", "sizes": "96x96", "type": "image/png" }]
+    },
+    {
+      "name": "Ruh Halini Kaydet",
+      "short_name": "Ruh Hali",
+      "description": "Duygusal durumunu kaydet",
+      "url": "./index.html#mood",
+      "icons": [{ "src": "./icon-96.png", "sizes": "96x96", "type": "image/png" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
