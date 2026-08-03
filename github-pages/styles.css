@@ -1340,3 +1340,33 @@ button,
   background: var(--primary);
   color: #fff;
 }
+
+/* === DARK MODE & TOGGLE FIXES === */
+[data-theme="dark"] .cycle-ring-card,
+[data-theme="dark"] .home-card {
+  background: var(--surface-1) !important;
+  border-color: var(--border-light) !important;
+}
+[data-theme="dark"] select.input-field,
+[data-theme="dark"] input.input-field {
+  background: var(--surface-2);
+  color: var(--text-1);
+  border-color: var(--border-light);
+}
+[data-theme="dark"] .settings-item {
+  background: var(--surface-1);
+  border-color: var(--border-light);
+}
+.toggle { position:relative; display:inline-flex; align-items:center; cursor:pointer; }
+.toggle input { opacity:0; width:0; height:0; position:absolute; }
+.toggle-track {
+  width:44px; height:24px; background:#ccc; border-radius:12px;
+  transition:background 0.2s; display:block;
+}
+.toggle-track::after {
+  content:""; position:absolute; width:20px; height:20px;
+  background:#fff; border-radius:50%; top:2px; left:2px;
+  transition:transform 0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle input:checked + .toggle-track { background:var(--primary); }
+.toggle input:checked + .toggle-track::after { transform:translateX(20px); }

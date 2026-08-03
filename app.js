@@ -683,7 +683,9 @@ function computePredictions() {
   // Next period dates
   const nextPeriodStart = addDays(lastPeriodDate, avgCycle);
   const nextPeriodEnd   = addDays(nextPeriodStart, avgPeriod - 1);
-  const daysUntilPeriod = Math.max(0, Math.round((nextPeriodStart - todayZero) / 86400000));
+  // Date-only diff to avoid timezone shift causing "0 days" display bug
+  const nextMidnight  = new Date(nextPeriodStart.getFullYear(), nextPeriodStart.getMonth(), nextPeriodStart.getDate());
+  const daysUntilPeriod = Math.max(0, Math.round((nextMidnight - todayZero) / 86400000));
 
   // Current phase
   let phase;
@@ -2600,7 +2602,96 @@ function updateSliderFill(slider) {
 // ============================================================
 // EARLY PERIOD END HANDLING
 // ============================================================
+// ============================================================
+// STREAK, BADGE & DATA EXPORT SYSTEM
+// ============================================================
+function getLoggingStreak() {
+  const allDates = new Set([
+    ...(state.symptoms || []).map(s => s.date),
+    ...(state.moods    || []).map(m => m.date),
+  ]);
+  let streak = 0;
+  const check = new Date(TODAY);
+  while (true) {
+    const ds = check.getFullYear() + '-' +
+      String(check.getMonth()+1).padStart(2,'0') + '-' +
+      String(check.getDate()).padStart(2,'0');
+    if (allDates.has(ds)) { streak++; check.setDate(check.getDate()-1); }
+    else break;
+  }
+  return streak;
+}
+
+function getStreakBadge(streak) {
+  if (streak >= 60) return { emoji: '🏆', label: 'Efsane' };
+  if (streak >= 30) return { emoji: '🥇', label: '30 Gün Şampiyonu' };
+  if (streak >= 14) return { emoji: '🌟', label: '2 Hafta Serisi' };
+  if (streak >= 7)  return { emoji: '🔥', label: '7 Gün Serisi' };
+  if (streak >= 3)  return { emoji: '✨', label: '3 Gün Serisi' };
+  return null;
+}
+
+function downloadDataAsJSON() {
+  const isTr = (state.lang || 'tr') === 'tr';
+  const exportData = {
+    exported_at: new Date().toISOString(),
+    app: 'Flowia',
+    user: { name: state.user?.name, email: state.user?.email, dob: state.user?.dob },
+    cycle_settings: { avg_cycle: state.onboardData?.cycleLength || 28, avg_period: state.onboardData?.periodLength || 5 },
+    cycles: state.cycles || [],
+    symptoms: state.symptoms || [],
+    moods: state.moods || [],
+    journals: (state.journals || []).map(j => ({ date: j.date, content: j.content, tags: j.tags })),
+    predictions: {
+      last_period_start: PREDICTIONS?.lastPeriodDate,
+      next_period_start: PREDICTIONS?.nextPeriodStart,
+      ovulation_date: PREDICTIONS?.ovulationDate,
+      fertile_start: PREDICTIONS?.fertileStart,
+      fertile_end: PREDICTIONS?.fertileEnd,
+    }
+  };
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'flowia_data_' + new Date().toISOString().split('T')[0] + '.json';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  showToast(isTr ? 'JSON verileriniz indiriliyor 📁' : 'Your JSON data is downloading 📁');
+}
+
+function downloadDataAsCSV() {
+  const isTr = (state.lang || 'tr') === 'tr';
+  const rows = [['Tarih/Date','Semptomlar/Symptoms','Stres/Stress','Hap/Pill','Ruh Hali/Mood','Enerji/Energy']];
+  const allDates = new Set([
+    ...(state.symptoms || []).map(s => s.date),
+    ...(state.moods    || []).map(m => m.date),
+  ]);
+  [...allDates].sort().reverse().forEach(date => {
+    const sym = (state.symptoms || []).find(s => s.date === date);
+    const moo = (state.moods    || []).find(m => m.date === date);
+    rows.push([
+      date,
+      sym ? (sym.symptoms || []).join(';') : '',
+      sym ? (sym.stress  || 0) : '',
+      sym ? (sym.pill ? 'Evet/Yes' : 'Hayır/No') : '',
+      moo ? (moo.mood  || '') : '',
+      moo ? (moo.energy|| '') : '',
+    ]);
+  });
+  const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'flowia_data_' + new Date().toISOString().split('T')[0] + '.csv';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  showToast(isTr ? 'CSV dosyası indiriliyor 📊' : 'CSV file downloading 📊');
+}
+
 function markPeriodEndedToday() {
+
   const cDay = (PREDICTIONS && PREDICTIONS.cycleDay) ? PREDICTIONS.cycleDay : 3;
   state.periodEndedEarly = true;
   state.actualPeriodLength = cDay;
@@ -2744,6 +2835,29 @@ function renderHome() {
         ${t('resume_period_btn')}
       </button>
     </div>` : '')}
+
+    <!-- Streak & Today Summary Card -->
+    <div class="section">
+      <div class="section-header"><span class="section-title">${(state.lang||'tr')==='tr' ? 'Bugünkü Özet' : "Today's Summary"}</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:linear-gradient(135deg,var(--primary-light),var(--secondary-light));border-radius:var(--r-lg);padding:14px 16px;border:1px solid var(--border-light)">
+          ${(() => { const s = getLoggingStreak(); const b = getStreakBadge(s); return `
+            <div style="font-size:22px;margin-bottom:4px">${b ? b.emoji : '📅'}</div>
+            <div style="font-size:24px;font-weight:800;color:var(--primary)">${s}</div>
+            <div style="font-size:11px;color:var(--text-2);font-weight:600">${(state.lang||'tr')==='tr' ? 'Gün Kayıt Serisi' : 'Day Log Streak'}</div>
+            ${b ? `<div style="margin-top:5px;font-size:10px;font-weight:700;color:var(--primary);background:rgba(156,39,176,0.1);border-radius:8px;padding:2px 7px;display:inline-block">${b.label}</div>` : ''}
+          `; })()}
+        </div>
+        <div style="background:var(--surface-2);border-radius:var(--r-lg);padding:14px 16px;border:1px solid var(--border-light)">
+          <div style="font-size:22px;margin-bottom:4px">📝</div>
+          <div style="font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:6px">${(state.lang||'tr')==='tr' ? 'Bugün Kaydedildi' : 'Logged Today'}</div>
+          <div style="font-size:12px;color:var(--text-2)">${state.moods.find(m=>m.date===TODAY_STR) ? '✅ ' + ((state.lang||'tr')==='tr' ? 'Ruh hali' : 'Mood') : '○ ' + ((state.lang||'tr')==='tr' ? 'Ruh hali yok' : 'No mood')}</div>
+          <div style="font-size:12px;color:var(--text-2)">${state.symptoms.find(s=>s.date===TODAY_STR) ? '✅ ' + ((state.lang||'tr')==='tr' ? 'Semptomlar' : 'Symptoms') : '○ ' + ((state.lang||'tr')==='tr' ? 'Semptom yok' : 'No symptoms')}</div>
+          ${(state.symptoms.find(s=>s.date===TODAY_STR)?.stress > 0) ? `<div style="font-size:12px;color:var(--text-2)">😤 ${(state.lang||'tr')==='tr' ? 'Stres' : 'Stress'}: ${state.symptoms.find(s=>s.date===TODAY_STR).stress}/5</div>` : ''}
+          ${state.symptoms.find(s=>s.date===TODAY_STR)?.pill ? `<div style="font-size:12px;color:var(--success)">💊 ${(state.lang||'tr')==='tr' ? 'Hap alındı' : 'Pill taken'}</div>` : ''}
+        </div>
+      </div>
+    </div>
 
     <!-- Quick Actions -->
     <div class="section">
@@ -3191,6 +3305,36 @@ function renderSymptoms() {
         </div>
       </div>
 
+
+      <!-- STRESS LEVEL SLIDER -->
+      <div class="input-group" style="margin-bottom:18px;padding:16px;background:var(--surface-2);border-radius:var(--r-lg);border:1px solid var(--border-light)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <label class="input-label" style="margin:0">😤 ${isTr ? 'Stres Seviyesi' : 'Stress Level'}</label>
+          <span id="stress-val-disp" style="font-size:16px;font-weight:800;color:var(--primary)">${state.stressLevel || 0}/5</span>
+        </div>
+        <input type="range" min="0" max="5" step="1" value="${state.stressLevel || 0}"
+          style="width:100%;accent-color:var(--primary)"
+          oninput="state.stressLevel=parseInt(this.value);document.getElementById('stress-val-disp').textContent=this.value+'/5'" />
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-2);margin-top:5px">
+          <span>${isTr ? 'Yok' : 'None'}</span><span>${isTr ? 'Hafif' : 'Mild'}</span><span>${isTr ? 'Orta' : 'Mod.'}</span><span>${isTr ? 'Yüksek' : 'High'}</span><span>${isTr ? 'Çok Yüksek' : 'Very High'}</span><span>${isTr ? 'Aşırı' : 'Extreme'}</span>
+        </div>
+      </div>
+
+      <!-- PILL / CONTRACEPTIVE TOGGLE -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--surface-2);border-radius:var(--r-lg);border:1px solid var(--border-light);margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:22px">💊</span>
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--text-1)">${isTr ? 'Hap / Kontraseptif Aldım' : 'Took Pill / Contraceptive'}</div>
+            <div style="font-size:12px;color:var(--text-2)">${isTr ? 'Bugün doğum kontrolü kullandım' : 'I used birth control today'}</div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" ${state.pillTakenToday ? 'checked' : ''} onchange="state.pillTakenToday=this.checked"/>
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+
       <div class="symptom-section-title">${t('physical_symptoms')}</div>
       <div class="symptoms-grid" style="margin-bottom:20px">
         ${SYMPTOMS_PHYSICAL.map(s => `
@@ -3236,23 +3380,33 @@ function renderSymptoms() {
 
 function saveSymptomsLog() {
   const isTr = (state.lang || 'tr') === 'tr';
-  if (state.selectedSymptoms.length > 0) {
-    const symptomLogDate = state.logDate || TODAY_STR;
-    // Update existing entry for the same date or prepend new one
-    const existingSymIdx = state.symptoms.findIndex(s => s.date === symptomLogDate);
+  const symptomLogDate = state.logDate || TODAY_STR;
+  const existingSymIdx = state.symptoms.findIndex(s => s.date === symptomLogDate);
+  const stressLevel = state.stressLevel || 0;
+  const pillTaken   = state.pillTakenToday || false;
+
+  if (state.selectedSymptoms.length > 0 || stressLevel > 0 || pillTaken) {
     if (existingSymIdx !== -1) {
-      // Merge symptoms for the same date
       const existing = state.symptoms[existingSymIdx];
       const merged = [...new Set([...existing.symptoms, ...state.selectedSymptoms])];
-      state.symptoms[existingSymIdx] = { date: symptomLogDate, symptoms: merged, severity: Math.max(existing.severity || 1, state.selectedSeverity) };
+      state.symptoms[existingSymIdx] = {
+        date: symptomLogDate, symptoms: merged,
+        severity: Math.max(existing.severity || 1, state.selectedSeverity),
+        stress: stressLevel, pill: pillTaken
+      };
     } else {
-      state.symptoms.unshift({ date: symptomLogDate, symptoms: [...state.selectedSymptoms], severity: state.selectedSeverity });
+      state.symptoms.unshift({
+        date: symptomLogDate, symptoms: [...state.selectedSymptoms],
+        severity: state.selectedSeverity, stress: stressLevel, pill: pillTaken
+      });
     }
     state.selectedSymptoms = [];
+    state.stressLevel = 0;
+    state.pillTakenToday = false;
   }
   saveToStorage();
   updateDynamicNotifications();
-  showToast(isTr ? 'Semptomlar kaydedildi! 💊' : 'Symptoms saved! 💊');
+  showToast(isTr ? 'Kaydedildi! Stres: ' + stressLevel + '/5 💊' : 'Saved! Stress: ' + stressLevel + '/5 💊');
   navigate('home', 'back');
 }
 
@@ -5046,12 +5200,22 @@ function renderSettings() {
 
     <div class="settings-section" style="margin-bottom:8px">
       <div class="settings-section-title">${t('data_mgmt')}</div>
-      <div class="settings-item" onclick="openDataExportModal()" style="cursor:pointer">
+      <div class="settings-item" onclick="downloadDataAsJSON()" style="cursor:pointer">
         <div class="profile-item-left" style="display:flex;align-items:center;gap:12px">
           <div class="settings-item-icon" style="background:#E3F2FD">📤</div>
           <div class="settings-item-text">
-            <div class="settings-item-label">${t('export_data')}</div>
+            <div class="settings-item-label">${t('export_data')} (JSON)</div>
             <div class="settings-item-desc">${t('export_desc')}</div>
+          </div>
+        </div>
+        <div class="settings-item-value">›</div>
+      </div>
+      <div class="settings-item" onclick="downloadDataAsCSV()" style="cursor:pointer">
+        <div class="profile-item-left" style="display:flex;align-items:center;gap:12px">
+          <div class="settings-item-icon" style="background:#E8F5E9">📊</div>
+          <div class="settings-item-text">
+            <div class="settings-item-label">${(state.lang||'tr')==='tr' ? 'CSV Olarak İndir' : 'Download as CSV'}</div>
+            <div class="settings-item-desc">${(state.lang||'tr')==='tr' ? 'Excel ile açılabilir tablo formatı' : 'Spreadsheet format, opens in Excel'}</div>
           </div>
         </div>
         <div class="settings-item-value">›</div>
@@ -5998,10 +6162,11 @@ function init() {
     if (!state.user) state.user = { name: 'Flowia Kullanıcısı', email: '', avgCycle: 28, avgPeriod: 5, initials: 'F' };
     if (!state.user.email || !state.isLoggedIn) {
       state.isLoggedIn = false;
-      if (!state.cycles) state.cycles = [];
-      if (!state.symptoms) state.symptoms = [];
-      if (!state.moods) state.moods = [];
-      if (!state.journals) state.journals = [];
+      if (!state.cycles)  state.cycles  = [];
+      // Only seed empty arrays — never overwrite existing user data with mock data
+      if (!state.symptoms || !Array.isArray(state.symptoms)) state.symptoms = [];
+      if (!state.moods    || !Array.isArray(state.moods))    state.moods    = [];
+      if (!state.journals || !Array.isArray(state.journals)) state.journals = [];
     }
     try {
       PREDICTIONS = computePredictions();
