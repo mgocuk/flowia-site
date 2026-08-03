@@ -1,36 +1,19 @@
-const CACHE_NAME = 'flowia-v3.0';
+const CACHE_NAME = 'flowia-v5.0';
 const STATIC_ASSETS = [
   './',
   './index.html',
-  './app.js',
-  './styles.css',
+  './app.html',
+  './app.js?v=5.0',
+  './styles.css?v=5.0',
   './manifest.json',
   './favicon.png',
-  './icon-72.png',
-  './icon-96.png',
-  './icon-120.png',
-  './icon-128.png',
-  './icon-144.png',
-  './icon-152.png',
-  './icon-167.png',
-  './icon-180.png',
-  './icon-192.png',
-  './icon-256.png',
-  './icon-512.png',
-  './splash-1125x2436.png',
-  './splash-1170x2532.png',
-  './splash-1179x2556.png',
-  './splash-1290x2796.png',
-  './screenshot-home.png',
-  './screenshot-calendar.png',
-  './privacy-policy.html',
-  './terms-of-service.html',
-  'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap',
-  'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js'
+  './lily-logo.png',
+  './lily-logo-sm.png'
 ];
 
-// ── INSTALL: Cache all static assets ──────────────────────────
+// ── INSTALL: Cache all static assets & skip waiting immediately ──
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return Promise.allSettled(
@@ -38,16 +21,16 @@ self.addEventListener('install', event => {
           cache.add(url).catch(e => console.warn('[SW] Failed to cache:', url, e))
         )
       );
-    }).then(() => self.skipWaiting())
+    })
   );
 });
 
-// ── ACTIVATE: Delete old caches ────────────────────────────────
+// ── ACTIVATE: Delete ALL old caches & claim clients immediately ──
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+        keys.map(k => caches.delete(k))
       )
     ).then(() => self.clients.claim())
   );
@@ -61,13 +44,51 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   if (url.protocol === 'chrome-extension:') return;
 
-  // Strategy 1: Cache-First for static assets (fonts, icons, CSS, JS)
-  const isStatic = (
-    url.pathname.match(/\.(png|jpg|jpeg|gif|svg|ico|woff2?|ttf|css)$/) ||
-    url.hostname.includes('fonts.googleapis.com') ||
-    url.hostname.includes('fonts.gstatic.com') ||
-    url.hostname.includes('cdn.jsdelivr.net')
+  // Strategy 1: Network-First for JS, CSS, and HTML (ALWAYS fetch latest code!)
+  const isCodeOrApp = (
+    url.pathname.match(/\.(js|css|html)$/) ||
+    url.pathname === '/' ||
+    url.pathname.endsWith('/')
   );
+
+  if (isCodeOrApp) {
+    event.respondWith(
+      fetch(event.request).then(response => {
+        if (response && response.status === 200) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+        }
+        return response;
+      }).catch(() => {
+        return caches.match(event.request).then(cached => {
+          return cached || caches.match('./app.html') || caches.match('./index.html');
+        });
+      })
+    );
+    return;
+  }
+
+  // Strategy 2: Cache-First for static media assets (png, jpg, fonts)
+  const isStatic = (
+    url.pathname.match(/\.(png|jpg|jpeg|gif|svg|ico|woff2?|ttf)$/) ||
+    url.hostname.includes('fonts.googleapis.com') ||
+    url.hostname.includes('fonts.gstatic.com')
+  );
+
+  if (isStatic) {
+    event.respondWith(
+      caches.match(event.request).then(cached => {
+        if (cached) return cached;
+        return fetch(event.request).then(response => {
+          if (!response || response.status !== 200) return response;
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+          return response;
+        }).catch(() => caches.match('./favicon.png'));
+      })
+    );
+    return;
+  }
 
   if (isStatic) {
     event.respondWith(
