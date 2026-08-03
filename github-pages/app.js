@@ -1268,6 +1268,12 @@ function updateStatusTime() {
 // 5. ROUTER & NAVIGATION
 // ============================================================
 function navigate(screen, dir = 'forward') {
+  // Reset calendar month view to current month when navigating to calendar from navigation bar
+  if (screen === 'calendar' && dir !== 'refresh' && dir !== 'back') {
+    state.calendarYear = TODAY.getFullYear();
+    state.calendarMonth = TODAY.getMonth();
+    state.calendarSelectedDay = TODAY.getDate();
+  }
   const container = document.getElementById('screen');
   if (!container) {
     console.warn('[Flowia] #screen container element not found yet.');
