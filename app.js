@@ -1,4 +1,32 @@
 
+function setNotifPeriodDays(val) {
+  state.notifPeriodDays = parseInt(val, 10) || 2;
+  saveToStorage();
+  updateDynamicNotifications();
+  const isTr = (state.lang || 'tr') === 'tr';
+  showToast(isTr ? `Adet anımsatıcısı ${state.notifPeriodDays} gün önceye ayarlandı 🔔` : `Period reminder set to ${state.notifPeriodDays} days before 🔔`);
+  navigate('settings', 'refresh');
+}
+
+function setNotifOvulationDays(val) {
+  state.notifOvulationDays = parseInt(val, 10) || 1;
+  saveToStorage();
+  updateDynamicNotifications();
+  const isTr = (state.lang || 'tr') === 'tr';
+  showToast(isTr ? `Yumurtlama uyarısı ${state.notifOvulationDays} gün önceye ayarlandı 📅` : `Ovulation reminder set to ${state.notifOvulationDays} days before 📅`);
+  navigate('settings', 'refresh');
+}
+
+function setNotifDailyTime(val) {
+  state.notifDailyTime = val || '20:00';
+  saveToStorage();
+  updateDynamicNotifications();
+  const isTr = (state.lang || 'tr') === 'tr';
+  showToast(isTr ? `Günlük kayıt anımsatıcısı saat ${state.notifDailyTime} olarak güncellendi ⏰` : `Daily log reminder time updated to ${state.notifDailyTime} ⏰`);
+  navigate('settings', 'refresh');
+}
+
+
 // ============================================================
 // SECURITY & ACCESSIBILITY HELPERS
 // ============================================================
@@ -5784,17 +5812,29 @@ function updateDynamicNotifications() {
 
     const newNotifs = [];
 
-    // 1. Period prediction notification
-    if (P.daysUntilPeriod !== undefined) {
-      const daysLabel = isTr ? 'gün' : 'days';
+    // 1. Period prediction notification (Respects user's selected 1, 2, or 3 days in advance preference)
+    const targetPeriodNotifDays = state.notifPeriodDays || 2;
+    if (P.daysUntilPeriod !== undefined && (P.daysUntilPeriod === targetPeriodNotifDays || P.daysUntilPeriod === 0)) {
       const title = isTr
-        ? (P.daysUntilPeriod === 0 ? 'Adet bugün başlıyor!' : P.daysUntilPeriod + ' gün sonra adet')
-        : (P.daysUntilPeriod === 0 ? 'Period starts today!' : 'Period in ' + P.daysUntilPeriod + ' days');
+        ? (P.daysUntilPeriod === 0 ? 'Adet bugün başlıyor! 🩸' : `Adete ${P.daysUntilPeriod} gün kaldı 🔔`)
+        : (P.daysUntilPeriod === 0 ? 'Period starts today! 🩸' : `Period in ${P.daysUntilPeriod} days 🔔`);
       const body = isTr
-        ? ('Sonraki adetinizin ' + formatDate(P.nextPeriodStart) + ' tarihinde başlaması bekleniyor.')
-        : ('Your next period is predicted to start on ' + formatDate(P.nextPeriodStart) + '.');
-      newNotifs.push({ id: 'notif_period_pred', type: 'prediction', icon: '📅', title, body, time: isTr ? 'Az önce' : 'Just now', read: false });
+        ? (`Sonraki adetinizin ${formatDate(P.nextPeriodStart)} tarihinde başlaması bekleniyor.`)
+        : (`Your next period is predicted to start on ${formatDate(P.nextPeriodStart)}.`);
+      newNotifs.push({ id: 'notif_period_pred', type: 'prediction', icon: '🔔', title, body, time: isTr ? 'Anımsatıcı' : 'Reminder', read: false });
     }
+
+    // 2. Daily Log Reminder (Respects user's selected notification time: e.g. 20:00)
+    const dailyTime = state.notifDailyTime || '20:00';
+    newNotifs.push({
+      id: 'notif_daily_reminder',
+      type: 'reminder',
+      icon: '💊',
+      title: isTr ? `Günlük Kayıt Anımsatıcısı (${dailyTime}) ⏰` : `Daily Log Reminder (${dailyTime}) ⏰`,
+      body: isTr ? `Saat ${dailyTime}! Bugünkü semptom ve ruh halinizi kaydetmeyi unutmayın.` : `It is ${dailyTime}! Don't forget to log your symptoms & mood today.`,
+      time: dailyTime,
+      read: false
+    });
 
     // 2. Ovulation / fertility notification
     if (P.cycleDay && P.avgCycle) {
