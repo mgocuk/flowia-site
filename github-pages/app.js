@@ -1343,8 +1343,12 @@ function navigate(screen, dir = 'forward') {
     'medical-disclaimer': renderMedicalDisclaimer,
   };
 
-  const renderFn = screenMap[screen];
-  if (!renderFn) return;
+  let renderFn = screenMap[screen];
+  if (!renderFn) {
+    console.warn('[Flowia] Invalid screen requested:', screen, 'falling back...');
+    screen = (state && state.isLoggedIn) ? 'home' : 'login';
+    renderFn = screenMap[screen] || renderLogin;
+  }
 
   try {
     const contentHtml = renderFn();
@@ -5821,19 +5825,28 @@ function init() {
     }
   } catch(e) {}
 
-  // On fresh app launch, default to login screen unless user has a valid active session
-  if (!state.user || !state.user.email || !state.isLoggedIn) {
+  try {
+    if (!state.user || !state.user.email || !state.isLoggedIn) {
+      state.isLoggedIn = false;
+      if (!state.cycles) state.cycles = [];
+      if (!state.symptoms) state.symptoms = [];
+      if (!state.moods) state.moods = [];
+      if (!state.journals) state.journals = [];
+    }
+    try {
+      PREDICTIONS = computePredictions();
+      updateDynamicNotifications();
+    } catch(e) { console.warn('[Flowia] Notifications init fallback:', e); }
+
+    const targetScreen = state.isLoggedIn ? (state.savedScreen || 'home') : 'login';
+    state.screen = null;
+    navigate(targetScreen, 'refresh');
+  } catch(e) {
+    console.error('[Flowia] Startup init error:', e);
     state.isLoggedIn = false;
-    state.cycles = [];
-    state.symptoms = [];
-    state.moods = [];
-    state.journals = [];
+    state.screen = null;
+    navigate('login', 'refresh');
   }
-  // Generate fresh dynamic notifications on startup
-  updateDynamicNotifications();
-  const targetScreen = state.isLoggedIn ? (state.savedScreen || 'home') : 'login';
-  state.screen = null;
-  navigate(targetScreen, 'refresh');
 }
 
 if (document.readyState === 'loading') {
