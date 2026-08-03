@@ -464,15 +464,13 @@ select option {
 }
 .splash-logo-circle {
   width: 100px; height: 100px; border-radius: 28px;
-  background: linear-gradient(135deg, #E8789A, #9B72CF);
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 12px 40px rgba(232,120,154,0.5);
+  background: url('./lily-logo-sm.png') center/cover no-repeat;
+  box-shadow: 0 12px 40px rgba(155,114,207,0.4);
   animation: float 3s ease-in-out infinite;
-  font-size: 52px;
 }
 .splash-app-name {
   font-size: 34px; font-weight: 800; letter-spacing: -0.5px;
-  background: linear-gradient(135deg, #C2185B, #9B72CF);
+  background: linear-gradient(135deg, #7B1FA2, #9B72CF);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   background-clip: text;
 }
@@ -483,11 +481,11 @@ select option {
 }
 .splash-dots { display: flex; gap: 8px; animation: fadeInUp 1s ease 0.4s both; }
 .splash-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--primary); animation: pulse 1.2s ease infinite;
+  width: 8px; height: 8px; border-radius: 50%; background: var(--primary);
+  opacity: 0.3; animation: pulseDot 1.4s infinite ease-in-out;
 }
-.splash-dot:nth-child(2) { animation-delay: 0.2s; background: var(--secondary); }
-.splash-dot:nth-child(3) { animation-delay: 0.4s; background: #66BB6A; }
+.splash-dot:nth-child(2) { animation-delay: 0.2s; }
+.splash-dot:nth-child(3) { animation-delay: 0.4s; }
 
 /* ============================================================
    SCREEN: AUTH (Login / Register)
@@ -503,10 +501,9 @@ select option {
   border-radius: 0 0 32px 32px; margin-bottom: 4px;
 }
 .auth-logo-sm {
-  width: 64px; height: 64px; border-radius: 18px;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 32px; box-shadow: var(--sh-md); margin-bottom: 6px;
+  width: 72px; height: 72px; border-radius: 20px;
+  background: url('./lily-logo-sm.png') center/cover no-repeat;
+  box-shadow: 0 8px 24px rgba(155, 114, 207, 0.3); margin-bottom: 8px;
 }
 .auth-title { font-size: 24px; font-weight: 700; color: var(--text-1); }
 .auth-subtitle { font-size: 14px; color: var(--text-2); text-align: center; }
