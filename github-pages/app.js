@@ -614,24 +614,11 @@ function computePredictions() {
   const diffDays  = Math.round((todayZero - lastZero) / 86400000);
   const cycleDay  = Math.max(1, diffDays + 1);
 
-  // Ovulation: luteal phase is fixed at ~14 days before next period
-  let ovulationDayNum = avgCycle - 14;
-  let fertileStartDayNum = ovulationDayNum - 5;
-  let fertileEndDayNum = ovulationDayNum + 1;
-
-  if (state && state.periodEndedEarly && state.actualPeriodLength) {
-    const savedDays = avgPeriod - state.actualPeriodLength;
-    if (savedDays > 0) {
-      const shift = Math.floor(savedDays / 2);
-      ovulationDayNum = Math.max(state.actualPeriodLength + 5, ovulationDayNum - shift);
-      fertileStartDayNum = state.actualPeriodLength + 1;
-      fertileEndDayNum = ovulationDayNum + 1;
-    }
-  }
-
-  const ovulationDate = addDays(lastPeriodDate, ovulationDayNum - 1);
-  const fertileStart  = addDays(lastPeriodDate, fertileStartDayNum - 1);
-  const fertileEnd    = addDays(lastPeriodDate, fertileEndDayNum - 1);
+    // Standard biological cycle calculation (5 light green fertile days + 1 dark green peak ovulation day)
+  const ovulationDayNum = avgCycle - 14;  // Day 14 of 28-day cycle
+  const ovulationDate  = addDays(lastPeriodDate, ovulationDayNum - 1); // 1 Dark Green Day
+  const fertileStart   = addDays(ovulationDate, -5);                   // 5 Light Green Days start
+  const fertileEnd     = addDays(ovulationDate, -1);                   // 5 Light Green Days end (day before peak)
 
   // Next period dates
   const nextPeriodStart = addDays(lastPeriodDate, avgCycle);
@@ -658,9 +645,9 @@ function computePredictions() {
   for (let i = 1; i <= 24; i++) {
     const pStart = addDays(lastPeriodDate, avgCycle * i);
     const pEnd   = addDays(pStart, avgPeriod - 1);
-    const ovDate = addDays(pStart, -14);
+    const ovDate = addDays(pStart, avgCycle - 15);
     const fStart = addDays(ovDate, -5);
-    const fEnd   = ovDate;
+    const fEnd   = addDays(ovDate, -1);
     futurePeriods.push({
       cycleIndex: i,
       start: pStart,
@@ -668,6 +655,7 @@ function computePredictions() {
       ovulationDate: ovDate,
       fertileStart: fStart,
       fertileEnd: fEnd,
+    
     });
   }
 
@@ -1204,20 +1192,20 @@ function getDateClass(year, month, day) {
   // Today
   if (isSameDay(date, TODAY)) classes.push('today');
 
-  // Determine current active cycle period length
   const pLen = (state && state.periodEndedEarly && state.actualPeriodLength) 
     ? state.actualPeriodLength 
     : (P.avgPeriod || 5);
 
-  // Current active cycle period days
+  // 1. Check logged / historical period entries
+  let isPeriodDay = false;
   if (P.lastPeriodDate) {
     const periodEnd = addDays(P.lastPeriodDate, pLen - 1);
     if (dateInRange(date, P.lastPeriodDate, periodEnd)) {
       classes.push('period');
+      isPeriodDay = true;
     }
   }
 
-  // Historical logged cycles (adjust current cycle endDate if early period end is active)
   (state.cycles || []).forEach(c => {
     if (c.startDate && c.endDate) {
       let cStart = new Date(c.startDate);
@@ -1227,53 +1215,43 @@ function getDateClass(year, month, day) {
       }
       if (dateInRange(date, cStart, cEnd)) {
         if (!classes.includes('period')) classes.push('period');
+        isPeriodDay = true;
       }
     }
   });
 
-  // If date falls AFTER early period end in current cycle, strip 'period' class for all remaining days until next cycle
-  if (state && state.periodEndedEarly && P.lastPeriodDate) {
-    const earlyEnd = addDays(P.lastPeriodDate, state.actualPeriodLength - 1);
-    const nextStart = P.nextPeriodStart || addDays(P.lastPeriodDate, P.avgCycle || 28);
-    if (date > earlyEnd && date < nextStart) {
-      let pIdx;
-      while ((pIdx = classes.indexOf('period')) !== -1) {
-        classes.splice(pIdx, 1);
+  // If date is an active period day, do not add fertility/ovulation highlights to it
+  if (isPeriodDay) return classes.join(' ');
+
+  // 2. Current Cycle Fertility & Ovulation (5 Light Green + 1 Dark Green)
+  if (P.ovulationDate && isSameDay(date, P.ovulationDate)) {
+    classes.push('ovulation');
+    return classes.join(' ');
+  }
+  if (P.fertileStart && P.fertileEnd && dateInRange(date, P.fertileStart, P.fertileEnd)) {
+    classes.push('fertile');
+    return classes.join(' ');
+  }
+
+  // 3. Future Cycles Predictions (Period, 5 Light Green, 1 Dark Green)
+  if (P.futurePeriods) {
+    for (let fp of P.futurePeriods) {
+      if (fp.start && fp.end && dateInRange(date, fp.start, fp.end)) {
+        classes.push('predicted');
+        return classes.join(' ');
+      }
+      if (fp.ovulationDate && isSameDay(date, fp.ovulationDate)) {
+        classes.push('ovulation');
+        return classes.join(' ');
+      }
+      if (fp.fertileStart && fp.fertileEnd && dateInRange(date, fp.fertileStart, fp.fertileEnd)) {
+        classes.push('fertile');
+        return classes.join(' ');
       }
     }
   }
 
-  // Fertile window
-  if (P.fertileStart && P.fertileEnd && dateInRange(date, P.fertileStart, P.fertileEnd))
-    classes.push('fertile');
-
-  // Ovulation day (peak fertility)
-  if (P.ovulationDate && isSameDay(date, P.ovulationDate))
-    classes.push('ovulation');
-
-  // Future predictions for all upcoming months (Period, Fertile Window, Ovulation Day)
-  if (date > TODAY && P.futurePeriods) {
-    P.futurePeriods.forEach(fp => {
-      if (fp.start && fp.end && dateInRange(date, fp.start, fp.end)) {
-        if (!classes.includes('predicted')) classes.push('predicted');
-      }
-      if (fp.fertileStart && fp.fertileEnd && dateInRange(date, fp.fertileStart, fp.fertileEnd)) {
-        if (!classes.includes('fertile')) classes.push('fertile');
-      }
-      if (fp.ovulationDate && isSameDay(date, fp.ovulationDate)) {
-        if (!classes.includes('ovulation')) classes.push('ovulation');
-      }
-    });
-  }
-
   return classes.join(' ');
-}
-function updateStatusTime() {
-  const el = document.getElementById('status-time');
-  if (el) {
-    const now = new Date();
-    el.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-  }
 }
 
 // ============================================================
