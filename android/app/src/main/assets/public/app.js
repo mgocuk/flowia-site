@@ -553,10 +553,17 @@ function toggleDarkMode(enabled) {
 }
 
 function applyTheme() {
-  const isDark = !!(state && state.darkMode);
-  const frame = document.querySelector('.device-frame');
-  if (frame) frame.classList.toggle('dark', isDark);
-  document.documentElement.classList.toggle('dark', isDark);
+  try {
+    const isDark = !!(state && state.darkMode);
+    const frame = document.querySelector ? document.querySelector('.device-frame') : null;
+    if (frame && frame.classList) frame.classList.toggle('dark', isDark);
+    if (document.documentElement && document.documentElement.classList) {
+      document.documentElement.classList.toggle('dark', isDark);
+    }
+    if (document.body && document.body.classList) {
+      document.body.classList.toggle('dark', isDark);
+    }
+  } catch(e) { console.warn('[Flowia] applyTheme error:', e); }
 }
 
 function setFirstDayOfWeek(val) {
@@ -5802,6 +5809,18 @@ function updateDynamicNotifications() {
     state.notifications = [...newNotifs, ...preserved].slice(0, 20);
 
   } catch(e) { console.warn('[Flowia] updateDynamicNotifications error:', e); }
+}
+
+function updateStatusTime() {
+  try {
+    const el = document.getElementById('status-time');
+    if (el) {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      el.textContent = `${h}:${m}`;
+    }
+  } catch(e) {}
 }
 
 function init() {
