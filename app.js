@@ -2931,12 +2931,16 @@ function syncWithICloud() {
 
 function openSyncGuideModal() {
   const isTr = (state.lang || 'tr') === 'tr';
+  const existing = document.getElementById('sync-guide-modal');
+  if (existing) existing.remove();
+
   const modal = document.createElement('div');
-  modal.className = 'modal-overlay open';
+  modal.className = 'custom-modal-overlay open';
   modal.id = 'sync-guide-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(15,7,20,0.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px';
 
   modal.innerHTML = `
-    <div class="modal-card" style="max-width:440px;max-height:85vh;overflow-y:auto;text-align:left">
+    <div class="custom-modal-box" style="width:100%;max-width:440px;max-height:85vh;overflow-y:auto;text-align:left;background:var(--surface);border-radius:24px;padding:24px 20px;box-shadow:0 16px 48px rgba(0,0,0,0.3);border:1px solid var(--border-light);transform:none;transition:none">
       <div style="font-size:18px;font-weight:800;color:var(--text-1);margin-bottom:6px;display:flex;align-items:center;gap:8px">
         <span>📖</span> ${isTr ? 'Adım Adım Senkronizasyon Rehberi' : 'Step-by-Step Sync Guide'}
       </div>
@@ -2974,9 +2978,8 @@ function openSyncGuideModal() {
           <span>📱</span> ${isTr ? 'QR Kod ile Anlık Cihaz Transferi' : 'Instant Device Transfer via QR Code'}
         </div>
         <ol style="margin:0;padding-left:18px;font-size:12px;color:var(--text-2);line-height:1.5">
-          <li><strong>${isTr ? 'QR Oluşturma:' : 'Generate QR:'}</strong> ${isTr ? '1. Cihazınızda "QR Kod ile Cihaz Eşle" butonuna basın.' : 'On 1st device, tap "Pair Device via QR Code".'}</li>
-          <li><strong>${isTr ? 'Kodu Kopyalama:' : 'Copy Data Code:'}</strong> ${isTr ? '"Kodu Kopyala" butonuna basıp mesaj veya e-posta ile kendinize gönderin.' : 'Tap "Copy Code" and send to yourself via message or email.'}</li>
-          <li><strong>${isTr ? '2. Cihazda Yükleme:' : 'Paste on 2nd Device:'}</strong> ${isTr ? '2. Cihazınızda Ayarlar → Yedek Yükle alanına kopyaladığınız metni veya dosyayı yükleyin.' : 'On 2nd device, Settings → Import Backup File and paste the data.'}</li>
+          <li><strong>${isTr ? 'QR / Kod Üretme:' : 'Generate QR / Code:'}</strong> ${isTr ? '1. Cihazınızda "QR Kod ile Cihaz Eşle" butonuna basın ve Kodu Kopyalayın.' : 'On 1st device, tap "Pair Device via QR Code" and Copy Code.'}</li>
+          <li><strong>${isTr ? '2. Cihazda Yükleme:' : 'Paste on 2nd Device:'}</strong> ${isTr ? '2. Cihazınızda "Veri Al (Yükle)" sekmesini açıp kopyaladığınız metni yapıştırın.' : 'On 2nd device, open "Import Data" tab and paste the code.'}</li>
         </ol>
       </div>
 
@@ -3017,6 +3020,8 @@ function importJSONFile(input) {
         PREDICTIONS = computePredictions();
         saveToStorage();
         showToast(isTr ? 'Yedek başarıyla yüklendi ve senkronize edildi! ✨' : 'Backup imported & synced successfully! ✨');
+        const qrM = document.getElementById('qr-modal');
+        if (qrM) qrM.remove();
         navigate('home', 'refresh');
       } else {
         showErrorModal(isTr ? 'Geçersiz Dosya' : 'Invalid File', isTr ? 'Lütfen geçerli bir Flowia JSON yedek dosyası seçin.' : 'Please select a valid Flowia JSON backup file.');
@@ -3028,68 +3033,136 @@ function importJSONFile(input) {
   reader.readAsText(file);
 }
 
-function openQRCodeModal() {
+function openQRCodeModal(activeTab = 'export') {
   const isTr = (state.lang || 'tr') === 'tr';
+  const existing = document.getElementById('qr-modal');
+  if (existing) existing.remove();
+
   const modal = document.createElement('div');
-  modal.className = 'modal-overlay open';
+  modal.className = 'custom-modal-overlay open';
   modal.id = 'qr-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(15,7,20,0.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px';
 
   const exportData = {
     app: 'Flowia',
-    user: state.user?.name || 'User',
-    raw: JSON.stringify({
-      user: state.user,
-      onboardData: state.onboardData,
-      cycles: state.cycles,
-      symptoms: state.symptoms,
-      moods: state.moods,
-      journals: state.journals,
-    })
+    user: state.user,
+    onboardData: state.onboardData,
+    cycles: state.cycles || [],
+    symptoms: state.symptoms || [],
+    moods: state.moods || [],
+    journals: state.journals || [],
+    periodEndedEarly: state.periodEndedEarly || false,
+    actualPeriodLength: state.actualPeriodLength || null,
   };
 
+  const rawJSON = JSON.stringify(exportData);
+
   modal.innerHTML = `
-    <div class="modal-card" style="max-width:380px;text-align:center">
-      <div style="font-size:20px;font-weight:800;color:var(--text-1);margin-bottom:6px">📱 ${isTr ? 'Cihaz Eşleme & Transfer' : 'Device Pairing & Transfer'}</div>
-      <div style="font-size:12px;color:var(--text-2);margin-bottom:16px">${isTr ? '2. cihazınızda aynı veriyi yüklemek için QR kodu kullanın veya kopyalayın.' : 'Use QR code or payload to transfer data to 2nd device.'}</div>
+    <div class="custom-modal-box" style="width:100%;max-width:420px;background:var(--surface);border-radius:24px;padding:24px 20px;text-align:center;box-shadow:0 16px 48px rgba(0,0,0,0.3);border:1px solid var(--border-light);transform:none;transition:none">
+      <div style="font-size:20px;font-weight:800;color:var(--text-1);margin-bottom:6px">📱 ${isTr ? 'Cihazlar Arası Veri Transferi' : 'Device Data Transfer'}</div>
+      <div style="font-size:12px;color:var(--text-2);margin-bottom:16px">${isTr ? '2. Cihazınıza veri aktarın (Veri Ver) veya 2. Cihazdan veri alın (Veri Al).' : 'Export data to 2nd device or import data from 2nd device.'}</div>
 
-      <div id="qrcode-container" style="display:flex;justify-content:center;align-items:center;padding:16px;background:#fff;border-radius:16px;border:1px solid var(--border-light);margin-bottom:16px;min-height:180px">
-        <div style="font-size:12px;color:var(--text-2)">QR Kod Oluşturuluyor...</div>
+      <!-- Tab Buttons -->
+      <div style="display:flex;background:var(--surface-2);border-radius:14px;padding:4px;margin-bottom:16px;gap:4px">
+        <button id="qr-tab-export" onclick="switchQRTab('export')" style="flex:1;padding:8px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;background:${activeTab==='export'?'var(--primary)':'transparent'};color:${activeTab==='export'?'#fff':'var(--text-2)'}">
+          📤 ${isTr ? 'Veri Ver (QR)' : 'Export Data'}
+        </button>
+        <button id="qr-tab-import" onclick="switchQRTab('import')" style="flex:1;padding:8px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;background:${activeTab==='import'?'var(--primary)':'transparent'};color:${activeTab==='import'?'#fff':'var(--text-2)'}">
+          📥 ${isTr ? 'Veri Al (Yükle)' : 'Import Data'}
+        </button>
       </div>
 
-      <div style="font-size:11px;color:var(--text-2);margin-bottom:16px;line-height:1.4">
-        ✨ <strong>${isTr ? 'Nasıl Çalışır?' : 'How It Works:'}</strong><br/>
-        ${isTr ? '2. Cihazınızda Flowia\'yı açın → Ayarlar → Yedek Yükle butonuna basıp yapıştırın.' : 'Open Flowia on 2nd device → Settings → Import backup JSON file.'}
+      <!-- TAB 1: EXPORT / VERİ VER -->
+      <div id="qr-section-export" style="display:${activeTab==='export'?'block':'none'}">
+        <div id="qrcode-container" style="display:flex;justify-content:center;align-items:center;padding:16px;background:#fff;border-radius:16px;border:1px solid var(--border-light);margin-bottom:14px;min-height:180px">
+          <div style="font-size:12px;color:#666">QR Kod Oluşturuluyor...</div>
+        </div>
+        <div style="font-size:11px;color:var(--text-2);margin-bottom:14px;line-height:1.4">
+          📋 ${isTr ? 'QR kod okutulamıyorsa "Kodu Kopyala" butonuna basarak metin kodunu 2. cihazınıza yapıştırabilirsiniz.' : 'If QR scanner is unavailable, copy the text code to 2nd device.'}
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-secondary" onclick="navigator.clipboard.writeText(document.getElementById('qr-payload-text').value);showToast('${isTr?'Veri kopyalandı! 📋 2. cihazda Veri Al sekmesine yapıştırın':'Data copied! 📋 Paste in Import tab on 2nd device'}')" style="flex:1;font-size:12px">
+            📋 ${isTr ? 'Kodu Kopyala' : 'Copy Code'}
+          </button>
+          <button class="btn btn-primary" onclick="document.getElementById('qr-modal').remove()" style="flex:1;font-size:12px">${isTr ? 'Kapat' : 'Close'}</button>
+        </div>
       </div>
 
-      <div style="display:flex;gap:10px">
-        <button class="btn btn-secondary" onclick="navigator.clipboard.writeText(document.getElementById('qr-payload-text').value);showToast('${isTr?'Veri kodu kopyalandı! 📋':'Data code copied! 📋'}')" style="flex:1;font-size:12px">📋 ${isTr?'Kodu Kopyala':'Copy Code'}</button>
-        <button class="btn btn-primary" onclick="document.getElementById('qr-modal').remove()" style="flex:1;font-size:12px">${isTr?'Kapat':'Close'}</button>
+      <!-- TAB 2: IMPORT / VERİ AL -->
+      <div id="qr-section-import" style="display:${activeTab==='import'?'block':'none'};text-align:left">
+        <div style="font-size:12px;font-weight:700;color:var(--text-1);margin-bottom:6px">1. ${isTr ? 'Kopyalanan Veri Kodu Yapıştırın:' : 'Paste Copied Data Code:'}</div>
+        <textarea id="import-text-input" placeholder="${isTr ? 'Diğer cihazdan kopyalanan kodu buraya yapıştırın...' : 'Paste copied code here...'}" style="width:100%;height:90px;padding:10px;border-radius:12px;border:1px solid var(--border-light);background:var(--surface-2);color:var(--text-1);font-size:11px;font-family:monospace;margin-bottom:12px;resize:none"></textarea>
+        
+        <div style="font-size:12px;font-weight:700;color:var(--text-1);margin-bottom:6px">2. ${isTr ? 'Veya .JSON Yedek Dosyası Seçin:' : 'Or Select .JSON Backup File:'}</div>
+        <input type="file" id="import-file-input" accept=".json" class="input-field" style="margin-bottom:16px;font-size:12px" onchange="importJSONFile(this)" />
+
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-primary" onclick="restoreFromPastedText()" style="flex:1;font-size:12px">✨ ${isTr ? 'Veriyi Yükle' : 'Restore Data'}</button>
+          <button class="btn btn-secondary" onclick="document.getElementById('qr-modal').remove()" style="flex:1;font-size:12px">${isTr ? 'İptal' : 'Cancel'}</button>
+        </div>
       </div>
 
-      <textarea id="qr-payload-text" style="position:absolute;left:-9999px;opacity:0">${exportData.raw}</textarea>
+      <textarea id="qr-payload-text" style="position:absolute;left:-9999px;opacity:0">${rawJSON}</textarea>
     </div>
   `;
 
   document.body.appendChild(modal);
 
+  // Generate QR Code
   setTimeout(() => {
     const container = document.getElementById('qrcode-container');
-    if (container) {
+    if (container && activeTab === 'export') {
       container.innerHTML = '';
       if (typeof QRCode !== 'undefined') {
         new QRCode(container, {
-          text: 'https://mgocuk.github.io/flowia-site/app.html#sync=' + btoa(encodeURIComponent(exportData.raw.substring(0, 500))),
-          width: 160,
-          height: 160,
+          text: rawJSON,
+          width: 170,
+          height: 170,
           colorDark : '#1A1A2E',
           colorLight : '#ffffff',
-          correctLevel : QRCode.CorrectLevel.M
+          correctLevel : QRCode.CorrectLevel.L
         });
       } else {
-        container.innerHTML = `<div style="font-size:13px;font-weight:700;color:var(--primary);padding:12px">✅ ${isTr ? 'Veri Paketi Hazır!' : 'Data Ready!'}</div>`;
+        container.innerHTML = `<div style="font-size:13px;font-weight:700;color:var(--primary);padding:12px">✅ ${isTr ? 'Veri Paketi Kopyalamaya Hazır!' : 'Data Package Ready!'}</div>`;
       }
     }
   }, 100);
+}
+
+function switchQRTab(tab) {
+  const modal = document.getElementById('qr-modal');
+  if (modal) modal.remove();
+  openQRCodeModal(tab);
+}
+
+function restoreFromPastedText() {
+  const isTr = (state.lang || 'tr') === 'tr';
+  const txt = document.getElementById('import-text-input')?.value;
+  if (!txt || !txt.trim()) {
+    showErrorModal(isTr ? 'Boş Kod' : 'Empty Code', isTr ? 'Lütfen kopyaladığınız veri kodunu metin kutusuna yapıştırın.' : 'Please paste copied data code into text box.');
+    return;
+  }
+  try {
+    const data = JSON.parse(txt.trim());
+    if (data && (data.app === 'Flowia' || Array.isArray(data.cycles) || Array.isArray(data.symptoms) || data.user)) {
+      if (Array.isArray(data.cycles)) state.cycles = data.cycles;
+      if (Array.isArray(data.symptoms)) state.symptoms = data.symptoms;
+      if (Array.isArray(data.moods)) state.moods = data.moods;
+      if (Array.isArray(data.journals)) state.journals = data.journals;
+      if (data.user) state.user = { ...state.user, ...data.user };
+      if (data.onboardData) state.onboardData = { ...state.onboardData, ...data.onboardData };
+
+      PREDICTIONS = computePredictions();
+      saveToStorage();
+      showToast(isTr ? 'Verileriniz başarıyla yüklendi ve aktarıldı! ✨' : 'Data restored successfully! ✨');
+      document.getElementById('qr-modal')?.remove();
+      navigate('home', 'refresh');
+    } else {
+      showErrorModal(isTr ? 'Geçersiz Kodu' : 'Invalid Code', isTr ? 'Geçerli bir Flowia veri kodu yapıştırın.' : 'Please paste a valid Flowia data code.');
+    }
+  } catch(e) {
+    showErrorModal(isTr ? 'Ayrıştırma Hatası' : 'Parse Error', isTr ? 'Yapıştırılan kod okunamadı veya hatalı.' : 'Pasted code invalid or corrupt.');
+  }
 }
 
 function markPeriodEndedToday() {
