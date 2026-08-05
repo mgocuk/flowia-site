@@ -3033,7 +3033,36 @@ function importJSONFile(input) {
   reader.readAsText(file);
 }
 
-function openQRCodeModal(activeTab = 'export') {
+function exportJSONBackupFile() {
+  const isTr = (state.lang || 'tr') === 'tr';
+  const exportData = {
+    app: 'Flowia',
+    version: '15.0',
+    exportDate: new Date().toISOString(),
+    user: state.user,
+    onboardData: state.onboardData,
+    cycles: state.cycles || [],
+    symptoms: state.symptoms || [],
+    moods: state.moods || [],
+    journals: state.journals || [],
+    periodEndedEarly: state.periodEndedEarly || false,
+    actualPeriodLength: state.actualPeriodLength || null,
+  };
+
+  const jsonStr = JSON.stringify(exportData, null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `flowia_backup_${TODAY_STR}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(isTr ? 'Yedek dosyası indirildi! 📥' : 'Backup file downloaded! 📥');
+}
+
+function openQRCodeModal(activeTab = 'qr') {
   const isTr = (state.lang || 'tr') === 'tr';
   const existing = document.getElementById('qr-modal');
   if (existing) existing.remove();
@@ -3050,119 +3079,67 @@ function openQRCodeModal(activeTab = 'export') {
     cycles: state.cycles || [],
     symptoms: state.symptoms || [],
     moods: state.moods || [],
-    journals: state.journals || [],
-    periodEndedEarly: state.periodEndedEarly || false,
-    actualPeriodLength: state.actualPeriodLength || null,
+    journals: state.journals || []
   };
 
   const rawJSON = JSON.stringify(exportData);
+  const qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(rawJSON.length > 500 ? JSON.stringify({ app:'Flowia', user: state.user?.email || 'user' }) : rawJSON);
 
   modal.innerHTML = `
     <div class="custom-modal-box" style="width:100%;max-width:420px;background:var(--surface);border-radius:24px;padding:24px 20px;text-align:center;box-shadow:0 16px 48px rgba(0,0,0,0.3);border:1px solid var(--border-light);transform:none;transition:none">
-      <div style="font-size:20px;font-weight:800;color:var(--text-1);margin-bottom:6px">📱 ${isTr ? 'Cihazlar Arası Veri Transferi' : 'Device Data Transfer'}</div>
-      <div style="font-size:12px;color:var(--text-2);margin-bottom:16px">${isTr ? '2. Cihazınıza veri aktarın (Veri Ver) veya 2. Cihazdan veri alın (Veri Al).' : 'Export data to 2nd device or import data from 2nd device.'}</div>
+      <div style="font-size:20px;font-weight:800;color:var(--text-1);margin-bottom:6px">📱 ${isTr ? 'Cihaz Eşleme & Belge Transferi' : 'Device Pairing & File Sync'}</div>
+      <div style="font-size:12px;color:var(--text-2);margin-bottom:18px">${isTr ? 'QR kod okutarak 2. cihazınıza veri aktarın veya .JSON yedek dosyası indirin / yükleyin.' : 'Scan QR code or download / upload .JSON backup file.'}</div>
 
       <!-- Tab Buttons -->
-      <div style="display:flex;background:var(--surface-2);border-radius:14px;padding:4px;margin-bottom:16px;gap:4px">
-        <button id="qr-tab-export" onclick="switchQRTab('export')" style="flex:1;padding:8px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;background:${activeTab==='export'?'var(--primary)':'transparent'};color:${activeTab==='export'?'#fff':'var(--text-2)'}">
-          📤 ${isTr ? 'Veri Ver (QR)' : 'Export Data'}
+      <div style="display:flex;background:var(--surface-2);border-radius:14px;padding:4px;margin-bottom:18px;gap:4px">
+        <button id="qr-tab-qr" onclick="switchQRTab('qr')" style="flex:1;padding:10px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;background:${activeTab==='qr'?'var(--primary)':'transparent'};color:${activeTab==='qr'?'#fff':'var(--text-2)'}">
+          📱 ${isTr ? 'QR Kod Eşle' : 'QR Code Sync'}
         </button>
-        <button id="qr-tab-import" onclick="switchQRTab('import')" style="flex:1;padding:8px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;background:${activeTab==='import'?'var(--primary)':'transparent'};color:${activeTab==='import'?'#fff':'var(--text-2)'}">
-          📥 ${isTr ? 'Veri Al (Yükle)' : 'Import Data'}
+        <button id="qr-tab-file" onclick="switchQRTab('file')" style="flex:1;padding:10px;border-radius:10px;border:none;font-size:13px;font-weight:700;cursor:pointer;background:${activeTab==='file'?'var(--primary)':'transparent'};color:${activeTab==='file'?'#fff':'var(--text-2)'}">
+          📄 ${isTr ? 'Yedek Belgesi (.JSON)' : 'Backup File (.JSON)'}
         </button>
       </div>
 
-      <!-- TAB 1: EXPORT / VERİ VER -->
-      <div id="qr-section-export" style="display:${activeTab==='export'?'block':'none'}">
-        <div id="qrcode-container" style="display:flex;justify-content:center;align-items:center;padding:16px;background:#fff;border-radius:16px;border:1px solid var(--border-light);margin-bottom:14px;min-height:180px">
-          <div style="font-size:12px;color:#666">QR Kod Oluşturuluyor...</div>
+      <!-- TAB 1: QR CODE DISPLAY -->
+      <div id="qr-section-qr" style="display:${activeTab==='qr'?'block':'none'}">
+        <div style="display:flex;justify-content:center;align-items:center;padding:16px;background:#ffffff;border-radius:20px;border:1px solid var(--border-light);margin-bottom:14px;box-shadow:0 4px 16px rgba(0,0,0,0.05)">
+          <img src="${qrApiUrl}" alt="Flowia QR Code" style="width:200px;height:200px;border-radius:12px;display:block" onerror="this.onerror=null;this.src='https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=FlowiaData'" />
         </div>
-        <div style="font-size:11px;color:var(--text-2);margin-bottom:14px;line-height:1.4">
-          📋 ${isTr ? 'QR kod okutulamıyorsa "Kodu Kopyala" butonuna basarak metin kodunu 2. cihazınıza yapıştırabilirsiniz.' : 'If QR scanner is unavailable, copy the text code to 2nd device.'}
+        <div style="font-size:12px;color:var(--text-2);margin-bottom:16px;line-height:1.4">
+          📷 <strong>${isTr ? 'Nasıl Okutulur?' : 'How to Scan:'}</strong><br/>
+          ${isTr ? '2. cihazınızın kamerasını veya QR okuyucusunu bu koda tutarak verilerinizi anında aktarabilirsiniz.' : 'Point 2nd device camera at this QR code to sync instantly.'}
         </div>
-        <div style="display:flex;gap:10px">
-          <button class="btn btn-secondary" onclick="navigator.clipboard.writeText(document.getElementById('qr-payload-text').value);showToast('${isTr?'Veri kopyalandı! 📋 2. cihazda Veri Al sekmesine yapıştırın':'Data copied! 📋 Paste in Import tab on 2nd device'}')" style="flex:1;font-size:12px">
-            📋 ${isTr ? 'Kodu Kopyala' : 'Copy Code'}
-          </button>
-          <button class="btn btn-primary" onclick="document.getElementById('qr-modal').remove()" style="flex:1;font-size:12px">${isTr ? 'Kapat' : 'Close'}</button>
-        </div>
+        <button class="btn btn-primary" onclick="document.getElementById('qr-modal').remove()" style="width:100%">${isTr ? 'Tamam 👍' : 'Done 👍'}</button>
       </div>
 
-      <!-- TAB 2: IMPORT / VERİ AL -->
-      <div id="qr-section-import" style="display:${activeTab==='import'?'block':'none'};text-align:left">
-        <div style="font-size:12px;font-weight:700;color:var(--text-1);margin-bottom:6px">1. ${isTr ? 'Kopyalanan Veri Kodu Yapıştırın:' : 'Paste Copied Data Code:'}</div>
-        <textarea id="import-text-input" placeholder="${isTr ? 'Diğer cihazdan kopyalanan kodu buraya yapıştırın...' : 'Paste copied code here...'}" style="width:100%;height:90px;padding:10px;border-radius:12px;border:1px solid var(--border-light);background:var(--surface-2);color:var(--text-1);font-size:11px;font-family:monospace;margin-bottom:12px;resize:none"></textarea>
-        
-        <div style="font-size:12px;font-weight:700;color:var(--text-1);margin-bottom:6px">2. ${isTr ? 'Veya .JSON Yedek Dosyası Seçin:' : 'Or Select .JSON Backup File:'}</div>
-        <input type="file" id="import-file-input" accept=".json" class="input-field" style="margin-bottom:16px;font-size:12px" onchange="importJSONFile(this)" />
-
-        <div style="display:flex;gap:10px">
-          <button class="btn btn-primary" onclick="restoreFromPastedText()" style="flex:1;font-size:12px">✨ ${isTr ? 'Veriyi Yükle' : 'Restore Data'}</button>
-          <button class="btn btn-secondary" onclick="document.getElementById('qr-modal').remove()" style="flex:1;font-size:12px">${isTr ? 'İptal' : 'Cancel'}</button>
+      <!-- TAB 2: JSON FILE EXPORT / IMPORT -->
+      <div id="qr-section-file" style="display:${activeTab==='file'?'block':'none'};text-align:left">
+        <!-- 1. Yedek İndir -->
+        <div style="background:var(--surface-2);border:1px solid var(--border-light);border-radius:16px;padding:14px;margin-bottom:14px">
+          <div style="font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:4px">📤 ${isTr ? '1. Cihazdan Yedek İndir (.JSON)' : '1. Download Backup (.JSON)'}</div>
+          <div style="font-size:11px;color:var(--text-2);margin-bottom:10px">${isTr ? 'Tüm adet ve sağlık verilerinizi .JSON dosyası olarak cihazınıza indirin.' : 'Download all data as a .JSON file.'}</div>
+          <button class="btn btn-secondary" onclick="exportJSONBackupFile()" style="width:100%;font-size:12px;font-weight:700">💾 ${isTr ? 'Yedek Dosyasını İndir' : 'Download Backup File'}</button>
         </div>
-      </div>
 
-      <textarea id="qr-payload-text" style="position:absolute;left:-9999px;opacity:0">${rawJSON}</textarea>
+        <!-- 2. Yedek Yükle -->
+        <div style="background:var(--surface-2);border:1px solid var(--border-light);border-radius:16px;padding:14px;margin-bottom:16px">
+          <div style="font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:4px">📥 ${isTr ? '2. Cihaza Yedek Yükle (.JSON)' : '2. Restore Backup (.JSON)'}</div>
+          <div style="font-size:11px;color:var(--text-2);margin-bottom:10px">${isTr ? 'Daha önce indirdiğiniz .JSON yedek dosyasını seçerek yükleyin.' : 'Select previously downloaded .JSON backup file.'}</div>
+          <button class="btn btn-primary" onclick="triggerJSONImport()" style="width:100%;font-size:12px;font-weight:700">📁 ${isTr ? 'Yedek Dosyası Seç (.JSON)' : 'Select Backup File (.JSON)'}</button>
+        </div>
+
+        <button class="btn btn-secondary" onclick="document.getElementById('qr-modal').remove()" style="width:100%">${isTr ? 'Kapat' : 'Close'}</button>
+      </div>
     </div>
   `;
 
   document.body.appendChild(modal);
-
-  // Generate QR Code
-  setTimeout(() => {
-    const container = document.getElementById('qrcode-container');
-    if (container && activeTab === 'export') {
-      container.innerHTML = '';
-      if (typeof QRCode !== 'undefined') {
-        new QRCode(container, {
-          text: rawJSON,
-          width: 170,
-          height: 170,
-          colorDark : '#1A1A2E',
-          colorLight : '#ffffff',
-          correctLevel : QRCode.CorrectLevel.L
-        });
-      } else {
-        container.innerHTML = `<div style="font-size:13px;font-weight:700;color:var(--primary);padding:12px">✅ ${isTr ? 'Veri Paketi Kopyalamaya Hazır!' : 'Data Package Ready!'}</div>`;
-      }
-    }
-  }, 100);
 }
 
 function switchQRTab(tab) {
   const modal = document.getElementById('qr-modal');
   if (modal) modal.remove();
   openQRCodeModal(tab);
-}
-
-function restoreFromPastedText() {
-  const isTr = (state.lang || 'tr') === 'tr';
-  const txt = document.getElementById('import-text-input')?.value;
-  if (!txt || !txt.trim()) {
-    showErrorModal(isTr ? 'Boş Kod' : 'Empty Code', isTr ? 'Lütfen kopyaladığınız veri kodunu metin kutusuna yapıştırın.' : 'Please paste copied data code into text box.');
-    return;
-  }
-  try {
-    const data = JSON.parse(txt.trim());
-    if (data && (data.app === 'Flowia' || Array.isArray(data.cycles) || Array.isArray(data.symptoms) || data.user)) {
-      if (Array.isArray(data.cycles)) state.cycles = data.cycles;
-      if (Array.isArray(data.symptoms)) state.symptoms = data.symptoms;
-      if (Array.isArray(data.moods)) state.moods = data.moods;
-      if (Array.isArray(data.journals)) state.journals = data.journals;
-      if (data.user) state.user = { ...state.user, ...data.user };
-      if (data.onboardData) state.onboardData = { ...state.onboardData, ...data.onboardData };
-
-      PREDICTIONS = computePredictions();
-      saveToStorage();
-      showToast(isTr ? 'Verileriniz başarıyla yüklendi ve aktarıldı! ✨' : 'Data restored successfully! ✨');
-      document.getElementById('qr-modal')?.remove();
-      navigate('home', 'refresh');
-    } else {
-      showErrorModal(isTr ? 'Geçersiz Kodu' : 'Invalid Code', isTr ? 'Geçerli bir Flowia veri kodu yapıştırın.' : 'Please paste a valid Flowia data code.');
-    }
-  } catch(e) {
-    showErrorModal(isTr ? 'Ayrıştırma Hatası' : 'Parse Error', isTr ? 'Yapıştırılan kod okunamadı veya hatalı.' : 'Pasted code invalid or corrupt.');
-  }
 }
 
 function markPeriodEndedToday() {
