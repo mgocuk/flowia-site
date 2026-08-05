@@ -2927,6 +2927,64 @@ function syncWithICloud() {
   iCloudSync.sync();
 }
 
+function openSyncGuideModal() {
+  const isTr = (state.lang || 'tr') === 'tr';
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay open';
+  modal.id = 'sync-guide-modal';
+
+  modal.innerHTML = `
+    <div class="modal-card" style="max-width:440px;max-height:85vh;overflow-y:auto;text-align:left">
+      <div style="font-size:18px;font-weight:800;color:var(--text-1);margin-bottom:6px;display:flex;align-items:center;gap:8px">
+        <span>📖</span> ${isTr ? 'Adım Adım Senkronizasyon Rehberi' : 'Step-by-Step Sync Guide'}
+      </div>
+      <div style="font-size:12px;color:var(--text-2);margin-bottom:18px;line-height:1.4">
+        ${isTr ? 'Flowia verileriniz %100 gizli tutulur. İstediğiniz yöntemi seçerek cihazlarınız arasında senkronize edebilirsiniz:' : 'Your data is 100% private. Follow these steps to sync across your devices:'}
+      </div>
+
+      <!-- 1. APPLE iCLOUD REHBERİ -->
+      <div style="background:var(--surface-2);border:1px solid var(--border-light);border-radius:var(--r-md);padding:14px;margin-bottom:14px">
+        <div style="font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:8px;display:flex;align-items:center;gap:6px">
+          <span>🍏</span> ${isTr ? 'Apple iCloud Kullanıcıları (iPhone, iPad, Mac)' : 'Apple iCloud Users (iPhone, iPad, Mac)'}
+        </div>
+        <ol style="margin:0;padding-left:18px;font-size:12px;color:var(--text-2);line-height:1.5">
+          <li><strong>${isTr ? 'Yedek Alma (1. Cihaz):' : 'Backup (1st Device):'}</strong> ${isTr ? 'Ayarlar → 🍏 Apple iCloud Senkronizasyonu butonuna basın. Yedeğiniz iCloud Drive / Dosyalar alanına kaydedilir.' : 'Settings → Apple iCloud Sync. Your backup is saved to iCloud Drive / Files.'}</li>
+          <li><strong>${isTr ? '2. Cihaza Yükleme:' : 'Restore (2nd Device):'}</strong> ${isTr ? '2. Apple cihazınızda Flowia\'yı açın, Ayarlar → 📥 Yedek Dosyası Yükle (.JSON) butonuna basıp iCloud Drive\'daki dosyayı seçin.' : 'Open Flowia on 2nd device, Settings → Import Backup File (.JSON) and select the iCloud file.'}</li>
+          <li><strong>${isTr ? 'Sonuç:' : 'Result:'}</strong> ${isTr ? 'Tüm adet ve sağlık geçmişiniz anında senkronize olur.' : 'All cycle & health history syncs instantly.'}</li>
+        </ol>
+      </div>
+
+      <!-- 2. GOOGLE DRIVE REHBERİ -->
+      <div style="background:var(--surface-2);border:1px solid var(--border-light);border-radius:var(--r-md);padding:14px;margin-bottom:14px">
+        <div style="font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:8px;display:flex;align-items:center;gap:6px">
+          <span>☁️</span> ${isTr ? 'Google Drive Kullanıcıları (Android, Web)' : 'Google Drive Users (Android, Web)'}
+        </div>
+        <ol style="margin:0;padding-left:18px;font-size:12px;color:var(--text-2);line-height:1.5">
+          <li><strong>${isTr ? 'Bağlantı Kurma:' : 'Connect:'}</strong> ${isTr ? 'Ayarlar → Google Drive yanında "Bağlan" butonuna basıp Google hesabınızla izin verin.' : 'Settings → Google Drive, tap "Connect" and authorize with your Google account.'}</li>
+          <li><strong>${isTr ? 'Gizli Bulut Depolama:' : 'Private Storage:'}</strong> ${isTr ? 'Verileriniz Google Drive\'ınızdaki gizli uygulama klasörüne (%100 şifreli) yüklenir.' : 'Your data is uploaded to your Google Drive private app folder.'}</li>
+          <li><strong>${isTr ? 'Diğer Cihazdan Eşleme:' : 'Sync on 2nd Device:'}</strong> ${isTr ? 'Diğer cihazınızda aynı Google hesabıyla "Şimdi Eşle 🔄" butonuna basarak tüm veriyi çekin.' : 'On 2nd device with same Google account, tap "Sync Now" to fetch data.'}</li>
+        </ol>
+      </div>
+
+      <!-- 3. QR KOD İLE TRANSFER REHBERİ -->
+      <div style="background:var(--surface-2);border:1px solid var(--border-light);border-radius:var(--r-md);padding:14px;margin-bottom:18px">
+        <div style="font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:8px;display:flex;align-items:center;gap:6px">
+          <span>📱</span> ${isTr ? 'QR Kod ile Anlık Cihaz Transferi' : 'Instant Device Transfer via QR Code'}
+        </div>
+        <ol style="margin:0;padding-left:18px;font-size:12px;color:var(--text-2);line-height:1.5">
+          <li><strong>${isTr ? 'QR Oluşturma:' : 'Generate QR:'}</strong> ${isTr ? '1. Cihazınızda "QR Kod ile Cihaz Eşle" butonuna basın.' : 'On 1st device, tap "Pair Device via QR Code".'}</li>
+          <li><strong>${isTr ? 'Kodu Kopyalama:' : 'Copy Data Code:'}</strong> ${isTr ? '"Kodu Kopyala" butonuna basıp mesaj veya e-posta ile kendinize gönderin.' : 'Tap "Copy Code" and send to yourself via message or email.'}</li>
+          <li><strong>${isTr ? '2. Cihazda Yükleme:' : 'Paste on 2nd Device:'}</strong> ${isTr ? '2. Cihazınızda Ayarlar → Yedek Yükle alanına kopyaladığınız metni veya dosyayı yükleyin.' : 'On 2nd device, Settings → Import Backup File and paste the data.'}</li>
+        </ol>
+      </div>
+
+      <button class="btn btn-primary" onclick="document.getElementById('sync-guide-modal').remove()" style="width:100%">${isTr ? 'Anladım 👍' : 'Got it 👍'}</button>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+}
+
 function triggerJSONImport() {
   const el = document.getElementById('json-file-input');
   if (el) el.click();
@@ -5618,7 +5676,19 @@ function renderSettings() {
         <div class="settings-item-value">›</div>
       </div>
 
-      <!-- 3. Import JSON Backup File -->
+      <!-- 4. Sync & Backup Guide -->
+      <div class="settings-item" onclick="openSyncGuideModal()" style="cursor:pointer;background:linear-gradient(135deg, rgba(232,120,154,0.06), rgba(156,39,176,0.04))">
+        <div class="settings-item-left">
+          <div class="settings-item-icon" style="background:#FFF3E0">📖</div>
+          <div class="settings-item-text">
+            <div class="settings-item-label" style="color:var(--primary);font-weight:700">${(state.lang||'tr')==='tr' ? 'Adım Adım Senkronizasyon Rehberi' : 'Step-by-Step Sync Guide'}</div>
+            <div class="settings-item-desc">${(state.lang||'tr')==='tr' ? 'Apple iCloud, Google Drive veya QR Kod ile yedek alma' : 'Learn how to backup & sync via Apple, Google or QR'}</div>
+          </div>
+        </div>
+        <div class="settings-item-value" style="color:var(--primary)">›</div>
+      </div>
+
+      <!-- 5. Import JSON Backup File -->
       <div class="settings-item" onclick="triggerJSONImport()" style="cursor:pointer">
         <div class="settings-item-left">
           <div class="settings-item-icon" style="background:#FFF8E1">📥</div>
