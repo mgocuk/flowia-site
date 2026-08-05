@@ -2250,11 +2250,11 @@ function openRegisterStep1() {
       </div>
 
       <div style="font-size:11px;color:var(--text-3);line-height:1.4;margin-top:2px">
-        🔒 ${t('kvkk_gdpr_encrypted')}
+        🔒 ${t('kvkk_gdpr_encrypted')} • ✉️ <strong>${isTr ? 'Destek' : 'Support'}:</strong> <a href="mailto:floria.help@gmail.com" style="color:var(--primary);font-weight:700">floria.help@gmail.com</a>
       </div>
     </div>`;
 
-  openProfileEditModal('', title, sub, bodyHtml, () => {
+  openProfileEditModal('🌸', title, sub, bodyHtml, () => {
     return proceedToEmailVerification();
   });
 
@@ -4868,7 +4868,8 @@ function openProfileEditModal(icon, title, sub, bodyHtml, saveCallback = null) {
   const overlay = document.getElementById('profile-edit-modal-overlay');
   if (!overlay) return;
 
-  document.getElementById('pem-icon').textContent = icon;
+  const iconElem = document.getElementById('pem-icon');
+  if (iconElem) iconElem.textContent = icon || '🌸';
   document.getElementById('pem-title').textContent = title;
   document.getElementById('pem-sub').textContent = sub;
   document.getElementById('pem-body').innerHTML = bodyHtml;
@@ -5576,8 +5577,8 @@ function openSupportFaqModal() {
     <div style="background:linear-gradient(135deg,rgba(232,120,154,0.12),rgba(155,114,207,0.12));padding:14px;border-radius:var(--r-xl);border:1px solid var(--border-light);text-align:center;margin-bottom:12px">
       <div style="font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:4px">💬 ${isTr ? 'Canlı Destek & İletişim' : 'Live Support & Contact'}</div>
       <div style="font-size:12px;color:var(--text-2);margin-bottom:10px">${isTr ? 'Herhangi bir sorunuz için destek ekibimiz 7/24 hizmetinizde:' : 'Our support team is available 24/7 at your service:'}</div>
-      <a href="mailto:support@cyclecare.app" class="btn btn-outline" style="display:inline-block;padding:8px 20px;font-size:12px;font-weight:700;text-decoration:none">
-        ✉️ support@cyclecare.app
+      <a href="mailto:floria.help@gmail.com" class="btn btn-outline" style="display:inline-block;padding:8px 20px;font-size:12px;font-weight:700;text-decoration:none">
+        ✉️ floria.help@gmail.com
       </a>
     </div>`;
 
@@ -7154,7 +7155,7 @@ function renderPrivacyPolicy() {
   </ul>
 
   <h2 style="font-size:16px;font-weight:700;margin:16px 0 8px">6. İletişim</h2>
-  <p>Gizlilik sorularınız için: <strong>privacy@cyclecare.app</strong></p>
+  <p>Gizlilik ve destek sorularınız için: <strong>floria.help@gmail.com</strong></p>
 
   <div style="background:linear-gradient(135deg,#E8789A22,#9B72CF22);border-radius:16px;padding:16px;margin-top:24px;text-align:center">
     <div style="font-size:24px;margin-bottom:8px">🛡️</div>
@@ -7210,7 +7211,7 @@ function renderTermsOfService() {
   <p>Flowia, döngü tahminlerinin doğruluğunu garanti etmez. Biyolojik bireysellik nedeniyle tahminler her kullanıcı için farklılık gösterebilir.</p>
 
   <h2 style="font-size:16px;font-weight:700;margin:16px 0 8px">7. İletişim</h2>
-  <p>Sorularınız için: <strong>legal@cyclecare.app</strong></p>
+  <p>Sorularınız ve müşteri desteği için: <strong>floria.help@gmail.com</strong></p>
 
   <button class="btn btn-outline" onclick="goBack()" style="width:100%;margin-top:24px">← Geri Dön</button>
 </div>`;
