@@ -6684,7 +6684,7 @@ function init() {
   // Register Service Worker for PWA
   try {
     if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./service-worker.js?v=5.0')
+      navigator.serviceWorker.register('./service-worker.js?v=10.0')
         .then(reg  => console.log('[Flowia] SW registered:', reg.scope))
         .catch(err => console.warn('[Flowia] SW registration failed:', err));
     }
