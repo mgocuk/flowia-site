@@ -1433,6 +1433,7 @@ function navigate(screen, dir = 'forward') {
     'privacy-policy': renderPrivacyPolicy,
     'terms-of-service': renderTermsOfService,
     'medical-disclaimer': renderMedicalDisclaimer,
+    'forgot-password': renderForgotPassword,
   };
 
   let renderFn = screenMap[screen];
@@ -1836,6 +1837,24 @@ function processAppleAuth() {
 
     navigate('home', 'refresh');
   }, 1000);
+}
+
+function renderForgotPassword() {
+  setTimeout(() => openForgotPasswordModal(), 100);
+  return `
+  <div class="auth-screen">
+    <div class="auth-header" style="position:relative">
+      <div class="auth-logo-sm"></div>
+      <div class="auth-title">${t('forgot_password_title')}</div>
+      <div class="auth-subtitle">${(state.lang||'tr')==='tr'?'Kayıtlı e-posta adresinize kod göndererek şifrenizi sıfırlayın':'Reset your password securely via verification code'}</div>
+    </div>
+    <div class="auth-body">
+      <button class="btn btn-primary mt-4" onclick="openForgotPasswordModal()">🔑 ${(state.lang||'tr')==='tr'?'Şifre Sıfırlama Penceresini Aç':'Open Password Reset Modal'}</button>
+      <div class="auth-footer mt-4">
+        <a class="auth-link" onclick="closeProfileEditModal(); navigate('login','back')">← ${(state.lang||'tr')==='tr'?'Giriş Ekranına Dön':'Back to Login'}</a>
+      </div>
+    </div>
+  </div>`;
 }
 
 function openForgotPasswordModal() {
