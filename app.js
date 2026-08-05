@@ -1095,6 +1095,7 @@ function saveToStorage() {
       moods:         state.moods,
       journals:      state.journals,
       notifications: state.notifications,
+      deletedNotifIds: state.deletedNotifIds || [],
     };
     SafeStorage.setItem(key, JSON.stringify(data));
     CloudSync.pushCloudState();
@@ -1125,6 +1126,7 @@ function loadUserSession(email, name = '', dob = '') {
       state.moods = Array.isArray(data.moods) ? data.moods : [];
       state.journals = Array.isArray(data.journals) ? data.journals : [];
       state.notifications = Array.isArray(data.notifications) ? data.notifications : [];
+      state.deletedNotifIds = Array.isArray(data.deletedNotifIds) ? data.deletedNotifIds : [];
       state.periodEndedEarly = typeof data.periodEndedEarly !== 'undefined' ? data.periodEndedEarly : false;
       state.actualPeriodLength = typeof data.actualPeriodLength !== 'undefined' ? data.actualPeriodLength : null;
       
@@ -6250,13 +6252,45 @@ function showJournalEntry(id) {
 // ============================================================
 // 23. SCREEN: NOTIFICATIONS
 // ============================================================
+function deleteNotification(id, e) {
+  if (e) e.stopPropagation();
+  const isTr = (state.lang || 'tr') === 'tr';
+  if (!state.deletedNotifIds) state.deletedNotifIds = [];
+  const strId = String(id);
+  if (!state.deletedNotifIds.includes(strId)) {
+    state.deletedNotifIds.push(strId);
+  }
+  state.notifications = (state.notifications || []).filter(n => String(n.id) !== strId);
+  saveToStorage();
+  showToast(isTr ? 'Bildirim silindi 🗑️' : 'Notification deleted 🗑️');
+  navigate('notifications', 'refresh');
+}
+
+function clearAllNotifications() {
+  const isTr = (state.lang || 'tr') === 'tr';
+  if (!state.deletedNotifIds) state.deletedNotifIds = [];
+  (state.notifications || []).forEach(n => {
+    const strId = String(n.id);
+    if (!state.deletedNotifIds.includes(strId)) state.deletedNotifIds.push(strId);
+  });
+  state.notifications = [];
+  saveToStorage();
+  showToast(isTr ? 'Tüm bildirimler temizlendi 🗑️' : 'All notifications cleared 🗑️');
+  navigate('notifications', 'refresh');
+}
+
 function renderNotifications() {
   updateDynamicNotifications();
   state.notifications.forEach(n => n.read = true);
   const isTr = (state.lang || 'tr') === 'tr';
   return `
   <div style="padding:0 0 32px">
-    ${renderTopBar(t('notifications_title'))}
+    <div style="display:flex;align-items:center;justify-content:space-between;padding-right:16px">
+      ${renderTopBar(t('notifications_title'))}
+      ${state.notifications.length > 0 ? `
+        <button class="clear-all-notifs-btn" onclick="clearAllNotifications()">${isTr ? 'Tümünü Temizle' : 'Clear All'}</button>
+      ` : ''}
+    </div>
     ${state.notifications.length === 0 ? `
       <div style="display:flex;flex-direction:column;align-items:center;padding:60px 20px;gap:16px">
         <div style="font-size:56px">🔔</div>
@@ -6264,14 +6298,14 @@ function renderNotifications() {
         <div style="font-size:14px;color:var(--text-2);text-align:center">${isTr ? 'Yeni bildiriminiz bulunmuyor' : 'You have no new notifications'}</div>
       </div>` :
     state.notifications.map(n => `
-      <div style="display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border-light);cursor:pointer;background:${n.read?'transparent':'rgba(232,120,154,0.05)'}">
-        <div style="width:42px;height:42px;border-radius:var(--r-md);background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${n.icon}</div>
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border-light);background:${n.read?'transparent':'rgba(232,120,154,0.05)'}">
+        <div style="width:42px;height:42px;border-radius:var(--r-md);background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;margin-top:2px">${n.icon}</div>
         <div style="flex:1">
           <div style="font-size:14px;font-weight:600;color:var(--text-1);margin-bottom:3px">${n.title}</div>
           <div style="font-size:13px;color:var(--text-2);line-height:1.4">${n.body}</div>
           <div style="font-size:11px;color:var(--text-3);margin-top:4px">${n.time}</div>
         </div>
-        ${!n.read ? '<div style="width:8px;height:8px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:6px"></div>' : ''}
+        <button class="notif-delete-btn" onclick="event.stopPropagation(); deleteNotification('${n.id}', event)" title="${isTr ? 'Bildirimi Sil' : 'Delete Notification'}">✕</button>
       </div>`).join('')}
   </div>`;
 }
@@ -6615,8 +6649,9 @@ function updateDynamicNotifications() {
       read: true
     });
 
-    // Replace state.notifications with 100% dynamic, multi-language translated notifications!
-    state.notifications = newNotifs.slice(0, 15);
+    // Replace state.notifications with dynamic, multi-language translated notifications (filtering user-deleted ones)
+    const deleted = (state.deletedNotifIds || []).map(id => String(id));
+    state.notifications = newNotifs.filter(n => !deleted.includes(String(n.id))).slice(0, 15);
 
   } catch(e) { console.warn('[Flowia] updateDynamicNotifications error:', e); }
 }

@@ -1371,3 +1371,53 @@ button,
 }
 .toggle input:checked + .toggle-track { background:var(--primary); }
 .toggle input:checked + .toggle-track::after { transform:translateX(20px); }
+
+/* Notification Item Delete Button */
+.notif-delete-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.notif-delete-btn:hover {
+  background: #FFEBEE;
+  color: #D32F2F;
+  transform: scale(1.15);
+}
+[data-theme="dark"] .notif-delete-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-2);
+}
+[data-theme="dark"] .notif-delete-btn:hover {
+  background: rgba(211, 47, 47, 0.25);
+  color: #FF8A80;
+}
+
+.clear-all-notifs-btn {
+  background: transparent;
+  border: 1px solid var(--border-light);
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.clear-all-notifs-btn:hover {
+  background: var(--surface-2);
+  color: var(--error);
+  border-color: var(--error);
+}
+
