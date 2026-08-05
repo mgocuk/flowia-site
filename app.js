@@ -2218,17 +2218,37 @@ function openRegisterStep1() {
         </div>
       </div>
       <div class="input-group">
-        <label class="input-label">${t('dob')}</label>
+        <label class="input-label">${t('dob')} <span style="color:var(--primary);font-size:11px;font-weight:600">(${isTr ? 'En az 13 yaş' : 'Min. 13 years old'})</span></label>
         <div style="position:relative">
           <input class="input-field" type="text" id="reg-dob-display" readonly 
             placeholder="${getDatePlaceholder()}" 
             value="${state.tempRegDob ? formatDate(state.tempRegDob) : ''}" 
-            onclick="openFlowiaDatePicker('reg-dob-display', state.tempRegDob, (ymd) => { state.tempRegDob = ymd; const hidden = document.getElementById('reg-dob'); if(hidden) hidden.value = ymd; })" 
+            onclick="openFlowiaDatePicker('reg-dob-display', state.tempRegDob || '2000-08-05', (ymd) => { state.tempRegDob = ymd; const hidden = document.getElementById('reg-dob'); if(hidden) hidden.value = ymd; })" 
             style="cursor:pointer;padding-right:42px;background:var(--surface)"/>
           <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;font-size:18px">📅</span>
           <input type="hidden" id="reg-dob" value="${state.tempRegDob || ''}" />
         </div>
       </div>
+
+      <!-- KVKK & EXPLICIT CONSENT CHECKBOXES -->
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;padding:12px;background:var(--surface-2);border-radius:var(--r-md);border:1px solid var(--border-light)">
+        <label style="display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--text-1);cursor:pointer;line-height:1.4">
+          <input type="checkbox" id="reg-kvkk-cb" ${state.tempRegKvkk ? 'checked' : ''} onchange="state.tempRegKvkk=this.checked" style="width:18px;height:18px;margin-top:2px;accent-color:var(--primary);cursor:pointer" />
+          <span>
+            ${isTr ? 'KVKK Aydınlatma Metnini okudum, kişiselleştirilmiş sağlık takibi için verilerimin işlenmesini kabul ediyorum.' : 'I have read the KVKK Privacy Policy and accept data processing for personalized health tracking.'}
+            <a style="color:var(--primary);font-weight:700;text-decoration:underline;cursor:pointer" onclick="openPrivacyPolicyModal()">[${isTr ? 'Metni Oku' : 'Read Policy'}]</a>
+          </span>
+        </label>
+
+        <label style="display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--text-1);cursor:pointer;line-height:1.4">
+          <input type="checkbox" id="reg-consent-cb" ${state.tempRegConsent ? 'checked' : ''} onchange="state.tempRegConsent=this.checked" style="width:18px;height:18px;margin-top:2px;accent-color:var(--primary);cursor:pointer" />
+          <span>
+            ${isTr ? 'Sağlık ve döngü verilerimin güvenle saklanmasına açık rıza veriyor ve Kullanım Koşullarını onaylıyorum.' : 'I give explicit consent for storing my health cycle data and agree to the Terms of Service.'}
+            <a style="color:var(--primary);font-weight:700;text-decoration:underline;cursor:pointer" onclick="openTermsModal()">[${isTr ? 'Koşulları Oku' : 'Read Terms'}]</a>
+          </span>
+        </label>
+      </div>
+
       <div style="font-size:11px;color:var(--text-3);line-height:1.4;margin-top:2px">
         🔒 ${t('kvkk_gdpr_encrypted')}
       </div>
@@ -2250,7 +2270,9 @@ function proceedToEmailVerification() {
   const name = document.getElementById('reg-fullname')?.value?.trim() || '';
   const email = document.getElementById('reg-email')?.value?.trim() || '';
   const pass = document.getElementById('reg-password')?.value?.trim() || '';
-  const dob = document.getElementById('reg-dob')?.value?.trim() || '';
+  const dob = document.getElementById('reg-dob')?.value?.trim() || state.tempRegDob || '';
+  const kvkkChecked = document.getElementById('reg-kvkk-cb')?.checked || state.tempRegKvkk;
+  const consentChecked = document.getElementById('reg-consent-cb')?.checked || state.tempRegConsent;
   const errBox = document.getElementById('reg-step1-error');
 
   // INSTANT PERSISTENCE: Save typed inputs into state BEFORE any validation check!
@@ -2258,6 +2280,8 @@ function proceedToEmailVerification() {
   state.tempRegEmail = email;
   state.tempRegPass = pass;
   state.tempRegDob = dob;
+  state.tempRegKvkk = kvkkChecked;
+  state.tempRegConsent = consentChecked;
 
   // 1. Full Name Validation
   if (!name || name.length < 3) {
@@ -2327,7 +2351,7 @@ function proceedToEmailVerification() {
     return false;
   }
 
-  // 4. Date of Birth Validation
+  // 4. Date of Birth & Minimum Age (13 Years) Validation
   if (!dob) {
     const msg = isTr ? 'Lütfen Doğum Tarihinizi seçin! Bu alan boş bırakılamaz.' : 'Please select your Date of Birth!';
     state.tempRegErr = '📅 ' + msg;
@@ -2339,6 +2363,47 @@ function proceedToEmailVerification() {
       isTr ? 'Doğum Tarihi Eksik' : 'Date of Birth Required',
       msg,
       '📅',
+      () => openRegisterStep1()
+    );
+    return false;
+  }
+
+  const userAge = getAgeFromDob(dob);
+  if (userAge < 13) {
+    const ageDisp = userAge < 0 ? 0 : userAge;
+    const msg = isTr 
+      ? `🚫 Yasal Yaş Sınırı Engeli (KVKK / GDPR / COPPA):\n\nFlowia uygulamasını kullanabilmek için en az 13 yaşında olmanız gerekmektedir.\n\nGirdiğiniz doğum tarihine (${formatDate(dob)}) göre hesaplanan yaşınız: ${ageDisp} yaş.\n\nYasal yaş sınırının altındaki kullanıcıların kayıt yapmasına izin verilmemektedir.` 
+      : `🚫 Legal Minimum Age Restriction (GDPR / COPPA):\n\nYou must be at least 13 years old to create a Flowia account. Your calculated age (${ageDisp}) is below the required legal limit.`;
+    
+    state.tempRegErr = msg;
+    if (errBox) {
+      errBox.style.display = 'block';
+      errBox.textContent = state.tempRegErr;
+    }
+    showErrorModal(
+      isTr ? 'Yasal Yaş Sınırı Engeli (Min. 13 Yaş)' : 'Legal Age Restriction (Min. 13)',
+      msg,
+      '🚫',
+      () => openRegisterStep1()
+    );
+    return false;
+  }
+
+  // 5. KVKK & Explicit Consent Checkbox Validation
+  if (!kvkkChecked || !consentChecked) {
+    const msg = isTr 
+      ? 'Devam edebilmek için lütfen KVKK Aydınlatma Metnini ve Açık Rıza onay kutularını işaretleyin!' 
+      : 'Please accept the KVKK Privacy Policy and Explicit Consent terms to proceed!';
+    
+    state.tempRegErr = '⚠️ ' + msg;
+    if (errBox) {
+      errBox.style.display = 'block';
+      errBox.textContent = state.tempRegErr;
+    }
+    showErrorModal(
+      isTr ? 'Onay Kutuları Gerekli' : 'Consent Checkboxes Required',
+      msg,
+      '⚠️',
       () => openRegisterStep1()
     );
     return false;
@@ -5013,6 +5078,32 @@ function confirmFlowiaDateSelection() {
     onSelect(selectedYmd);
   }
   closeProfileEditModal();
+}
+
+function openPrivacyPolicyModal() {
+  const isTr = (state.lang || 'tr') === 'tr';
+  const bodyHtml = `<div style="max-height:300px;overflow-y:auto;padding-right:6px;font-size:12px;line-height:1.5;color:var(--text-1);">${renderPrivacyPolicy()}</div>`;
+  openProfileEditModal('🔒', isTr ? 'KVKK Aydınlatma Metni' : 'KVKK Privacy Policy', isTr ? 'Kişisel verilerinizin korunması ve işlenmesi hakkında detaylar' : 'Information on personal data protection', bodyHtml, () => {
+    openRegisterStep1();
+  });
+  const saveBtn = document.getElementById('pem-save-btn');
+  if (saveBtn) {
+    saveBtn.innerHTML = `← ${isTr ? 'Kayıt Ekranına Dön' : 'Back to Register'}`;
+    saveBtn.style.display = 'block';
+  }
+}
+
+function openTermsModal() {
+  const isTr = (state.lang || 'tr') === 'tr';
+  const bodyHtml = `<div style="max-height:300px;overflow-y:auto;padding-right:6px;font-size:12px;line-height:1.5;color:var(--text-1);">${renderTermsOfService()}</div>`;
+  openProfileEditModal('📄', isTr ? 'Kullanım Koşulları & Açık Rıza' : 'Terms of Service & Explicit Consent', isTr ? 'Hizmet kullanım şartları ve açık rıza sözleşmesi' : 'Terms of service agreement', bodyHtml, () => {
+    openRegisterStep1();
+  });
+  const saveBtn = document.getElementById('pem-save-btn');
+  if (saveBtn) {
+    saveBtn.innerHTML = `← ${isTr ? 'Kayıt Ekranına Dön' : 'Back to Register'}`;
+    saveBtn.style.display = 'block';
+  }
 }
 
 function updateDobModalAge(val) {
