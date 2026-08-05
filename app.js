@@ -2223,12 +2223,10 @@ function openRegisterStep1() {
           <input class="input-field" type="text" id="reg-dob-display" readonly 
             placeholder="${getDatePlaceholder()}" 
             value="${state.tempRegDob ? formatDate(state.tempRegDob) : ''}" 
-            onclick="const el=document.getElementById('reg-dob'); if(el && el.showPicker){el.showPicker();}else if(el){el.click();}" 
+            onclick="openFlowiaDatePicker('reg-dob-display', state.tempRegDob, (ymd) => { state.tempRegDob = ymd; const hidden = document.getElementById('reg-dob'); if(hidden) hidden.value = ymd; })" 
             style="cursor:pointer;padding-right:42px;background:var(--surface)"/>
           <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;font-size:18px">📅</span>
-          <input type="date" id="reg-dob" value="${state.tempRegDob || ''}" 
-            style="opacity:0;position:absolute;inset:0;width:100%;height:100%;cursor:pointer" 
-            onchange="state.tempRegDob=this.value; const d=document.getElementById('reg-dob-display'); if(d) d.value=formatDate(this.value);"/>
+          <input type="hidden" id="reg-dob" value="${state.tempRegDob || ''}" />
         </div>
       </div>
       <div style="font-size:11px;color:var(--text-3);line-height:1.4;margin-top:2px">
@@ -2538,9 +2536,9 @@ function renderOnboarding() {
     <div class="input-group mb-4">
       <label class="input-label">📅 ${isTr ? 'Başlangıç Tarihi' : 'Start Date'}</label>
       <div style="position:relative">
-        <input class="input-field" type="text" id="ob-date-display" value="${dateFormatted}" readonly onclick="const p = document.getElementById('ob-date'); p.showPicker ? p.showPicker() : p.click()" style="cursor:pointer;padding-right:40px;font-weight:600"/>
+        <input class="input-field" type="text" id="ob-date-display" value="${dateFormatted}" readonly onclick="openFlowiaDatePicker('ob-date-display', state.onboardData.lastPeriodDate || TODAY_STR, (ymd) => { state.onboardData.lastPeriodDate = ymd; const p = document.getElementById('ob-date'); if(p) p.value = ymd; })" style="cursor:pointer;padding-right:40px;font-weight:600"/>
         <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none">📅</span>
-        <input type="date" id="ob-date" value="${state.onboardData.lastPeriodDate || TODAY_STR}" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0" onchange="state.onboardData.lastPeriodDate=this.value; document.getElementById('ob-date-display').value=formatDate(this.value)"/>
+        <input type="hidden" id="ob-date" value="${state.onboardData.lastPeriodDate || TODAY_STR}"/>
       </div>
     </div>`;
   } else if (s.type === 'cycle-slider') {
@@ -3646,9 +3644,9 @@ function renderLogPeriod() {
       <div class="input-group" style="margin-bottom:20px">
         <label class="input-label">📅 ${isTr ? 'Tarih' : 'Date'}</label>
         <div style="position:relative">
-          <input class="input-field" type="text" id="log-date-display" value="${dateFormatted}" readonly onclick="const p = document.getElementById('log-date-picker'); p.showPicker ? p.showPicker() : p.click()" style="cursor:pointer;padding-right:40px;font-weight:600"/>
+          <input class="input-field" type="text" id="log-date-display" value="${dateFormatted}" readonly onclick="openFlowiaDatePicker('log-date-display', state.logDate || TODAY_STR, (ymd) => { state.logDate = ymd; })" style="cursor:pointer;padding-right:40px;font-weight:600"/>
           <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none">📅</span>
-          <input type="date" id="log-date-picker" value="${state.logDate || TODAY_STR}" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0" onchange="state.logDate=this.value; document.getElementById('log-date-display').value=formatDate(this.value)"/>
+          <input type="hidden" id="log-date-picker" value="${state.logDate || TODAY_STR}"/>
         </div>
       </div>
       <div style="margin-bottom:20px">
@@ -3787,9 +3785,9 @@ function renderSymptoms() {
       <div class="input-group" style="margin-bottom:20px">
         <label class="input-label">📅 ${t('date_label')}</label>
         <div style="position:relative">
-          <input class="input-field" type="text" id="symp-date-display" value="${dateFormatted}" readonly onclick="const p = document.getElementById('symp-date-picker'); p.showPicker ? p.showPicker() : p.click()" style="cursor:pointer;padding-right:40px;font-weight:600"/>
+          <input class="input-field" type="text" id="symp-date-display" value="${dateFormatted}" readonly onclick="openFlowiaDatePicker('symp-date-display', state.logDate || TODAY_STR, (ymd) => { state.logDate = ymd; })" style="cursor:pointer;padding-right:40px;font-weight:600"/>
           <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none">📅</span>
-          <input type="date" id="symp-date-picker" value="${state.logDate || TODAY_STR}" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0" onchange="state.logDate=this.value; document.getElementById('symp-date-display').value=formatDate(this.value)"/>
+          <input type="hidden" id="symp-date-picker" value="${state.logDate || TODAY_STR}"/>
         </div>
       </div>
 
@@ -3932,9 +3930,9 @@ function renderMood() {
       <div class="input-group" style="margin-bottom:24px">
         <label class="input-label">📅 ${t('date_label')}</label>
         <div style="position:relative">
-          <input class="input-field" type="text" id="mood-date-display" value="${dateFormatted}" readonly onclick="const p = document.getElementById('mood-date-picker'); p.showPicker ? p.showPicker() : p.click()" style="cursor:pointer;padding-right:40px;font-weight:600"/>
+          <input class="input-field" type="text" id="mood-date-display" value="${dateFormatted}" readonly onclick="openFlowiaDatePicker('mood-date-display', state.logDate || TODAY_STR, (ymd) => { state.logDate = ymd; })" style="cursor:pointer;padding-right:40px;font-weight:600"/>
           <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none">📅</span>
-          <input type="date" id="mood-date-picker" value="${state.logDate || TODAY_STR}" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0" onchange="state.logDate=this.value; document.getElementById('mood-date-display').value=formatDate(this.value)"/>
+          <input type="hidden" id="mood-date-picker" value="${state.logDate || TODAY_STR}"/>
         </div>
       </div>
 
@@ -4840,6 +4838,181 @@ function openProfileEditModal(icon, title, sub, bodyHtml, saveCallback = null) {
 function closeProfileEditModal() {
   const overlay = document.getElementById('profile-edit-modal-overlay');
   if (overlay) overlay.classList.remove('open');
+}
+
+// ============================================================
+// FLOWIA CUSTOM INTERACTIVE DATE PICKER MODAL
+// ============================================================
+let flowiaDatePickerState = {
+  targetInputId: null,
+  year: 2000,
+  month: 7,
+  selectedYmd: '2000-08-05',
+  onSelect: null
+};
+
+function openFlowiaDatePicker(targetInputId, initialVal, onSelectCallback) {
+  const now = new Date();
+  let defaultYmd = initialVal || '2000-08-05';
+  if (!initialVal && targetInputId && document.getElementById(targetInputId)) {
+    const val = document.getElementById(targetInputId).value;
+    if (val && val.includes('-')) defaultYmd = val;
+  }
+
+  const parts = defaultYmd.split('-');
+  let y = parseInt(parts[0], 10) || now.getFullYear();
+  let m = (parseInt(parts[1], 10) || (now.getMonth() + 1)) - 1;
+  let d = parseInt(parts[2], 10) || now.getDate();
+
+  flowiaDatePickerState = {
+    targetInputId,
+    year: y,
+    month: m,
+    selectedYmd: `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`,
+    onSelect: onSelectCallback
+  };
+
+  renderFlowiaDatePickerModal();
+}
+
+function renderFlowiaDatePickerModal() {
+  const isTr = (state.lang || 'tr') === 'tr';
+  const { year, month, selectedYmd } = flowiaDatePickerState;
+
+  const monthNamesTr = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+  const monthNamesEn = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const monthNames = isTr ? monthNamesTr : monthNamesEn;
+
+  const dayHeadersTr = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
+  const dayHeadersEn = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+  const dayHeaders = isTr ? dayHeadersTr : dayHeadersEn;
+
+  let yearOptsHtml = '';
+  for (let y = 2030; y >= 1940; y--) {
+    yearOptsHtml += `<option value="${y}" ${y === year ? 'selected' : ''}>${y}</option>`;
+  }
+
+  let monthOptsHtml = '';
+  monthNames.forEach((mn, idx) => {
+    monthOptsHtml += `<option value="${idx}" ${idx === month ? 'selected' : ''}>${mn}</option>`;
+  });
+
+  const firstDayOfMonth = new Date(year, month, 1);
+  const lastDayOfMonth = new Date(year, month + 1, 0);
+  const totalDays = lastDayOfMonth.getDate();
+
+  let startDay = firstDayOfMonth.getDay() - 1;
+  if (startDay < 0) startDay = 6;
+
+  const prevMonthLastDay = new Date(year, month, 0).getDate();
+
+  let daysHtml = '';
+  for (let i = startDay - 1; i >= 0; i--) {
+    const dayNum = prevMonthLastDay - i;
+    daysHtml += `<div class="fdp-day muted">${dayNum}</div>`;
+  }
+
+  const todayYmd = new Date().toISOString().split('T')[0];
+  for (let day = 1; day <= totalDays; day++) {
+    const ymd = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const isSelected = ymd === selectedYmd;
+    const isToday = ymd === todayYmd;
+
+    daysHtml += `
+      <div class="fdp-day ${isSelected ? 'selected' : ''} ${isToday ? 'today' : ''}" onclick="selectFlowiaDate('${ymd}')">
+        ${day}
+      </div>`;
+  }
+
+  const totalCells = startDay + totalDays;
+  const remainingCells = (7 - (totalCells % 7)) % 7;
+  for (let day = 1; day <= remainingCells; day++) {
+    daysHtml += `<div class="fdp-day muted">${day}</div>`;
+  }
+
+  const selectedFormatted = formatDate(selectedYmd);
+
+  const bodyHtml = `
+    <div class="flowia-date-picker-wrap">
+      <div class="fdp-header">
+        <button class="fdp-nav-btn" onclick="changeFlowiaPickerMonth(-1)">‹</button>
+        <div class="fdp-selects">
+          <select class="fdp-select" onchange="setFlowiaPickerMonth(this.value)">${monthOptsHtml}</select>
+          <select class="fdp-select" onchange="setFlowiaPickerYear(this.value)">${yearOptsHtml}</select>
+        </div>
+        <button class="fdp-nav-btn" onclick="changeFlowiaPickerMonth(1)">›</button>
+      </div>
+
+      <div class="fdp-quick-years">
+        <span class="fdp-qy-lbl">${isTr ? 'Hızlı Yıl:' : 'Quick Year:'}</span>
+        <button class="fdp-qy-chip ${year === 2005 ? 'active' : ''}" onclick="setFlowiaPickerYear(2005)">2005</button>
+        <button class="fdp-qy-chip ${year === 2000 ? 'active' : ''}" onclick="setFlowiaPickerYear(2000)">2000</button>
+        <button class="fdp-qy-chip ${year === 1995 ? 'active' : ''}" onclick="setFlowiaPickerYear(1995)">1995</button>
+        <button class="fdp-qy-chip ${year === 1990 ? 'active' : ''}" onclick="setFlowiaPickerYear(1990)">1990</button>
+      </div>
+
+      <div class="fdp-weekdays">
+        ${dayHeaders.map(dh => `<div class="fdp-wd">${dh}</div>`).join('')}
+      </div>
+
+      <div class="fdp-days-grid">
+        ${daysHtml}
+      </div>
+
+      <div class="fdp-footer-preview">
+        <span>📅 ${isTr ? 'Seçilen Tarih:' : 'Selected Date:'}</span>
+        <strong>${selectedFormatted}</strong>
+      </div>
+    </div>`;
+
+  openProfileEditModal('📅', isTr ? 'Tarih Seçin' : 'Select Date', isTr ? 'Doğum gününüzü veya kaydetmek istediğiniz tarihi seçin' : 'Choose your birth date or target entry date', bodyHtml, () => {
+    confirmFlowiaDateSelection();
+  });
+
+  const saveBtn = document.getElementById('pem-save-btn');
+  if (saveBtn) {
+    saveBtn.innerHTML = `✓ ${isTr ? 'Tarihi Onayla' : 'Confirm Date'}`;
+    saveBtn.style.display = 'block';
+  }
+}
+
+function selectFlowiaDate(ymd) {
+  flowiaDatePickerState.selectedYmd = ymd;
+  renderFlowiaDatePickerModal();
+}
+
+function changeFlowiaPickerMonth(delta) {
+  let { year, month } = flowiaDatePickerState;
+  month += delta;
+  if (month > 11) { month = 0; year++; }
+  else if (month < 0) { month = 11; year--; }
+  flowiaDatePickerState.month = month;
+  flowiaDatePickerState.year = year;
+  renderFlowiaDatePickerModal();
+}
+
+function setFlowiaPickerMonth(mVal) {
+  flowiaDatePickerState.month = parseInt(mVal, 10);
+  renderFlowiaDatePickerModal();
+}
+
+function setFlowiaPickerYear(yVal) {
+  flowiaDatePickerState.year = parseInt(yVal, 10);
+  renderFlowiaDatePickerModal();
+}
+
+function confirmFlowiaDateSelection() {
+  const { targetInputId, selectedYmd, onSelect } = flowiaDatePickerState;
+  if (targetInputId) {
+    const input = document.getElementById(targetInputId);
+    if (input) {
+      input.value = formatDate(selectedYmd);
+    }
+  }
+  if (onSelect && typeof onSelect === 'function') {
+    onSelect(selectedYmd);
+  }
+  closeProfileEditModal();
 }
 
 function updateDobModalAge(val) {
