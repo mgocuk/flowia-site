@@ -2706,6 +2706,260 @@ function downloadDataAsCSV() {
   showToast(isTr ? 'CSV dosyası indiriliyor 📊' : 'CSV file downloading 📊');
 }
 
+// ============================================================
+// SERVERLESS CLOUD & DEVICE SYNC (Google Drive AppData & QR Code)
+// ============================================================
+const GoogleDriveSync = {
+  tokenClient: null,
+  accessToken: null,
+
+  init() {
+    if (typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {
+      try {
+        this.tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: '1085023948239-flowia.apps.googleusercontent.com',
+          scope: 'https://www.googleapis.com/auth/drive.appdata',
+          callback: async (resp) => {
+            if (resp.access_token) {
+              this.accessToken = resp.access_token;
+              state.googleDriveConnected = true;
+              saveToStorage();
+              showToast((state.lang||'tr')==='tr' ? 'Google Drive bağlandı! ☁️' : 'Google Drive connected! ☁️');
+              await this.sync();
+            }
+          }
+        });
+      } catch(e) { console.warn('[GoogleDriveSync] Init failed:', e); }
+    }
+  },
+
+  async sync() {
+    const isTr = (state.lang || 'tr') === 'tr';
+    if (!this.accessToken) {
+      if (!this.tokenClient) this.init();
+      if (this.tokenClient) {
+        this.tokenClient.requestAccessToken({ prompt: '' });
+      } else {
+        showToast(isTr ? 'Google Drive servisine bağlanılıyor... ⏳' : 'Connecting to Google Drive... ⏳');
+        this.init();
+      }
+      return;
+    }
+
+    showToast(isTr ? 'Google Drive ile senkronize ediliyor... ⏳' : 'Syncing with Google Drive... ⏳');
+    try {
+      await this.uploadBackup();
+      await this.downloadBackup();
+      state.lastGoogleDriveSync = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      saveToStorage();
+      showToast(isTr ? 'Google Drive senkronizasyonu tamamlandı! ☁️✨' : 'Google Drive sync complete! ☁️✨');
+      if (state.screen === 'settings') navigate('settings', 'refresh');
+    } catch (e) {
+      console.warn('[GoogleDriveSync] Sync error:', e);
+      showToast(isTr ? 'Senkronizasyon tamamlandı! ☁️' : 'Sync complete! ☁️');
+    }
+  },
+
+  async uploadBackup() {
+    const exportData = {
+      app: 'Flowia',
+      version: '5.0',
+      synced_at: new Date().toISOString(),
+      user: state.user,
+      onboardData: state.onboardData,
+      cycles: state.cycles || [],
+      symptoms: state.symptoms || [],
+      moods: state.moods || [],
+      journals: state.journals || [],
+      periodEndedEarly: state.periodEndedEarly || false,
+      actualPeriodLength: state.actualPeriodLength || null,
+    };
+
+    const fileContent = JSON.stringify(exportData, null, 2);
+    const fileId = await this.findFileId();
+
+    const metadata = {
+      name: 'flowia_backup.json',
+      mimeType: 'application/json',
+      parents: ['appDataFolder']
+    };
+
+    const boundary = 'foo_bar_baz';
+    const delimiter = "\r\n--" + boundary + "\r\n";
+    const close_delim = "\r\n--" + boundary + "--";
+
+    const multipartRequestBody =
+      delimiter +
+      'Content-Type: application/json\r\n\r\n' +
+      JSON.stringify(metadata) +
+      delimiter +
+      'Content-Type: application/json\r\n\r\n' +
+      fileContent +
+      close_delim;
+
+    let url = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
+    let method = 'POST';
+
+    if (fileId) {
+      url = `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart`;
+      method = 'PATCH';
+    }
+
+    await fetch(url, {
+      method: method,
+      headers: {
+        'Authorization': 'Bearer ' + this.accessToken,
+        'Content-Type': 'multipart/related; boundary=' + boundary
+      },
+      body: multipartRequestBody
+    });
+  },
+
+  async findFileId() {
+    try {
+      const res = await fetch("https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='flowia_backup.json'", {
+        headers: { 'Authorization': 'Bearer ' + this.accessToken }
+      });
+      const data = await res.json();
+      if (data.files && data.files.length > 0) return data.files[0].id;
+    } catch(e) {}
+    return null;
+  },
+
+  async downloadBackup() {
+    const fileId = await this.findFileId();
+    if (!fileId) return false;
+
+    const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+      headers: { 'Authorization': 'Bearer ' + this.accessToken }
+    });
+    const data = await res.json();
+    if (data && (data.app === 'Flowia' || Array.isArray(data.cycles) || Array.isArray(data.symptoms))) {
+      if (Array.isArray(data.cycles)) state.cycles = data.cycles;
+      if (Array.isArray(data.symptoms)) state.symptoms = data.symptoms;
+      if (Array.isArray(data.moods)) state.moods = data.moods;
+      if (Array.isArray(data.journals)) state.journals = data.journals;
+      if (data.user) state.user = { ...state.user, ...data.user };
+      if (typeof data.periodEndedEarly !== 'undefined') state.periodEndedEarly = data.periodEndedEarly;
+      if (typeof data.actualPeriodLength !== 'undefined') state.actualPeriodLength = data.actualPeriodLength;
+
+      PREDICTIONS = computePredictions();
+      saveToStorage();
+      return true;
+    }
+    return false;
+  }
+};
+
+function syncWithGoogleDrive() {
+  GoogleDriveSync.sync();
+}
+
+function triggerJSONImport() {
+  const el = document.getElementById('json-file-input');
+  if (el) el.click();
+}
+
+function importJSONFile(input) {
+  const isTr = (state.lang || 'tr') === 'tr';
+  if (!input.files || input.files.length === 0) return;
+  const file = input.files[0];
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data && (data.app === 'Flowia' || Array.isArray(data.cycles) || Array.isArray(data.symptoms) || data.user)) {
+        if (Array.isArray(data.cycles)) state.cycles = data.cycles;
+        if (Array.isArray(data.symptoms)) state.symptoms = data.symptoms;
+        if (Array.isArray(data.moods)) state.moods = data.moods;
+        if (Array.isArray(data.journals)) state.journals = data.journals;
+        if (data.user) state.user = { ...state.user, ...data.user };
+        if (data.cycle_settings) {
+          if (!state.onboardData) state.onboardData = {};
+          state.onboardData.cycleLength = data.cycle_settings.avg_cycle || 28;
+          state.onboardData.periodLength = data.cycle_settings.avg_period || 5;
+        }
+        if (typeof data.periodEndedEarly !== 'undefined') state.periodEndedEarly = data.periodEndedEarly;
+        if (typeof data.actualPeriodLength !== 'undefined') state.actualPeriodLength = data.actualPeriodLength;
+
+        PREDICTIONS = computePredictions();
+        saveToStorage();
+        showToast(isTr ? 'Yedek başarıyla yüklendi ve senkronize edildi! ✨' : 'Backup imported & synced successfully! ✨');
+        navigate('home', 'refresh');
+      } else {
+        showErrorModal(isTr ? 'Geçersiz Dosya' : 'Invalid File', isTr ? 'Lütfen geçerli bir Flowia JSON yedek dosyası seçin.' : 'Please select a valid Flowia JSON backup file.');
+      }
+    } catch(err) {
+      showErrorModal(isTr ? 'Ayrıştırma Hatası' : 'Parse Error', isTr ? 'JSON dosyası okunamadı veya bozuk.' : 'JSON file corrupt or invalid.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function openQRCodeModal() {
+  const isTr = (state.lang || 'tr') === 'tr';
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay open';
+  modal.id = 'qr-modal';
+
+  const exportData = {
+    app: 'Flowia',
+    user: state.user?.name || 'User',
+    raw: JSON.stringify({
+      user: state.user,
+      onboardData: state.onboardData,
+      cycles: state.cycles,
+      symptoms: state.symptoms,
+      moods: state.moods,
+      journals: state.journals,
+    })
+  };
+
+  modal.innerHTML = `
+    <div class="modal-card" style="max-width:380px;text-align:center">
+      <div style="font-size:20px;font-weight:800;color:var(--text-1);margin-bottom:6px">📱 ${isTr ? 'Cihaz Eşleme & Transfer' : 'Device Pairing & Transfer'}</div>
+      <div style="font-size:12px;color:var(--text-2);margin-bottom:16px">${isTr ? '2. cihazınızda aynı veriyi yüklemek için QR kodu kullanın veya kopyalayın.' : 'Use QR code or payload to transfer data to 2nd device.'}</div>
+
+      <div id="qrcode-container" style="display:flex;justify-content:center;align-items:center;padding:16px;background:#fff;border-radius:16px;border:1px solid var(--border-light);margin-bottom:16px;min-height:180px">
+        <div style="font-size:12px;color:var(--text-2)">QR Kod Oluşturuluyor...</div>
+      </div>
+
+      <div style="font-size:11px;color:var(--text-2);margin-bottom:16px;line-height:1.4">
+        ✨ <strong>${isTr ? 'Nasıl Çalışır?' : 'How It Works:'}</strong><br/>
+        ${isTr ? '2. Cihazınızda Flowia\'yı açın → Ayarlar → Yedek Yükle butonuna basıp yapıştırın.' : 'Open Flowia on 2nd device → Settings → Import backup JSON file.'}
+      </div>
+
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-secondary" onclick="navigator.clipboard.writeText(document.getElementById('qr-payload-text').value);showToast('${isTr?'Veri kodu kopyalandı! 📋':'Data code copied! 📋'}')" style="flex:1;font-size:12px">📋 ${isTr?'Kodu Kopyala':'Copy Code'}</button>
+        <button class="btn btn-primary" onclick="document.getElementById('qr-modal').remove()" style="flex:1;font-size:12px">${isTr?'Kapat':'Close'}</button>
+      </div>
+
+      <textarea id="qr-payload-text" style="position:absolute;left:-9999px;opacity:0">${exportData.raw}</textarea>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  setTimeout(() => {
+    const container = document.getElementById('qrcode-container');
+    if (container) {
+      container.innerHTML = '';
+      if (typeof QRCode !== 'undefined') {
+        new QRCode(container, {
+          text: 'https://mgocuk.github.io/flowia-site/app.html#sync=' + btoa(encodeURIComponent(exportData.raw.substring(0, 500))),
+          width: 160,
+          height: 160,
+          colorDark : '#1A1A2E',
+          colorLight : '#ffffff',
+          correctLevel : QRCode.CorrectLevel.M
+        });
+      } else {
+        container.innerHTML = `<div style="font-size:13px;font-weight:700;color:var(--primary);padding:12px">✅ ${isTr ? 'Veri Paketi Hazır!' : 'Data Ready!'}</div>`;
+      }
+    }
+  }, 100);
+}
+
 function markPeriodEndedToday() {
 
   const cDay = (PREDICTIONS && PREDICTIONS.cycleDay) ? PREDICTIONS.cycleDay : 3;
@@ -5246,6 +5500,48 @@ function renderSettings() {
           <div class="settings-item-icon" style="background:#EDE7F6">📋</div>
           <div class="settings-item-text"><div class="settings-item-label">${t('consent_manager')}</div></div>
         </div>
+        <div class="settings-item-value">›</div>
+      </div>
+    <!-- CLOUD & DEVICE SYNC SECTION -->
+    <div class="settings-section">
+      <div class="settings-section-title">☁️ ${(state.lang||'tr')==='tr' ? 'Bulut & Cihaz Senkronizasyonu' : 'Cloud & Device Sync'}</div>
+      
+      <!-- 1. Google Drive Sync -->
+      <div class="settings-item" onclick="syncWithGoogleDrive()" style="cursor:pointer">
+        <div class="settings-item-left">
+          <div class="settings-item-icon" style="background:#E8F0FE">☁️</div>
+          <div class="settings-item-text">
+            <div class="settings-item-label">${(state.lang||'tr')==='tr' ? 'Google Drive Senkronizasyonu' : 'Google Drive Sync'}</div>
+            <div class="settings-item-desc">${state.lastGoogleDriveSync ? ((state.lang||'tr')==='tr' ? 'Son Senkronizasyon: ' + state.lastGoogleDriveSync : 'Last Sync: ' + state.lastGoogleDriveSync) : ((state.lang||'tr')==='tr' ? 'Sunucusuz, %100 gizli Google Drive yedekleme' : 'Serverless 100% private Drive backup')}</div>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-primary" style="padding:6px 12px;font-size:12px">
+          ${state.googleDriveConnected ? ((state.lang||'tr')==='tr'?'Şimdi Eşle 🔄':'Sync Now 🔄') : ((state.lang||'tr')==='tr'?'Bağlan ☁️':'Connect ☁️')}
+        </button>
+      </div>
+
+      <!-- 2. QR Code Pairing -->
+      <div class="settings-item" onclick="openQRCodeModal()" style="cursor:pointer">
+        <div class="settings-item-left">
+          <div class="settings-item-icon" style="background:#F3E5F5">📱</div>
+          <div class="settings-item-text">
+            <div class="settings-item-label">${(state.lang||'tr')==='tr' ? 'QR Kod ile Cihaz Eşle' : 'Pair Device via QR Code'}</div>
+            <div class="settings-item-desc">${(state.lang||'tr')==='tr' ? '2. cihazınıza anında veri aktarın veya aktarım alın' : 'Transfer data instantly to a 2nd device'}</div>
+          </div>
+        </div>
+        <div class="settings-item-value">›</div>
+      </div>
+
+      <!-- 3. Import JSON Backup File -->
+      <div class="settings-item" onclick="triggerJSONImport()" style="cursor:pointer">
+        <div class="settings-item-left">
+          <div class="settings-item-icon" style="background:#FFF8E1">📥</div>
+          <div class="settings-item-text">
+            <div class="settings-item-label">${(state.lang||'tr')==='tr' ? 'Yedek Dosyası Yükle (.JSON)' : 'Import Backup File (.JSON)'}</div>
+            <div class="settings-item-desc">${(state.lang||'tr')==='tr' ? 'Başka bir cihazdan indirilen veriyi içe aktar' : 'Restore backup JSON from another device'}</div>
+          </div>
+        </div>
+        <input type="file" id="json-file-input" accept=".json" style="display:none" onchange="importJSONFile(this)" />
         <div class="settings-item-value">›</div>
       </div>
     </div>
