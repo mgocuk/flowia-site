@@ -4479,6 +4479,33 @@ function runAIInsightEngine() {
   const dynamicList = [];
   const userName = (state.user && state.user.name) ? state.user.name.split(' ')[0] : '';
   const namePrefix = userName ? `${userName}, ` : '';
+  const P = PREDICTIONS || computePredictions();
+  const isTr = (state.lang || 'tr') === 'tr';
+
+  // 0. High-Priority New Period Started & Unexpected Period Start AI Insights
+  if (P.cycleDay !== undefined && P.cycleDay <= (P.effectivePeriodLength || 5)) {
+    dynamicList.push({
+      id: 'dynamic_period_started',
+      icon: '🩸',
+      iconBg: '#FFEBEE',
+      tag: isTr ? 'Yeni Adet Başlangıcı' : 'New Period Started',
+      tagColor: '#C62828',
+      premium: false,
+      title: isTr ? `🩸 Yeni Adet Döngüsü Başladı (${P.cycleDay}. Döngü Günü)` : `🩸 New Cycle Started (Day ${P.cycleDay})`,
+      body: `${namePrefix}${isTr ? `Yeni adet döngünüz bugün (${P.cycleDay}. Gün) başladı. Vücudunuz dokularını yenilerken demir takviyesi, ılık su torbası ve bol sıvı tüketimine özen gösterin. Takvim ve doğurganlık pencereleriniz yeni başlangıcınıza göre anında adapte edildi.` : `Today is Day ${P.cycleDay} of your cycle. Support your body with iron-rich foods, warmth, and rest. Your calendar has been recalculated.`}`
+    });
+
+    dynamicList.push({
+      id: 'dynamic_unexpected_period',
+      icon: '⚡',
+      iconBg: '#FFF3E0',
+      tag: isTr ? 'Otomatik Yapay Zeka Adaptasyonu' : 'Automatic AI Adaptation',
+      tagColor: '#E65100',
+      premium: false,
+      title: isTr ? '⚡ Zamansız Adet Girişi Otomatik Eşlendi' : '⚡ Period Start Adapted',
+      body: `${namePrefix}${isTr ? `Yeni girdiğiniz adet başlangıç tarihiyle birlikte, Yapay Zeka motorumuz gelecek ayın adet günlerini, yumurtlama tarihini ve doğurganlık pencerelerini otomatik olarak yeniden hesapladı.` : `With your new period start date, AI has automatically recalculated your upcoming period, ovulation, and fertility windows.`}`
+    });
+  }
 
   // 1. Live Cycle Regularity & Stability AI Engine (Calculates real variation from user logs)
   const cycles = state.cycles || [];
@@ -6590,9 +6617,29 @@ function updateDynamicNotifications() {
 
     const newNotifs = [];
 
-    // 1. Period prediction notification (Respects user's selected 1, 2, or 3 days in advance preference)
-    const targetPeriodNotifDays = state.notifPeriodDays || 2;
-    if (P.daysUntilPeriod !== undefined) {
+    // 1. Period prediction notification (Adapts to Period Started vs Future Period)
+    if (P.cycleDay !== undefined && P.cycleDay <= (P.effectivePeriodLength || 5)) {
+      newNotifs.push({
+        id: 'notif_period_started',
+        type: 'prediction',
+        icon: '🩸',
+        title: isTr ? `Yeni Adet Evreniz Başladı (1. Gün) 🩸` : `New Period Started (Day 1) 🩸`,
+        body: `${namePrefix}${isTr ? `Yeni adet döngünüz bugün başladı. Tahmini sonraki adet tarihiniz: ${formatDate(P.nextPeriodStart)}. Vücudunuza bugün ekstra özen gösterin!` : `Day 1 of your cycle. Predicted next period: ${formatDate(P.nextPeriodStart)}. Take extra care today!`}`,
+        time: isTr ? 'Bugün' : 'Today',
+        read: false
+      });
+
+      newNotifs.push({
+        id: 'notif_period_pred',
+        type: 'prediction',
+        icon: '🔔',
+        title: isTr ? `Sonraki adete ${P.daysUntilPeriod} gün kaldı 🔔` : `Next period in ${P.daysUntilPeriod} days 🔔`,
+        body: `${namePrefix}${isTr ? `Yeni adet başlangıcınıza göre sonraki adetinizin ${formatDate(P.nextPeriodStart)} tarihinde başlaması bekleniyor.` : `Based on your new period start, next period is predicted for ${formatDate(P.nextPeriodStart)}.`}`,
+        time: isTr ? 'Güncellendi' : 'Updated',
+        read: false
+      });
+    } else if (P.daysUntilPeriod !== undefined) {
+      const targetPeriodNotifDays = state.notifPeriodDays || 2;
       const title = isTr
         ? (P.daysUntilPeriod === 0 ? 'Adet bugün başlıyor! 🩸' : `Adete ${P.daysUntilPeriod} gün kaldı 🔔`)
         : (P.daysUntilPeriod === 0 ? 'Period starts today! 🩸' : `Period in ${P.daysUntilPeriod} days 🔔`);
@@ -6610,7 +6657,7 @@ function updateDynamicNotifications() {
       });
     }
 
-    // 2. Daily Log Reminder (Respects user's selected notification time: e.g. 20:00)
+    // 2. Daily Log Reminder
     const dailyTime = state.notifDailyTime || '20:00';
     newNotifs.push({
       id: 'notif_daily_reminder',
@@ -6622,7 +6669,7 @@ function updateDynamicNotifications() {
       read: false
     });
 
-    // 3. Personalized AI Insights generated strictly from REAL user data!
+    // 3. Personalized AI Insights strictly from real user data & phase
     const { dynamicList } = runAIInsightEngine();
     if (dynamicList && dynamicList.length > 0) {
       dynamicList.forEach((item, idx) => {
@@ -6638,7 +6685,7 @@ function updateDynamicNotifications() {
       });
     }
 
-    // 4. Supplement & Health Tip (Iron & Vitamin C / Nutrition advice in target language)
+    // 4. Supplement & Health Tip
     newNotifs.push({
       id: 'notif_iron_supp',
       type: 'reminder',
