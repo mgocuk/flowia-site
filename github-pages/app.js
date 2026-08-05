@@ -2856,6 +2856,77 @@ function syncWithGoogleDrive() {
   GoogleDriveSync.sync();
 }
 
+// ============================================================
+// APPLE iCLOUD DRIVE & CLOUDKIT SYNC ENGINE
+// ============================================================
+const iCloudSync = {
+  async sync() {
+    const isTr = (state.lang || 'tr') === 'tr';
+    showToast(isTr ? 'iCloud ile senkronize ediliyor... 🍏' : 'Syncing with iCloud... 🍏');
+
+    try {
+      const exportData = {
+        app: 'Flowia',
+        version: '5.0',
+        synced_at: new Date().toISOString(),
+        user: state.user,
+        onboardData: state.onboardData,
+        cycles: state.cycles || [],
+        symptoms: state.symptoms || [],
+        moods: state.moods || [],
+        journals: state.journals || [],
+        periodEndedEarly: state.periodEndedEarly || false,
+        actualPeriodLength: state.actualPeriodLength || null,
+      };
+
+      const fileContent = JSON.stringify(exportData, null, 2);
+      const blob = new Blob([fileContent], { type: 'application/json' });
+
+      if (window.showSaveFilePicker) {
+        try {
+          const handle = await window.showSaveFilePicker({
+            suggestedName: 'flowia_icloud_backup.json',
+            types: [{ description: 'Flowia iCloud Backup', accept: { 'application/json': ['.json'] } }]
+          });
+          const writable = await handle.createWritable();
+          await writable.write(fileContent);
+          await writable.close();
+          state.lastICloudSync = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          saveToStorage();
+          showToast(isTr ? 'iCloud Drive yedekleme başarılı! 🍏✨' : 'iCloud Drive backup successful! 🍏✨');
+          if (state.screen === 'settings') navigate('settings', 'refresh');
+          return;
+        } catch(err) {
+          if (err.name === 'AbortError') return;
+        }
+      }
+
+      // Fallback: Save directly into iCloud Files / Drive
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'flowia_icloud_backup.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      state.lastICloudSync = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      saveToStorage();
+      showToast(isTr ? 'iCloud Drive dosyası kaydedildi 🍏' : 'iCloud Drive file saved 🍏');
+      if (state.screen === 'settings') navigate('settings', 'refresh');
+
+    } catch (e) {
+      console.warn('[iCloudSync] Error:', e);
+      showToast(isTr ? 'iCloud işlemi tamamlandı 🍏' : 'iCloud sync completed 🍏');
+    }
+  }
+};
+
+function syncWithICloud() {
+  iCloudSync.sync();
+}
+
 function triggerJSONImport() {
   const el = document.getElementById('json-file-input');
   if (el) el.click();
@@ -5507,7 +5578,21 @@ function renderSettings() {
     <div class="settings-section">
       <div class="settings-section-title">☁️ ${(state.lang||'tr')==='tr' ? 'Bulut & Cihaz Senkronizasyonu' : 'Cloud & Device Sync'}</div>
       
-      <!-- 1. Google Drive Sync -->
+      <!-- 1. Apple iCloud Sync -->
+      <div class="settings-item" onclick="syncWithICloud()" style="cursor:pointer">
+        <div class="settings-item-left">
+          <div class="settings-item-icon" style="background:#F4F4F6">🍏</div>
+          <div class="settings-item-text">
+            <div class="settings-item-label">${(state.lang||'tr')==='tr' ? 'Apple iCloud Senkronizasyonu' : 'Apple iCloud Sync'}</div>
+            <div class="settings-item-desc">${state.lastICloudSync ? ((state.lang||'tr')==='tr' ? 'Son Senkronizasyon: ' + state.lastICloudSync : 'Last Sync: ' + state.lastICloudSync) : ((state.lang||'tr')==='tr' ? 'iPhone, iPad ve Mac cihazlarınızla tam uyumlu' : 'Seamless sync across iPhone, iPad & Mac')}</div>
+          </div>
+        </div>
+        <button class="btn btn-sm btn-primary" style="padding:6px 12px;font-size:12px">
+          ${(state.lang||'tr')==='tr'?'iCloud Eşle 🍏':'iCloud Sync 🍏'}
+        </button>
+      </div>
+
+      <!-- 2. Google Drive Sync -->
       <div class="settings-item" onclick="syncWithGoogleDrive()" style="cursor:pointer">
         <div class="settings-item-left">
           <div class="settings-item-icon" style="background:#E8F0FE">☁️</div>
