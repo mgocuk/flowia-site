@@ -3,7 +3,7 @@
   "name": "Flowia — Akıllı Döngü Takipçisi",
   "short_name": "Flowia",
   "description": "AI destekli adet döngüsü takibi, doğurganlık içgörüleri ve kadın sağlığı analitiği. Güvenli, özel ve kişiselleştirilmiş.",
-  "start_url": "./index.html",
+  "start_url": "./app.html",
   "scope": "./",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
@@ -105,21 +105,21 @@
       "name": "Adet Kaydet",
       "short_name": "Adet",
       "description": "Hızlıca adet başlangıcı kaydet",
-      "url": "./index.html#log-period",
+      "url": "./app.html#log-period",
       "icons": [{ "src": "./icon-96.png", "sizes": "96x96", "type": "image/png" }]
     },
     {
       "name": "Semptom Kaydet",
       "short_name": "Semptom",
       "description": "Bugün nasıl hissediyorsun?",
-      "url": "./index.html#symptoms",
+      "url": "./app.html#symptoms",
       "icons": [{ "src": "./icon-96.png", "sizes": "96x96", "type": "image/png" }]
     },
     {
       "name": "Ruh Halini Kaydet",
       "short_name": "Ruh Hali",
       "description": "Duygusal durumunu kaydet",
-      "url": "./index.html#mood",
+      "url": "./app.html#mood",
       "icons": [{ "src": "./icon-96.png", "sizes": "96x96", "type": "image/png" }]
     }
   ],

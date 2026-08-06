@@ -1,10 +1,10 @@
-const CACHE_NAME = 'flowia-v21.0';
+const CACHE_NAME = 'flowia-v22.0';
 const STATIC_ASSETS = [
   './',
   './index.html',
   './app.html',
-  './app.js?v=21.0',
-  './styles.css?v=21.0',
+  './app.js?v=22.0',
+  './styles.css?v=22.0',
   './manifest.json',
   './favicon.png',
   './lily-logo.png',
