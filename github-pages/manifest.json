@@ -2,6 +2,8 @@
   "id": "com.flowia.app",
   "name": "Flowia — Akıllı Döngü Takipçisi",
   "short_name": "Flowia",
+  "version": "1.0.2",
+  "version_code": 2,
   "description": "AI destekli adet döngüsü takibi, doğurganlık içgörüleri ve kadın sağlığı analitiği. Güvenli, özel ve kişiselleştirilmiş.",
   "start_url": "./app.html",
   "scope": "./",
