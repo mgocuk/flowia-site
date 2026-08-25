@@ -277,7 +277,7 @@ const I18N = {
   how_severe: { en:'How severe is your symptom?', tr:'Semptomunuz ne kadar şiddetli?', ru:'Насколько выражен симптом?', zh:'您的症状有多严重？', es:'¿Qué tan severo es tu síntoma?', hi:'आपका लक्षण कितना गंभीर है?', fr:'Quelle est la sévérité du symptôme ?', ar:'ما مدى شدة الأعراض؟', bn:'আপনার উপসর্গ কতটা তীব্র?', pt:'Quão grave é o seu sintoma?', ur:'آپ کی علامت کتنی شدید ہے؟', de:'Wie schwer ist Ihr Symptom?' },
   unlock_all_insights: { en:'Unlock All AI Insights', tr:'Tüm YZ İçgörülerinin Kilidini Aç', ru:'Разблокировать всю ИИ-аналитику', zh:'解锁所有 AI 见解', es:'Desbloquear toda la información de IA', hi:'सभी एआई अंतर्दृष्टि अनलॉक करें', fr:'Débloquer toutes les analyses IA', ar:'افتح جميع رؤى الذكاء الاصطناعي', bn:'সমস্ত AI ইনসাইট আনলক করুন', pt:'Desbloquear todos os insights de IA', ur:'تمام AI بصیرت انلاک کریں', de:'Alle KI-Erkenntnisse freischalten' },
   unlock_all_desc: { en:'Get personalized cycle analysis & symptom predictions with Premium.', tr:'Premium ile kişiselleştirilmiş döngü analizi ve semptom tahminleri alın.', ru:'Получите персональный анализ цикла и прогнозы симптомов с Premium.', zh:'使用 Premium 获取个性化的周期分析和症状预测。', es:'Obtén análisis de ciclo personalizado y predicciones de síntomas con Premium.', hi:'प्रीमियम के साथ व्यक्तिगत चक्र विश्लेषण और लक्षण भविष्यवाणियां प्राप्त करें।', fr:'Obtenez des analyses de cycle personnalisées et des prédictions de symptômes avec Premium.', ar:'احصل على تحليل مخصص للدورة وتوقعات الأعراض مع بريميوم.', bn:'প্রিমিয়ামের মাধ্যমে ব্যক্তিগতকৃত চক্র বিশ্লেষণ এবং উপসর্গ অনুমান পান।', pt:'Obtenha análise personalizada do ciclo e previsões de sintomas com o Premium.', ur:'پریمیم کے ساتھ ذاتی نوعیت کا سائیکل کا تجزیہ اور علامات کی پیش گوئیاں حاصل کریں۔', de:'Erhalten Sie personalisierte Zyklusanalysen und Symptomvorhersagen mit Premium.' },
-  try_premium_free: { en:'Try Premium Free', tr:'Premium\'u Ücretsiz Dene', ru:'Попробовать Premium бесплатно', zh:'免费试用 Premium', es:'Prueba Premium gratis', hi:'निःशुल्क प्रीमियम आज़माएं', fr:'Essayer Premium gratuitement', ar:'تجربة بريميوم مجاناً', bn:'বিনামূল্যে প্রিমিয়াম চেষ্টা করুন', pt:'Experimente o Premium grátis', ur:'مفت پریمیم آزمائیں', de:'Premium kostenlos testen' },
+  try_premium_free: { en:'Try 1 Month Free', tr:'1 Ay Ücretsiz Dene', ru:'1 месяц бесплатно', zh:'免费试用1个月', es:'Prueba 1 mes gratis', hi:'1 महीना मुफ़्त आज़माएं', fr:'1 mois gratuit', ar:'تجربة شهر مجاناً', bn:'১ মাস বিনামূল্যে ব্যবহার করুন', pt:'Experimente 1 mês grátis', ur:'1 ماہ مفت آزمائیں', de:'1 Monat kostenlos testen' },
   click_to_edit: { en:'Click to edit', tr:'Düzenlemek için tıklayın', ru:'Нажмите для редактирования', zh:'点击编辑', es:'Haz clic para editar', hi:'संपादित करने के लिए क्लिक करें', fr:'Cliquer pour modifier', ar:'انقر للتعديل', bn:'সম্পাদনা করতে ক্লিক করুন', pt:'Clique para editar', ur:'ترمیم کے لیے کلک کریں', de:'Klicken zum Bearbeiten' },
 
   home: { en:'Home', tr:'Ana Sayfa', ru:'Главная', zh:'首页', es:'Inicio', hi:'होम', fr:'Accueil', ar:'الرئيسية', bn:'হোম', pt:'Início', ur:'ہوم', de:'Startseite' },
@@ -7422,10 +7422,10 @@ function saveConsentPreferences() {
 function renderPremium() {
   const isTr = (state.lang || 'tr') === 'tr';
   const isAnnual = state.premiumTab === 'annual';
-  const price = isAnnual ? '$1.00' : '$2.00';
+  const price = isAnnual ? '$1.00' : '$0.00';
   const period = isAnnual 
     ? (isTr ? '/ay, yıllık $12.00 faturalandırılır' : '/month, billed $12.00/year')
-    : (isTr ? '/ay' : '/month');
+    : (isTr ? '1. Ay Ücretsiz • Sonra $2.00 / ay' : '1st Month Free • Then $2.00 / month');
 
   const features = [
     { name: isTr ? 'Döngü & adet takibi' : 'Cycle & period tracking',             free: true,  premium: true,  new: false },
@@ -7451,15 +7451,16 @@ function renderPremium() {
   const tabMonthly = isTr ? 'Aylık' : 'Monthly';
   const tabAnnual = isTr ? 'Yıllık' : 'Annual';
   const saveLabel = isTr ? '%50 Tasarruf' : 'Save 50%';
+  const freeMonthBadge = isTr ? '🎁 1. Ay Ücretsiz' : '🎁 1st Mo Free';
   const saveYearlyBadge = isTr ? 'Yılda $12.00 tasarruf edin' : 'Save $12.00/year';
 
   const btnText = isAnnual 
-    ? (isTr ? '🌟 Yıllık Planı Başlat' : '🌟 Start Annual Plan')
-    : (isTr ? ' Aylık Planı Başlat' : ' Start Monthly Plan');
+    ? (isTr ? '🌟 Yıllık Planı Başlat ($1.00/ay)' : '🌟 Start Annual Plan ($1.00/mo)')
+    : (isTr ? '🌟 1 Ay Ücretsiz Başlat (Sonra $2.00/ay)' : '🌟 Start 1-Month Free Trial (Then $2.00/mo)');
 
-  const subCommit = isTr 
-    ? '7 gün ücretsiz deneme • İstediğin zaman iptal et • Taahhüt yok' 
-    : '7-day free trial • Cancel anytime • No commitments';
+  const subCommit = isAnnual
+    ? (isTr ? '7 gün ücretsiz deneme • Yılda $12.00 tasarruf • İstediğin zaman iptal et' : '7-day free trial • Save $12.00/year • Cancel anytime')
+    : (isTr ? 'İlk 30 gün tamamen ücretsiz • Sonrasında aylık $2.00 • İstediğin zaman iptal et' : 'First 30 days 100% free • Then $2.00/month • Cancel anytime');
 
   const incLabel = isTr ? 'Neler dahil:' : 'What\'s included:';
   const freeBadge = isTr ? 'Ücretsiz' : 'Free';
@@ -7484,7 +7485,9 @@ function renderPremium() {
 
     <!-- Plan Toggle -->
     <div class="plan-toggle">
-      <div class="plan-tab ${!isAnnual?'active':''}" onclick="switchPremiumTab('monthly')">${tabMonthly}</div>
+      <div class="plan-tab ${!isAnnual?'active':''}" onclick="switchPremiumTab('monthly')">
+        ${tabMonthly} <span class="save-badge" style="background:#4CAF50;color:white">${freeMonthBadge}</span>
+      </div>
       <div class="plan-tab ${isAnnual?'active':''}" onclick="switchPremiumTab('annual')">
         ${tabAnnual} <span class="save-badge">${saveLabel}</span>
       </div>
@@ -7496,7 +7499,9 @@ function renderPremium() {
         <div style="font-size:14px;font-weight:700;margin-bottom:4px">PREMIUM</div>
         <div style="font-size:42px;font-weight:800;color:white">${price}</div>
         <div style="font-size:12px;opacity:0.85;margin-bottom:8px">${period}</div>
-        ${isAnnual ? `<div style="display:inline-block;background:rgba(255,255,255,0.25);border-radius:var(--r-full);padding:4px 14px;font-size:12px;font-weight:700">${saveYearlyBadge}</div>` : ''}
+        ${isAnnual 
+          ? `<div style="display:inline-block;background:rgba(255,255,255,0.25);border-radius:var(--r-full);padding:4px 14px;font-size:12px;font-weight:700">${saveYearlyBadge}</div>` 
+          : `<div style="display:inline-block;background:rgba(255,255,255,0.25);border-radius:var(--r-full);padding:4px 14px;font-size:12px;font-weight:700">${isTr ? '🎁 İlk 30 Gün $0.00 (Ücretsiz)' : '🎁 First 30 Days $0.00 (Free)'}</div>`}
       </div>
       <button class="btn btn-primary" onclick="purchasePremium()" style="margin-top:0">
         ${btnText}
@@ -7543,33 +7548,51 @@ function purchasePremium() {
 function openPaymentCheckoutModal() {
   const isTr = (state.lang || 'tr') === 'tr';
   const isAnnual = state.premiumTab === 'annual';
-  const planName = isAnnual 
-    ? (isTr ? 'Yıllık Premium Üyelik (7 Gün Ücretsiz Deneme)' : 'Annual Premium Plan (7-Day Free Trial)')
-    : (isTr ? 'Aylık Premium Üyelik (7 Gün Ücretsiz Deneme)' : 'Monthly Premium Plan (7-Day Free Trial)');
 
-  const planPrice = isAnnual 
+  const planName = isAnnual 
+    ? (isTr ? 'Yıllık Premium Plan (7 Gün Ücretsiz Deneme)' : 'Annual Premium Plan (7-Day Free Trial)')
+    : (isTr ? 'Aylık Premium Plan (1 Ay Ücretsiz Deneme)' : 'Monthly Premium Plan (1-Month Free Trial)');
+
+  const badgeText = isAnnual 
+    ? (isTr ? '7 GÜN ÜCRETSİZ' : '7 DAYS FREE') 
+    : (isTr ? '1 AY ÜCRETSİZ' : '1 MONTH FREE');
+
+  const planPriceAfter = isAnnual 
     ? '$12.00 / yıl ($1.00/ay)' 
-    : '$2.00 / ay';
+    : '$2.00 / ay (İlk ay sonrası)';
+
+  const securityNote = isAnnual
+    ? (isTr ? '🛡️ İlk 7 gün boyunca hiçbir ücret alınmayacaktır. İptal etmediğiniz takdirde 7 gün sonra yıllık $12.00 olarak devam eder.' : '🛡️ You will not be charged today. Auto-renews in 7 days at $12.00/year unless cancelled.')
+    : (isTr ? '🛡️ İlk 30 gün boyunca hiçbir ücret alınmayacaktır. İptal etmediğiniz takdirde 1 ay sonra aylık $2.00 olarak devam eder.' : '🛡️ You will not be charged today. Auto-renews in 30 days at $2.00/month unless cancelled.');
+
+  const btnText = isAnnual
+    ? (isTr ? '🔒 💳 Yıllık Planı Başlat ($12.00/yıl)' : '🔒 💳 Start Annual Plan ($12.00/year)')
+    : (isTr ? '🔒 💳 1 Ay Ücretsiz Başlat (Sonra $2.00/ay)' : '🔒 💳 Start 1-Month Free (Then $2.00/mo)');
 
   const title = isTr ? 'Ödeme Sayfası (Google Play / App Store)' : 'Payment Checkout (Google Play / App Store)';
-  const sub = isTr ? 'Lütfen ödeme yöntemini onaylayın' : 'Please confirm your payment method';
+  const sub = isTr ? 'Lütfen abonelik paketinizi onaylayın' : 'Please confirm your subscription';
 
   const bodyHtml = `
     <div style="background:var(--surface-2);border-radius:var(--r-xl);padding:14px;border:1px solid var(--border-light);margin-bottom:14px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:22px"></span>
+          <span style="font-size:22px">⭐</span>
           <div>
             <div style="font-size:14px;font-weight:700;color:var(--text-1)">Flowia Premium</div>
             <div style="font-size:11px;color:var(--text-2);margin-top:2px">${planName}</div>
           </div>
         </div>
-        <span class="badge badge-success" style="font-size:10px">${isTr ? '7 GÜN ÜCRETSİZ' : '7 DAYS FREE'}</span>
+        <span class="badge badge-success" style="font-size:10px">${badgeText}</span>
       </div>
       
-      <div style="border-top:1px dashed var(--border-light);padding-top:10px;margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:1px dashed var(--border-light)">
+        <span style="font-size:12px;color:var(--text-2)">${isTr ? 'Bugün Ödenecek:' : 'Due Today:'}</span>
+        <span style="font-size:15px;font-weight:800;color:var(--success)">$0.00 (${isTr ? 'Ücretsiz' : 'Free'})</span>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
         <span style="font-size:12px;color:var(--text-2)">${isTr ? 'Deneme Sonrası Tutar:' : 'Price After Trial:'}</span>
-        <span style="font-size:16px;font-weight:800;color:var(--primary)">${planPrice}</span>
+        <span style="font-size:15px;font-weight:800;color:var(--primary)">${planPriceAfter}</span>
       </div>
     </div>
 
@@ -7587,11 +7610,11 @@ function openPaymentCheckoutModal() {
     </div>
 
     <div style="font-size:11px;color:var(--text-3);line-height:1.4;margin-bottom:16px;text-align:center">
-      🛡️ ${isTr ? 'Bugün hiçbir ücret alınmayacaktır. İptal etmediğiniz takdirde 7 gün sonra otomatik yenilenir.' : 'You will not be charged today. Auto-renews in 7 days unless cancelled.'}
+      ${securityNote}
     </div>
 
     <button id="btn-confirm-payment" class="btn btn-primary" style="width:100%;font-weight:700;padding:12px;font-size:14px" onclick="processPaymentAndUnlock()">
-      🔒 ${isTr ? '💳 Ödemeyi Onayla & Satın Al (7 Gün Ücretsiz)' : '🔒 💳 Confirm & Purchase (7-Day Free Trial)'}
+      ${btnText}
     </button>`;
 
   openProfileEditModal('💳', title, sub, bodyHtml, null);
