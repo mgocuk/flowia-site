@@ -623,13 +623,33 @@ function computePredictions(customLastDate, customAvgCycle, customAvgPeriod) {
       : null;
     if (raw) lastPeriodDate = new Date(raw + (raw.includes('T') ? '' : 'T00:00:00'));
   }
-  if (!lastPeriodDate || isNaN(lastPeriodDate.getTime())) {
-    lastPeriodDate = new Date(TODAY.getFullYear(), TODAY.getMonth(), 3);
-  }
-
   // Average cycle & period defaults
-  let avgCycle = customAvgCycle || (state && state.onboardData && state.onboardData.cycleLength) || 28;
+  let avgCycle = customAvgCycle || (state && state.user && state.user.avgCycle) || (state && state.onboardData && state.onboardData.cycleLength) || 28;
   let avgPeriod = customAvgPeriod || (state && state.user && state.user.avgPeriod) || (state && state.onboardData && state.onboardData.periodLength) || 5;
+
+  // If user has NOT logged or entered any period date, return 100% clean empty prediction state!
+  if (!lastPeriodDate || isNaN(lastPeriodDate.getTime())) {
+    return {
+      noData: true,
+      lastPeriodDate: null,
+      cycleDay: 1,
+      ovulationDate: null,
+      fertileStart: null,
+      fertileEnd: null,
+      nextPeriodStart: null,
+      nextPeriodEnd: null,
+      daysUntilPeriod: 0,
+      phase: PHASES.follicular,
+      avgCycle,
+      avgPeriod,
+      effectivePeriodLength: avgPeriod,
+      earlyDiff: 0,
+      adjustedCycleLength: avgCycle,
+      isEarlyEnd: false,
+      confidence: 'Low',
+      futurePeriods: [],
+    };
+  }
 
   if (!customAvgCycle && state && state.cycles && state.cycles.length >= 3) {
     const lengths = state.cycles.filter(c => c.length > 0).map(c => c.length);
@@ -752,7 +772,7 @@ let state = {
   calendarYear: TODAY.getFullYear(),
   calendarSelectedDay: TODAY.getDate(),
   onboardStep: 1,
-  onboardData: { lastPeriodDate: TODAY_STR, cycleLength: 28, periodLength: 5, goals: [] },
+  onboardData: { lastPeriodDate: '', cycleLength: 28, periodLength: 5, goals: [] },
   reportTab: 'monthly',
   premiumTab: 'annual',
   logDate: TODAY_STR,
@@ -774,7 +794,7 @@ let state = {
   dateFormat: 'DD.MM.YYYY',
   lang: 'tr',
   consentPrefs: { healthData: true, aiProcessing: true, analytics: true, reminders: true },
-  user: { name: '', email: '', dob: '', initials: 'F', avgCycle: 28, avgPeriod: 5, goals: ['Track my cycle'] },
+  user: { name: '', email: '', dob: '', initials: 'F', avgCycle: 28, avgPeriod: 5, lastPeriodDate: '', goals: ['Track my cycle'] },
   charts: {},
 };
 
@@ -801,7 +821,7 @@ function generateUserPersonalizedData(email, name, dob) {
       initials: displayName ? displayName.charAt(0).toUpperCase() : 'F',
       avgCycle: 28,
       avgPeriod: 5,
-      lastPeriodDate: TODAY_STR,
+      lastPeriodDate: '',
       goals: ['Track my cycle']
     },
     cycles: [],
@@ -1048,7 +1068,7 @@ function loadUserSession(email, name = '', dob = '') {
         state.user.initials = name.trim().charAt(0).toUpperCase();
       }
 
-      PREDICTIONS = computePredictions(state.user.lastPeriodDate || TODAY_STR, state.user.avgCycle || 28, (state && state.user && state.user.avgPeriod ? state.user.avgPeriod : 5) || 5);
+      PREDICTIONS = computePredictions(state.user.lastPeriodDate || null, state.user.avgCycle || 28, state.user.avgPeriod || 5);
       CloudSync.startAutoSync(email);
       saveToStorage();
       return true;
@@ -1066,7 +1086,7 @@ function loadUserSession(email, name = '', dob = '') {
   state.journals = [];
   state.isLoggedIn = true;
 
-  PREDICTIONS = computePredictions(state.user.lastPeriodDate || TODAY_STR, state.user.avgCycle, (state && state.user && state.user.avgPeriod ? state.user.avgPeriod : 5));
+  PREDICTIONS = computePredictions(state.user.lastPeriodDate || null, state.user.avgCycle, state.user.avgPeriod || 5);
   saveToStorage();
   return true;
 }
@@ -1185,6 +1205,12 @@ function getDateClass(year, month, day) {
 
   // Today highlight
   if (isSameDay(date, TODAY)) classes.push('today');
+
+  // If no cycle or period data exists, keep all other calendar days clean and uncolored!
+  const hasExplicitCycles = state && state.cycles && state.cycles.length > 0;
+  if ((!P || !P.lastPeriodDate || P.noData) && !hasExplicitCycles) {
+    return classes.join(' ');
+  }
 
   const pLen = (state && state.periodEndedEarly && state.actualPeriodLength) 
     ? state.actualPeriodLength 
@@ -2620,37 +2646,23 @@ function nextOnboardStep() {
     navigate('onboarding', 'refresh');
   } else {
     // New user onboarding finalized
-    const startStr = state.onboardData.lastPeriodDate || TODAY_STR;
     const cycleLen = state.onboardData.cycleLength || 28;
     const periodLen = state.onboardData.periodLength || 5;
-    const startDateObj = new Date(startStr);
-    const endDateObj = new Date(startDateObj.getTime() + (periodLen - 1) * 86400000);
-
-    state.user.lastPeriodDate = startStr;
+    state.user.lastPeriodDate = '';
     state.user.avgCycle = cycleLen;
     state.user.avgPeriod = periodLen;
     state.user.goals = [...(state.onboardData.goals || ['Track my cycle'])];
 
-    // Seed ONLY the real initial period entry specified by the user
-    state.cycles = [
-      {
-        id: 1,
-        startDate: startStr,
-        endDate: endDateObj.toISOString().split('T')[0],
-        length: cycleLen,
-        periodDays: periodLen,
-        notes: (state.lang || 'tr') === 'tr' ? 'İlk adet başlangıç kaydı' : 'Initial period entry'
-      }
-    ];
-
-    // Absolutely zero mock or fake past data
+    // Completely clean state for new user — 0 cycles, 0 symptoms, 0 moods until user logs one
+    state.cycles = [];
     state.symptoms = [];
     state.moods = [];
     state.journals = [];
+    state.notifications = [];
 
     state.isLoggedIn = true;
     state.onboardStep = 1;
-    PREDICTIONS = computePredictions(startStr, cycleLen, periodLen);
+    PREDICTIONS = computePredictions();
     updateDynamicNotifications();
     saveToStorage();
     showToast((state.lang || 'tr') === 'tr' ? 'Profiliniz ve döngü tahminleriniz hazırlandı! 🌸' : 'Your profile and cycle predictions are ready! 🌸');
@@ -3276,8 +3288,11 @@ function renderHome() {
                   (cd >= fertDayStart && cd <= ovDay+2) ? 'High' :
                   (cd >= ovDay+3 && cd <= ovDay+7) ? 'Low' : 'Very Low';
   const fertilityStatusKey = 'fert_' + fertRaw.toLowerCase().replace(' ', '_');
-  const fertilityStatus = t(fertilityStatusKey);
-  const fertilityColor = fertRaw === 'Peak' ? '#66BB6A' : fertRaw === 'High' ? '#FFA726' : '#9E9E9E';
+  const fertilityStatus = P.noData ? (isTr ? 'Kayıt Bekleniyor' : 'Awaiting Entry') : t(fertilityStatusKey);
+  const fertilityColor = P.noData ? '#9E9E9E' : (fertRaw === 'Peak' ? '#66BB6A' : fertRaw === 'High' ? '#FFA726' : '#9E9E9E');
+
+  const cycleDayDisplay = P.noData ? '-' : P.cycleDay;
+  const daysUntilDisplay = P.noData ? '-' : P.daysUntilPeriod;
 
   return `
   <div class="home-screen">
@@ -3296,7 +3311,7 @@ function renderHome() {
 
     <!-- Cycle Ring Card -->
     <div class="cycle-ring-card" style="margin-top:-16px">
-      <div class="phase-chip ${phase.cls}">${phase.emoji} ${phase.name}</div>
+      <div class="phase-chip ${P.noData ? 'chip-follicular' : phase.cls}">${P.noData ? '🌸 ' + (isTr ? 'Kayıt Bekleniyor' : 'Awaiting Entry') : `${phase.emoji} ${phase.name}`}</div>
       <div class="cycle-ring-svg-wrap">
         <svg class="cycle-ring-svg" viewBox="0 0 120 120">
           <circle cx="60" cy="60" r="54" fill="none" stroke="#EDE0ED" stroke-width="9"/>
@@ -3307,17 +3322,17 @@ function renderHome() {
             </linearGradient>
           </defs>
           <circle cx="60" cy="60" r="54" fill="none" stroke="url(#ringGrad)" stroke-width="9"
-            stroke-dasharray="${circumference.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}"
+            stroke-dasharray="${circumference.toFixed(2)}" stroke-dashoffset="${(P.noData ? circumference : offset).toFixed(2)}"
             stroke-linecap="round"/>
         </svg>
         <div class="cycle-ring-text">
-          <div class="cycle-day-num" style="color:${phase.color}">${P.cycleDay}</div>
+          <div class="cycle-day-num" style="color:${P.noData ? 'var(--text-2)' : phase.color}">${cycleDayDisplay}</div>
           <div class="cycle-day-lbl">${t('cycle_day_lbl')}</div>
         </div>
       </div>
       <div class="cycle-stats">
         <div class="cycle-stat">
-          <div class="cycle-stat-val" style="color:var(--primary)">${P.daysUntilPeriod}</div>
+          <div class="cycle-stat-val" style="color:var(--primary)">${daysUntilDisplay}</div>
           <div class="cycle-stat-lbl">${t('days_until_period').replace(' ', '<br>')}</div>
         </div>
         <div class="cycle-stat">
@@ -3332,7 +3347,7 @@ function renderHome() {
     </div>
 
     <!-- Early Period End Banner -->
-    ${(phaseRaw.cls.includes('menstrual') || (P.cycleDay <= (P.avgPeriod || 5) && !state.periodEndedEarly)) ? `
+    ${(!P.noData && (phaseRaw.cls.includes('menstrual') || (P.cycleDay <= (P.avgPeriod || 5) && !state.periodEndedEarly))) ? `
     <div style="margin: -4px 16px 16px; background: linear-gradient(135deg, rgba(232,120,154,0.14), rgba(156,39,176,0.1)); border: 1px solid rgba(232,120,154,0.35); border-radius: var(--r-md); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; animation: fadeInUp 0.3s ease both">
       <div style="display: flex; align-items: center; gap: 10px;">
         <span style="font-size: 22px;">🩸</span>
