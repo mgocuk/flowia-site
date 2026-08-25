@@ -713,14 +713,24 @@ function computePredictions(customLastDate, customAvgCycle, customAvgPeriod) {
 
   // Current clinical phase resolution for any cycle length (15 to 60 days)
   let phase;
-  if (cycleDay <= effectivePeriodLength) {
-    phase = PHASES.menstrual;
-  } else if (cycleDay < fertileStartDayNum) {
-    phase = PHASES.follicular;
-  } else if (cycleDay <= ovulationDayNum + 1) {
-    phase = PHASES.ovulation;
+  if (isEarlyEnd) {
+    if (cycleDay < fertileStartDayNum) {
+      phase = PHASES.follicular;
+    } else if (cycleDay <= ovulationDayNum + 1) {
+      phase = PHASES.ovulation;
+    } else {
+      phase = PHASES.luteal;
+    }
   } else {
-    phase = PHASES.luteal;
+    if (cycleDay <= effectivePeriodLength) {
+      phase = PHASES.menstrual;
+    } else if (cycleDay < fertileStartDayNum) {
+      phase = PHASES.follicular;
+    } else if (cycleDay <= ovulationDayNum + 1) {
+      phase = PHASES.ovulation;
+    } else {
+      phase = PHASES.luteal;
+    }
   }
 
   // Confidence score based on logged data history
@@ -1157,7 +1167,8 @@ function clearStorage() {
 function getCyclePhase(cycleDay) {
   const d = (cycleDay !== undefined) ? cycleDay : (PREDICTIONS.cycleDay || 1);
   const avg = PREDICTIONS.avgCycle || 28;
-  const effectivePeriod = (state && state.periodEndedEarly && state.actualPeriodLength) ? state.actualPeriodLength : (PREDICTIONS.avgPeriod || 5);
+  const isEarlyEnd = !!(state && state.periodEndedEarly && state.actualPeriodLength);
+  const effectivePeriod = isEarlyEnd ? state.actualPeriodLength : (PREDICTIONS.avgPeriod || 5);
   
   let ovDay;
   if (PREDICTIONS.ovulationDayNum) {
@@ -1172,7 +1183,7 @@ function getCyclePhase(cycleDay) {
 
   const fertileStart = Math.max(1, ovDay - 5);
 
-  if (d <= effectivePeriod) return PHASES.menstrual;
+  if (!isEarlyEnd && d <= effectivePeriod) return PHASES.menstrual;
   if (d < fertileStart) return PHASES.follicular;
   if (d <= ovDay + 1) return PHASES.ovulation;
   return PHASES.luteal;
@@ -3254,12 +3265,10 @@ function switchQRTab(tab) {
 }
 
 function markPeriodEndedToday() {
-
-  const cDay = (PREDICTIONS && PREDICTIONS.cycleDay) ? PREDICTIONS.cycleDay : 3;
+  const cDay = (PREDICTIONS && PREDICTIONS.cycleDay) ? PREDICTIONS.cycleDay : 1;
   state.periodEndedEarly = true;
   state.actualPeriodLength = cDay;
 
-  if (!state.user) state.user = {};
   if (!state.user) state.user = { name: 'Flowia Kullanıcısı', email: '', avgCycle: 28, avgPeriod: 5, initials: 'F' };
   if (!(state && state.user && state.user.avgPeriod ? state.user.avgPeriod : 5)) state.user.avgPeriod = 5;
 
@@ -3275,9 +3284,10 @@ function markPeriodEndedToday() {
   }
 
   PREDICTIONS = computePredictions();
+  updateDynamicNotifications();
   saveToStorage();
   
-  showToast(t('period_ended_toast'));
+  showToast((state.lang || 'tr') === 'tr' ? 'Adet bitişi kaydedildi! Foliküler evreye geçildi ✨' : 'Period end logged! Follicular phase activated ✨');
   navigate(state.screen || 'home', 'refresh');
 }
 
@@ -3285,8 +3295,9 @@ function resumePeriodLog() {
   state.periodEndedEarly = false;
   state.actualPeriodLength = null;
   PREDICTIONS = computePredictions();
+  updateDynamicNotifications();
   saveToStorage();
-  showToast((state.lang || 'tr') === 'tr' ? 'Adet takibi varsayılan süresine döndürüldü. ' : 'Period tracking reset to default length. ');
+  showToast((state.lang || 'tr') === 'tr' ? 'Adet takibi varsayılan süresine döndürüldü. 🩸' : 'Period tracking reset to default length. 🩸');
   navigate(state.screen || 'home', 'refresh');
 }
 
@@ -3380,7 +3391,7 @@ function renderHome() {
     </div>
 
     <!-- Early Period End Action / Status Banner -->
-    ${(!P.noData && (phaseRaw.cls.includes('menstrual') || (P.cycleDay <= (P.avgPeriod || 5) && !state.periodEndedEarly))) ? `
+    ${(!P.noData && !state.periodEndedEarly && (phaseRaw.cls.includes('menstrual') || P.cycleDay <= (P.avgPeriod || 5))) ? `
     <div style="margin: -4px 16px 16px; background: linear-gradient(135deg, rgba(232,120,154,0.14), rgba(156,39,176,0.1)); border: 1px solid rgba(232,120,154,0.35); border-radius: var(--r-md); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; animation: fadeInUp 0.3s ease both">
       <div style="display: flex; align-items: center; gap: 10px;">
         <span style="font-size: 22px;">🩸</span>
@@ -8156,7 +8167,7 @@ function updateDynamicNotifications() {
     const timeStr = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
 
     // 1. Dynamic Cycle Phase & Period Prediction Notification
-    if (P.cycleDay !== undefined && P.cycleDay <= (P.effectivePeriodLength || 5)) {
+    if (!state.periodEndedEarly && P.cycleDay !== undefined && P.cycleDay <= (P.effectivePeriodLength || 5)) {
       newNotifs.push({
         id: 'notif_period_active',
         type: 'prediction',
@@ -8164,6 +8175,16 @@ function updateDynamicNotifications() {
         title: isTr ? `🩸 Adet Evresi (Döngü ${P.cycleDay}. Gün)` : `🩸 Menstrual Phase (Day ${P.cycleDay})`,
         body: `${namePrefix}${isTr ? `Bugün adet döneminizin ${P.cycleDay}. günündesiniz. Tahmini sonraki adet tarihiniz: ${formatDate(P.nextPeriodStart)}. Dinlenmeye ve hidrasyona özen gösterin!` : `Day ${P.cycleDay} of your period. Predicted next cycle start: ${formatDate(P.nextPeriodStart)}. Rest and stay hydrated!`}`,
         time: isTr ? 'Bugün' : 'Today',
+        read: false
+      });
+    } else if (state.periodEndedEarly) {
+      newNotifs.push({
+        id: 'notif_period_ended_early',
+        type: 'prediction',
+        icon: '✨',
+        title: isTr ? `✨ Adet Bitişi Kaydedildi (${state.actualPeriodLength} Gün)` : `✨ Period Ended (${state.actualPeriodLength} Days)`,
+        body: `${namePrefix}${isTr ? `Adetinizin ${state.actualPeriodLength}. günde sona erdiği kaydedildi. Foliküler evre aktif. Sonraki adet tarihiniz: ${formatDate(P.nextPeriodStart)}.` : `Period recorded as ended on Day ${state.actualPeriodLength}. Follicular phase active. Next period: ${formatDate(P.nextPeriodStart)}.`}`,
+        time: isTr ? 'Güncellendi' : 'Updated',
         read: false
       });
     } else if (P.cycleDay !== undefined && P.cycleDay >= (P.fertileStartDayNum || 9) && P.cycleDay <= (P.ovulationDayNum || 14) + 1) {
