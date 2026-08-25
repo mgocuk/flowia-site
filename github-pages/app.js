@@ -6163,11 +6163,6 @@ function renderProfile() {
         <div class="profile-item-text"><div class="profile-item-label">${t('logout')}</div></div>
         <span class="profile-item-arrow">›</span>
       </div>
-      <div class="profile-item" onclick="openDeleteAccountModal()" style="cursor:pointer">
-        <div class="profile-item-icon" style="background:#FFEBEE">🗑️</div>
-        <div class="profile-item-text"><div class="profile-item-label" style="color:var(--error);font-weight:700">${(state.lang||'tr')==='tr' ? 'Hesabı Komple Sil' : 'Delete Account Completely'}</div></div>
-        <span class="profile-item-arrow" style="color:var(--error)">›</span>
-      </div>
     </div>
   </div>`;
 }
@@ -6484,12 +6479,12 @@ function renderSettings() {
         <div class="settings-item-value" style="color:#E65100">›</div>
       </div>
 
-      <!-- 2. BUTON: Hesabı Komple Sil (Kalıcı Olarak Yok Etme & Çıkış) -->
+      <!-- 2. BUTON: Hesabı Sil (Kalıcı Olarak Yok Etme & Çıkış) -->
       <div class="settings-item" onclick="openDeleteAccountModal()" style="cursor:pointer">
         <div class="settings-item-left">
           <div class="settings-item-icon" style="background:#FFEBEE">🗑️</div>
           <div class="settings-item-text">
-            <div class="settings-item-label" style="color:var(--error);font-weight:700">${(state.lang||'tr')==='tr' ? 'Hesabı Komple Sil' : 'Delete Account Completely'}</div>
+            <div class="settings-item-label" style="color:var(--error);font-weight:700">${(state.lang||'tr')==='tr' ? 'Hesabı Sil' : 'Delete Account'}</div>
             <div class="settings-item-desc">${(state.lang||'tr')==='tr' ? 'Hesabınızı, üyeliğinizi ve bulut verilerinizi kalıcı olarak yok eder (GDPR)' : 'Permanently wipe account and all cloud data (GDPR)'}</div>
           </div>
         </div>
@@ -6596,18 +6591,18 @@ function executeResetData() {
 }
 
 // ------------------------------------------------------------
-// 2. MODAL: HESABI KOMPLE SİL (KALICI SİLME & OTURUM KAPATMA)
+// 2. MODAL: HESABI SİL (KALICI SİLME & OTURUM KAPATMA)
 // ------------------------------------------------------------
 function openDeleteAccountModal() {
   const isTr = (state.lang || 'tr') === 'tr';
-  const title = isTr ? 'Hesabı Komple Sil (GDPR / KVKK)' : 'Delete Account Completely (GDPR)';
+  const title = isTr ? 'Hesabı Sil (GDPR / KVKK)' : 'Delete Account (GDPR)';
   const sub = isTr ? 'Bu işlem hesabınızı ve tüm verilerinizi kalıcı olarak yok eder' : 'Permanently wipe your account and all associated data';
 
   const bodyHtml = `
     <div style="text-align:center;padding:6px 0">
       <div style="font-size:44px;margin-bottom:10px">⚠️</div>
       <div style="font-size:16px;font-weight:800;color:var(--error);margin-bottom:8px">
-        ${isTr ? 'Hesabınızı Tamamen Silmek İstediğinizden Emin Misiniz?' : 'Permanently Delete Your Flowia Account?'}
+        ${isTr ? 'Hesabınızı Silmek İstediğinizden Emin Misiniz?' : 'Delete Your Flowia Account?'}
       </div>
 
       <div style="background:rgba(239,83,80,0.12);border:1px solid rgba(239,83,80,0.3);border-radius:var(--r-xl);padding:14px;margin:14px 0;text-align:left">
@@ -6627,7 +6622,7 @@ function openDeleteAccountModal() {
 
       <div style="display:flex;flex-direction:column;gap:8px">
         <button class="btn btn-ghost" style="color:var(--error);border:1px solid var(--error);padding:12px;font-size:13px;font-weight:800;background:rgba(239,83,80,0.08)" onclick="executeDeleteAccount()">
-          ${isTr ? '🗑️ Evet, Hesabımı ve Verilerimi Kalıcı Olarak Sil' : '🗑️ Yes, Permanently Delete My Account'}
+          ${isTr ? '🗑️ Evet, Hesabımı Kalıcı Olarak Sil' : '🗑️ Yes, Permanently Delete My Account'}
         </button>
         <button class="btn btn-primary" style="padding:10px;font-size:13px;font-weight:700" onclick="closeProfileEditModal()">
           ${isTr ? ' Vazgeç (Hesabımı Koru)' : ' Cancel (Keep My Account)'}
