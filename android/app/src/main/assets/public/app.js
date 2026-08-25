@@ -3441,7 +3441,7 @@ function renderHome() {
           <div style="display:flex;align-items:center;gap:10px">
             <span style="font-size:26px">📱</span>
             <div>
-              <div style="font-weight:700;font-size:14px;color:var(--text-1)">${(state.lang||'tr')==='tr' ? 'Mobil Sağlık & 500 YZ Spor Koçu' : 'Apple Health & 500 AI Sports Coach'}</div>
+              <div style="font-weight:700;font-size:14px;color:var(--text-1)">${(state.lang||'tr')==='tr' ? 'Mobil Sağlık & YZ Spor Koçu' : 'Apple Health & AI Sports Coach'}</div>
               <div style="font-size:11px;color:var(--primary);font-weight:600">Apple Health • Google Health Connect</div>
             </div>
           </div>
@@ -3449,8 +3449,8 @@ function renderHome() {
         </div>
         <p style="font-size:12px;color:var(--text-2);line-height:1.5;margin-bottom:12px">
           ${(state.lang||'tr')==='tr'
-            ? 'Apple Health ve Health Connect üzerinden günlük adım, aktif kalori ve antrenman verilerinizi döngünüzle eşleştirin. 500 farklı yapay zeka spor ve egzersiz içgörüsünü açmak için Premium\'a geçin.'
-            : 'Sync daily steps, active calories, and workouts via Apple Health & Health Connect. Upgrade to Premium to unlock 500 cycle-synced AI fitness insights.'}
+            ? 'Apple Health ve Health Connect üzerinden günlük adım, aktif kalori ve antrenman verilerinizi döngünüzle eşleştirin. Kişiselleştirilmiş yapay zeka spor ve egzersiz koçunu açmak için Premium\'a geçin.'
+            : 'Sync daily steps, active calories, and workouts via Apple Health & Health Connect. Upgrade to Premium to unlock cycle-synced AI sports & fitness coaching.'}
         </p>
         <button class="btn btn-sm btn-primary" style="width:100%;font-weight:700;box-shadow:0 4px 14px rgba(232,120,154,0.35)">
           ⭐ ${(state.lang||'tr')==='tr' ? 'Premium ile Kilidi Aç' : 'Unlock with Premium'} →
@@ -4780,7 +4780,7 @@ function openHealthPermissionModal() {
   const isTr = (state.lang || 'tr') === 'tr';
   if (!state.isPremium) {
     navigate('premium');
-    showToast(isTr ? 'Mobil Sağlık Entegrasyonu ve 500 YZ Spor Koçu Premium bir özelliktir ⭐' : 'Apple Health & 500 AI Fitness Coach is a Premium feature ⭐');
+    showToast(isTr ? 'Mobil Sağlık Entegrasyonu ve YZ Spor Koçu Premium bir özelliktir ⭐' : 'Apple Health & AI Fitness Coach is a Premium feature ⭐');
     return;
   }
 
@@ -4791,7 +4791,7 @@ function openHealthPermissionModal() {
     <div style="text-align:center;padding:4px 0">
       <div style="font-size:46px;margin-bottom:10px">🏃‍♀️</div>
       <div style="font-size:16px;font-weight:800;color:var(--text-1);margin-bottom:6px">
-        ${isTr ? 'Sportif Verilerinizle 500 YZ Spor İçgörüsü' : '500 AI Cycle-Synced Fitness Insights'}
+        ${isTr ? 'Sportif Verilerinizle YZ Spor Koçu' : 'AI Cycle-Synced Fitness Coach'}
       </div>
       <div style="font-size:12px;color:var(--text-2);line-height:1.5;margin-bottom:16px">
         ${isTr ? 'Mobil cihazınızın sağlık uygulamasından (Apple Health / Google Health Connect) günlük hareket verilerinizi okuyarak döngü evrenize özel yapay zeka antrenman tavsiyeleri üretiyoruz.' : 'By reading your daily activity from Apple Health / Google Health Connect, Flowia delivers cycle-synced workout and recovery guidance.'}
@@ -4858,7 +4858,7 @@ function grantHealthPermissions() {
   saveToStorage();
   updateDynamicNotifications();
   closeProfileEditModal();
-  showToast(isTr ? 'Sağlık uygulaması bağlandı! 500 YZ Spor Tavsiyesi aktif 🏃‍♀️' : 'Health app connected! 500 AI Fitness Coach active 🏃‍♀️');
+  showToast(isTr ? 'Sağlık uygulaması bağlandı! YZ Spor Koçu aktif 🏃‍♀️' : 'Health app connected! AI Fitness Coach active 🏃‍♀️');
   navigate(state.screen || 'home', 'refresh');
 }
 
@@ -4886,7 +4886,7 @@ function openFitnessSyncModal() {
   const isTr = (state.lang || 'tr') === 'tr';
   if (!state.isPremium) {
     navigate('premium');
-    showToast(isTr ? 'Aktivite takibi ve 500 YZ Spor Koçu Premium bir özelliktir ⭐' : 'Fitness tracking & 500 AI Sports Coach is a Premium feature ⭐');
+    showToast(isTr ? 'Aktivite takibi ve YZ Spor Koçu Premium bir özelliktir ⭐' : 'Fitness tracking & AI Sports Coach is a Premium feature ⭐');
     return;
   }
 
@@ -4977,8 +4977,8 @@ function openFitnessSyncModal() {
         <span style="font-size:16px;line-height:1;">✨</span>
         <div style="font-size:11px;color:var(--text-2);line-height:1.4;">
           ${(isTr
-            ? 'Kaydettiğiniz veriler anında döngü fazınızla eşleşir ve <strong>500 farklı YZ spor tavsiyesi</strong> dinamik olarak güncellenir.'
-            : 'Your logged metrics sync instantly with your cycle phase to update <strong>500 distinct AI workout insights</strong>.')}
+            ? 'Kaydettiğiniz veriler anında döngü fazınızla eşleşir ve <strong>YZ spor koçu tavsiyeniz</strong> dinamik olarak güncellenir.'
+            : 'Your logged metrics sync instantly with your cycle phase to update your <strong>personalized AI workout coach</strong>.')}
         </div>
       </div>
     </div>`;
@@ -6981,7 +6981,7 @@ function renderSettings() {
           <div class="settings-item-icon" style="background:#E8F5E9">${!state.isPremium ? '🔒' : '🍏'}</div>
           <div class="settings-item-text">
             <div class="settings-item-label">${(state.lang||'tr')==='tr' ? 'Apple Health & Health Connect İzinleri' : 'Apple Health & Health Connect Permissions'}</div>
-            <div class="settings-item-desc">${!state.isPremium ? ((state.lang||'tr')==='tr' ? '⭐ Premium ile 500 YZ Spor Koçunu açın' : '⭐ Unlock 500 AI Sports Coach with Premium') : (state.healthKitConnected ? ((state.lang||'tr')==='tr' ? '🟢 Bağlandı • 500 YZ Spor Tavsiyesi Aktif' : '🟢 Connected • 500 AI Sports Coach Active') : ((state.lang||'tr')==='tr' ? 'Günlük adım, kalori ve egzersiz analizi' : 'Daily steps, calories & workout sync'))}</div>
+            <div class="settings-item-desc">${!state.isPremium ? ((state.lang||'tr')==='tr' ? '⭐ Premium ile YZ Spor Koçunu açın' : '⭐ Unlock AI Sports Coach with Premium') : (state.healthKitConnected ? ((state.lang||'tr')==='tr' ? '🟢 Bağlandı • YZ Spor Koçu Aktif' : '🟢 Connected • AI Sports Coach Active') : ((state.lang||'tr')==='tr' ? 'Günlük adım, kalori ve egzersiz analizi' : 'Daily steps, calories & workout sync'))}</div>
           </div>
         </div>
         <button class="btn btn-sm ${state.isPremium && state.healthKitConnected ? 'btn-ghost' : 'btn-primary'}" style="padding:6px 12px;font-size:12px">
@@ -7434,7 +7434,7 @@ function renderPremium() {
     { name: isTr ? 'Sınırsız geçmiş döngü kaydı' : 'Unlimited cycle history',    free: false, premium: true,  new: false },
     { name: isTr ? 'Yapay zeka destekli içgörüler' : 'AI-powered insights',        free: false, premium: true,  new: true  },
     { name: isTr ? '📱 Apple Health & Health Connect Entegrasyonu' : '📱 Apple Health & Health Connect sync', free: false, premium: true, new: true },
-    { name: isTr ? '🏃‍♀️ 500 YZ Spor & Fitness Koçu Tavsiyesi' : '🏃‍♀️ 500 AI Sports & Fitness Coach Tips', free: false, premium: true, new: true },
+    { name: isTr ? '🏃‍♀️ YZ Spor & Fitness Koçu Tavsiyeleri' : '🏃‍♀️ AI Sports & Fitness Coach Guidance', free: false, premium: true, new: true },
     { name: isTr ? 'Gelişmiş analizler & grafikler' : 'Advanced analytics & charts', free: false, premium: true,  new: false },
     { name: isTr ? 'Doğurganlık planlama araçları' : 'Fertility planning tools',   free: false, premium: true,  new: false },
     { name: isTr ? 'PDF sağlık raporu çıktısı' : 'PDF report export',             free: false, premium: true,  new: false },
