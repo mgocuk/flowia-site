@@ -661,12 +661,12 @@ function computePredictions(customLastDate, customAvgCycle, customAvgPeriod) {
   avgCycle = Math.max(21, Math.min(45, avgCycle));
   avgPeriod = Math.max(2, Math.min(10, avgPeriod));
 
-  // Early Period End Handling & Adjusted Cycle Length:
-  // User Formula: earlyDiff = (avgPeriod - actualPeriodLength), adjustedCycleLength = avgCycle - earlyDiff
+  // Clinical Standard Average Cycle Calculation (ACOG / Mayo Clinic / WHO):
+  // Ending bleeding early does not alter follicular development or cycle length.
   const isEarlyEnd = !!(state && state.periodEndedEarly && state.actualPeriodLength);
   const effectivePeriodLength = isEarlyEnd ? state.actualPeriodLength : avgPeriod;
   const earlyDiff = isEarlyEnd ? Math.max(0, avgPeriod - state.actualPeriodLength) : 0;
-  const adjustedCycleLength = isEarlyEnd ? Math.max(21, avgCycle - earlyDiff) : avgCycle;
+  const adjustedCycleLength = avgCycle; // Standard average cycle duration
 
   // Current cycle day (1-indexed)
   const todayZero = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate());
@@ -677,23 +677,16 @@ function computePredictions(customLastDate, customAvgCycle, customAvgPeriod) {
   // Period end date
   const periodEnd = addDays(lastPeriodDate, effectivePeriodLength - 1);
 
-  // Fertile Window MUST start exactly 3 days after period end!
-  // (periodEnd + 1, periodEnd + 2, periodEnd + 3 are the 3 uncolored gap days -> fertileStart is periodEnd + 4)
-  let fertileStart = addDays(periodEnd, 4);
+  // Clinical standard: Luteal phase is 14 days. Ovulation Day = avgCycle - 14
+  const ovulationDayNum = Math.max(effectivePeriodLength + 1, avgCycle - 14);
+  const ovulationDate  = addDays(lastPeriodDate, ovulationDayNum);
 
-  // Ovulation date calculated relative to adjustedCycleLength:
-  let ovulationDayNum = Math.max(effectivePeriodLength + 5, adjustedCycleLength - 13);
-  let ovulationDate  = addDays(lastPeriodDate, ovulationDayNum - 1);
+  // Fertile Window: 5 days prior to ovulation through ovulation day (6-day clinical window)
+  const fertileStart = addDays(ovulationDate, -5);
+  const fertileEnd   = ovulationDate;
 
-  // Fertile window ends on day before ovulation (or adjusted if fertileStart is close)
-  let fertileEnd = addDays(ovulationDate, -1);
-  if (fertileEnd < fertileStart) {
-    fertileEnd = addDays(fertileStart, 4);
-    ovulationDate = addDays(fertileEnd, 1);
-  }
-
-  // Next period dates (based on adjustedCycleLength for current cycle)
-  const nextPeriodStart = addDays(lastPeriodDate, adjustedCycleLength);
+  // Next period dates (based on standard average cycle length)
+  const nextPeriodStart = addDays(lastPeriodDate, avgCycle);
   const nextPeriodEnd   = addDays(nextPeriodStart, avgPeriod - 1);
 
   // Date-only diff for daysUntilPeriod
@@ -702,28 +695,29 @@ function computePredictions(customLastDate, customAvgCycle, customAvgPeriod) {
 
   // Current phase
   let phase;
-  if (isEarlyEnd && cycleDay >= effectivePeriodLength) {
-    if (cycleDay < ovulationDayNum) phase = PHASES.follicular;
-    else if (cycleDay <= ovulationDayNum + 2) phase = PHASES.ovulation;
-    else phase = PHASES.luteal;
-  } else if (cycleDay <= effectivePeriodLength) phase = PHASES.menstrual;
-  else if (cycleDay < ovulationDayNum)     phase = PHASES.follicular;
-  else if (cycleDay <= ovulationDayNum+2)  phase = PHASES.ovulation;
-  else                                     phase = PHASES.luteal;
+  if (cycleDay <= effectivePeriodLength) {
+    phase = PHASES.menstrual;
+  } else if (cycleDay < ovulationDayNum - 5) {
+    phase = PHASES.follicular;
+  } else if (cycleDay <= ovulationDayNum + 1) {
+    phase = PHASES.ovulation;
+  } else {
+    phase = PHASES.luteal;
+  }
 
   // Confidence score based on logged data history
   const pts = (state && state.cycles) ? state.cycles.length : 0;
   const confidence = pts >= 6 ? 'High' : pts >= 3 ? 'Medium' : 'Low';
 
-  // Future period & fertility predictions (24 cycles / 2 years ahead)
+  // Future period & fertility predictions (24 cycles / 2 years ahead based on average cycle)
   const futurePeriods = [];
-  let cumulativeDays = adjustedCycleLength;
+  let cumulativeDays = avgCycle;
   for (let i = 1; i <= 24; i++) {
     const pStart = addDays(lastPeriodDate, cumulativeDays);
     const pEnd   = addDays(pStart, avgPeriod - 1);
     const ovDate = addDays(pStart, avgCycle - 14);
     const fStart = addDays(ovDate, -5);
-    const fEnd   = addDays(ovDate, -1);
+    const fEnd   = ovDate;
     futurePeriods.push({
       cycleIndex: i,
       start: pStart,
@@ -1261,12 +1255,7 @@ function getDateClass(year, month, day) {
 
   if (isPeriod) return classes.join(' ');
 
-  // STRICT 3-DAY GAP RULE: The 3 days immediately following ANY period end MUST remain 100% uncolored/blank!
-  if (activePeriodEnd && date > activePeriodEnd && date <= addDays(activePeriodEnd, 3)) {
-    return classes.join(' '); // Force 3 blank gap days after period end!
-  }
-
-  // 2. Current Cycle Ovulation (1 Koyu Yeşil) & Fertile Window (5 Açık Yeşil)
+  // 2. Current Cycle Ovulation (Dark Green) & Fertile Window (Light Green)
   if (P.ovulationDate && isSameDay(date, P.ovulationDate)) {
     classes.push('ovulation');
     return classes.join(' ');
@@ -1276,16 +1265,11 @@ function getDateClass(year, month, day) {
     return classes.join(' ');
   }
 
-  // 3. Future Cycles Predictions (Period, 5 Açık Yeşil, 1 Koyu Yeşil)
+  // 3. Future Cycles Predictions (Predicted Period, Fertile Window, Ovulation)
   if (P.futurePeriods) {
     for (let fp of P.futurePeriods) {
       if (fp.start && fp.end && dateInRange(date, fp.start, fp.end)) {
         classes.push('predicted');
-        return classes.join(' ');
-      }
-
-      // Check gap rule for predicted future periods as well
-      if (fp.end && date > fp.end && date <= addDays(fp.end, 3)) {
         return classes.join(' ');
       }
 
@@ -3354,8 +3338,8 @@ function renderHome() {
           <div class="cycle-stat-lbl">${t('days_until_period').replace(' ', '<br>')}</div>
         </div>
         <div class="cycle-stat">
-          <div class="cycle-stat-val">${P.isEarlyEnd ? P.adjustedCycleLength : P.avgCycle}</div>
-          <div class="cycle-stat-lbl">${P.isEarlyEnd ? ((state.lang||'tr')==='tr' ? 'BU AYKİ DÖNGÜ<br>(Erken: -' + P.earlyDiff + ' gün)' : 'THIS CYCLE<br>(-' + P.earlyDiff + ' days)') : t('avg_cycle_length').replace(' ', '<br>')}</div>
+          <div class="cycle-stat-val">${P.avgCycle}</div>
+          <div class="cycle-stat-lbl">${t('avg_cycle_length').replace(' ', '<br>')}</div>
         </div>
         <div class="cycle-stat">
           <div class="cycle-stat-val" style="color:${fertilityColor}">${fertilityStatus}</div>
@@ -3364,7 +3348,7 @@ function renderHome() {
       </div>
     </div>
 
-    <!-- Early Period End Banner -->
+    <!-- Early Period End Action / Status Banner -->
     ${(!P.noData && (phaseRaw.cls.includes('menstrual') || (P.cycleDay <= (P.avgPeriod || 5) && !state.periodEndedEarly))) ? `
     <div style="margin: -4px 16px 16px; background: linear-gradient(135deg, rgba(232,120,154,0.14), rgba(156,39,176,0.1)); border: 1px solid rgba(232,120,154,0.35); border-radius: var(--r-md); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; animation: fadeInUp 0.3s ease both">
       <div style="display: flex; align-items: center; gap: 10px;">
@@ -3378,21 +3362,14 @@ function renderHome() {
         ${t('mark_period_ended_btn')}
       </button>
     </div>` : (state.periodEndedEarly ? `
-    <div style="margin: -4px 16px 16px; background: rgba(102,187,106,0.12); border: 1px solid rgba(102,187,106,0.35); border-radius: var(--r-md); padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; animation: fadeInUp 0.3s ease both">
-      <div style="display: flex; align-items: center; justify-content: space-between;">
-        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--success); font-weight: 700;">
-          <span>✨</span>
-          <span>${(state.lang||'tr')==='tr' ? 'Erken Adet Bitişi Hesaplandı' : 'Early Period End Calculated'} (${state.actualPeriodLength} ${(state.lang||'tr')==='tr'?'Gün':'Days'})</span>
-        </div>
-        <button class="btn-link" onclick="resumePeriodLog()" style="font-size: 11px; color: var(--text-2); text-decoration: underline;">
-          ${t('resume_period_btn')}
-        </button>
+    <div style="margin: -4px 16px 16px; background: rgba(102,187,106,0.12); border: 1px solid rgba(102,187,106,0.35); border-radius: var(--r-md); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 8px; animation: fadeInUp 0.3s ease both">
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--success); font-weight: 700;">
+        <span>✨</span>
+        <span>${(state.lang||'tr')==='tr' ? 'Adet Bitişi Kaydedildi' : 'Period End Logged'} (${state.actualPeriodLength} ${(state.lang||'tr')==='tr'?'Gün':'Days'})</span>
       </div>
-      <div style="font-size: 12px; color: var(--text-1); line-height: 1.4; background: rgba(255,255,255,0.7); padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(102,187,106,0.2);">
-        📊 <strong>${(state.lang||'tr')==='tr'?'Döngü Hesabı':'Cycle Calc'}:</strong> ${(state.lang||'tr')==='tr'?'Normal':'Normal'} ${P.avgPeriod} ${(state.lang||'tr')==='tr'?'gün':'days'} - ${(state.lang||'tr')==='tr'?'Gerçekleşen':'Actual'} ${state.actualPeriodLength} ${(state.lang||'tr')==='tr'?'gün':'days'} = <strong>${P.earlyDiff} ${(state.lang||'tr')==='tr'?'gün erken bitti':'days early'}</strong>.<br/>
-        🔄 <strong>${(state.lang||'tr')==='tr'?'Bu Ayki Döngü Süreniz':'This Month Cycle Length'}:</strong> ${P.avgCycle} - ${P.earlyDiff} = <strong>${P.adjustedCycleLength} ${(state.lang||'tr')==='tr'?'Gün':'Days'}</strong>.<br/>
-        🌿 <strong>${(state.lang||'tr')==='tr'?'Doğurganlık Dönemi':'Fertile Window'}:</strong> 3 ${(state.lang||'tr')==='tr'?'boş gün sonrası':'gap days later'} <strong>${formatDateShort(P.fertileStart)}</strong> ${(state.lang||'tr')==='tr'?'tarihinde başladı.':'started.'}
-      </div>
+      <button class="btn-link" onclick="resumePeriodLog()" style="font-size: 11px; color: var(--text-2); text-decoration: underline;">
+        ${t('resume_period_btn')}
+      </button>
     </div>` : '')}
 
     <!-- Streak & Today Summary Card -->
@@ -3703,16 +3680,6 @@ function renderCalendar() {
       </div>
       <div class="cal-weekdays">${weekDays.map(d=>`<div>${d}</div>`).join('')}</div>
     </div>
-
-    ${state.periodEndedEarly ? `
-    <div style="margin: 0 16px 12px; background: rgba(102,187,106,0.12); border: 1px solid rgba(102,187,106,0.35); border-radius: var(--r-md); padding: 10px 14px; font-size: 12px; color: var(--text-1); line-height: 1.4; animation: fadeInUp 0.3s ease both">
-      <div style="font-weight:700; color:var(--success); margin-bottom:2px; display:flex; align-items:center; gap:6px;">
-        <span>✨</span> ${(state.lang||'tr')==='tr' ? 'Erken Adet Bitişi Hesabı' : 'Early Period End Calculation'}
-      </div>
-      ${(state.lang||'tr')==='tr' ? 'Adet' : 'Period'} ${state.actualPeriodLength} ${(state.lang||'tr')==='tr' ? 'günde bitti' : 'days'} (${PREDICTIONS.earlyDiff} ${(state.lang||'tr')==='tr' ? 'gün erken' : 'days early'}).<br/>
-      • <strong>${(state.lang||'tr')==='tr' ? 'Bu Ayki Döngü Süresi' : 'This Month Cycle'}:</strong> ${PREDICTIONS.adjustedCycleLength} ${(state.lang||'tr')==='tr' ? 'Gün' : 'Days'} (${PREDICTIONS.avgCycle} - ${PREDICTIONS.earlyDiff})<br/>
-      • <strong>${(state.lang||'tr')==='tr' ? 'Doğurganlık Dönemi (Yeşil)' : 'Fertile Days (Green)'}:</strong> 3 ${(state.lang||'tr')==='tr' ? 'gün boşluk sonrası' : 'gap days later'} <strong>${formatDateShort(PREDICTIONS.fertileStart)}</strong> ${(state.lang||'tr')==='tr' ? 'başladı' : 'started'}.
-    </div>` : ''}
 
     <div class="cal-grid">${cells}</div>
 
