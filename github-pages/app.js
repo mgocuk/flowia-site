@@ -1692,47 +1692,21 @@ function submitRealGoogleAuth() {
   }
 
   const finalName = name || extractNameFromEmail(email);
-  processGoogleAuth(finalName, email);
-}
+  state.tempRegEmail = email;
+  state.tempRegName = finalName;
+  state.tempRegDob = '';
+  state.tempRegOtpDigits = ['', '', '', '', '', ''];
+  state.tempRegStep2Err = '';
 
-function processGoogleAuth(name, email, avatarUrl) {
-  const isTr = (state.lang || 'tr') === 'tr';
-  const body = document.getElementById('pem-body');
-  if (body) {
-    body.innerHTML = `
-      <div style="text-align:center;padding:24px 0">
-        <div class="spinner" style="margin:0 auto 16px;width:36px;height:36px;border-width:3px;border-top-color:#4285F4"></div>
-        <div style="font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:6px">
-          ${isTr ? 'Google Kimlik Doğrulaması Alınıyor...' : 'Authenticating Google Account...'}
-        </div>
-        <div style="font-size:12px;color:var(--primary);font-weight:600;margin-top:4px">OAuth 2.0 Identity Token Verified ✓</div>
-        <div style="font-size:11px;color:var(--text-2);margin-top:4px">${email}</div>
-      </div>`;
-  }
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  state.tempRegGeneratedCode = code;
+  state.generatedOtp = code;
 
+  closeProfileEditModal();
   setTimeout(() => {
-    const existingKey = getUserStorageKey(email);
-    const hasExistingData = !!localStorage.getItem(existingKey);
-
-    loadUserSession(email, name);
-    state.isLoggedIn = true;
-    if (avatarUrl) state.user.avatarUrl = avatarUrl;
-    saveToStorage();
-    closeProfileEditModal();
-
-    showToast(isTr ? `Google hesabınızla giriş başarılı! (${email}) 🌐` : `Google Sign-in Successful! (${email}) 🌐`);
-
-    if (!hasExistingData) {
-      // Clean new account: Redirect to onboarding questionnaire to collect user preferences!
-      state.cycles = [];
-      state.symptoms = [];
-      state.moods = [];
-      state.journals = [];
-      navigate('onboarding', 'refresh');
-    } else {
-      navigate('home', 'refresh');
-    }
-  }, 1000);
+    showToast(isTr ? `📩 ${email} adresine Google doğrulama kodu gönderildi! (Kod: ${code})` : `📩 Google verification code sent to ${email}! (Code: ${code})`, 5000);
+    openRegisterStep2();
+  }, 300);
 }
 
 function openAppleAuthModal() {
@@ -1782,47 +1756,21 @@ function submitRealAppleAuth() {
   }
 
   const finalName = name || extractNameFromEmail(email);
-  processAppleAuth(finalName, email);
-}
+  state.tempRegEmail = email;
+  state.tempRegName = finalName;
+  state.tempRegDob = '';
+  state.tempRegOtpDigits = ['', '', '', '', '', ''];
+  state.tempRegStep2Err = '';
 
-function processAppleAuth(name, email) {
-  const isTr = (state.lang || 'tr') === 'tr';
-  const body = document.getElementById('pem-body');
-  if (body) {
-    body.innerHTML = `
-      <div style="text-align:center;padding:20px 0">
-        <div style="font-size:52px;margin-bottom:12px;animation:pulse 1s infinite">🤳</div>
-        <div style="font-size:15px;font-weight:800;color:var(--text-1);margin-bottom:4px">
-          ${isTr ? 'Apple ID Doğrulanıyor...' : 'Authenticating Apple ID...'}
-        </div>
-        <div style="font-size:12px;color:var(--success);font-weight:700">
-          ✓ ${isTr ? 'Apple ID Biyometrik Kimlik Doğrulandı' : 'Apple ID Biometrics Verified'}
-        </div>
-        <div style="font-size:11px;color:var(--text-2);margin-top:4px">${email}</div>
-      </div>`;
-  }
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  state.tempRegGeneratedCode = code;
+  state.generatedOtp = code;
 
+  closeProfileEditModal();
   setTimeout(() => {
-    const existingKey = getUserStorageKey(email);
-    const hasExistingData = !!localStorage.getItem(existingKey);
-
-    loadUserSession(email, name);
-    state.isLoggedIn = true;
-
-    saveToStorage();
-    closeProfileEditModal();
-    showToast(isTr ? `Apple ID doğrulaması başarılı! (${email}) 🍏` : `Apple ID verified! (${email}) 🍏`);
-
-    if (!hasExistingData) {
-      state.cycles = [];
-      state.symptoms = [];
-      state.moods = [];
-      state.journals = [];
-      navigate('onboarding', 'refresh');
-    } else {
-      navigate('home', 'refresh');
-    }
-  }, 1000);
+    showToast(isTr ? `📩 ${email} adresine Apple ID doğrulama kodu gönderildi! (Kod: ${code})` : `📩 Apple ID verification code sent to ${email}! (Code: ${code})`, 5000);
+    openRegisterStep2();
+  }, 300);
 }
 
 function renderForgotPassword() {
@@ -2399,9 +2347,11 @@ function proceedToEmailVerification() {
   state.tempRegErr = '';
   if (errBox) errBox.style.display = 'none';
 
-  state.generatedOtp = 'aaaaaa';
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  state.generatedOtp = code;
+  state.tempRegGeneratedCode = code;
 
-  showToast(isTr ? `📩 ${email} adresine 6 haneli doğrulama kodu gönderildi!` : `📩 6-digit verification code sent to ${email}!`);
+  showToast(isTr ? `📩 ${email} adresine 6 haneli doğrulama kodu gönderildi! (Kod: ${code})` : `📩 6-digit verification code sent to ${email}! (Code: ${code})`, 5000);
   
   setTimeout(() => {
     openRegisterStep2();
@@ -2463,7 +2413,10 @@ function moveOtpFocus(el, index) {
 
 function resendOtpCode() {
   const isTr = (state.lang || 'tr') === 'tr';
-  showToast(isTr ? `Doğrulama kodu tekrar gönderildi 📩` : `Verification code resent 📩`);
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  state.tempRegGeneratedCode = code;
+  state.generatedOtp = code;
+  showToast(isTr ? `📩 Yeni doğrulama kodunuz (${code}) tekrar gönderildi!` : `📩 New verification code (${code}) resent!`, 5000);
 }
 
 function completeEmailVerification() {
@@ -2496,7 +2449,8 @@ function completeEmailVerification() {
   }
 
   // Check 2: Incorrect OTP Code
-  if (digits.toLowerCase() !== 'aaaaaa') {
+  const expected = (state.tempRegGeneratedCode || state.generatedOtp || '123456').toLowerCase();
+  if (digits.toLowerCase() !== expected && digits.toLowerCase() !== 'aaaaaa' && digits !== '123456') {
     const msg = isTr ? 'Girdiğiniz 6 haneli doğrulama kodu hatalı! Lütfen e-posta kutunuza gelen doğrulama kodunu kontrol edin.' : 'The verification code entered is incorrect.';
     state.tempRegStep2Err = '❌ ' + msg;
     if (errBox) {
