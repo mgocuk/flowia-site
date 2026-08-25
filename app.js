@@ -818,14 +818,14 @@ let state = {
   healthKitConnected: false,
   healthPermissions: { steps: true, calories: true, workouts: true, distance: true },
   fitnessData: {
-    steps: 7420,
+    steps: 0,
     targetSteps: 10000,
-    activeCalories: 320,
-    activeMinutes: 42,
-    distanceKm: 5.2,
+    activeCalories: 0,
+    activeMinutes: 0,
+    distanceKm: 0,
     workoutType: 'walking_nature',
-    source: 'Apple Health / Health Connect',
-    lastSynced: 'Bugün'
+    source: 'Apple Health / Google Health Connect',
+    lastSynced: null
   },
   user: { name: '', email: '', dob: '', initials: 'F', avgCycle: 28, avgPeriod: 5, lastPeriodDate: '', goals: ['Track my cycle'] },
   charts: {},
@@ -4747,7 +4747,7 @@ var AI_FITNESS_ENGINE = (() => {
     else if (cd <= ovDay + 1) phaseKey = 'ovulatory';
     else phaseKey = 'luteal';
 
-    const steps = (state.fitnessData && state.fitnessData.steps) || 7420;
+    const steps = (state.fitnessData && typeof state.fitnessData.steps === 'number') ? state.fitnessData.steps : 0;
     const stepRange = getStepRangeKey(steps);
     const workoutType = (state.fitnessData && state.fitnessData.workoutType) || 'walking_nature';
 
@@ -8155,41 +8155,41 @@ function updateDynamicNotifications() {
     const now = new Date();
     const timeStr = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
 
-    // 1. Period prediction notification (Adapts to Period Started vs Future Period)
+    // 1. Dynamic Cycle Phase & Period Prediction Notification
     if (P.cycleDay !== undefined && P.cycleDay <= (P.effectivePeriodLength || 5)) {
       newNotifs.push({
-        id: 'notif_period_started',
+        id: 'notif_period_active',
         type: 'prediction',
         icon: '🩸',
-        title: isTr ? `Yeni Adet Evreniz Başladı (1. Gün) 🩸` : `New Period Started (Day 1) 🩸`,
-        body: `${namePrefix}${isTr ? `Yeni adet döngünüz bugün başladı. Tahmini sonraki adet tarihiniz: ${formatDate(P.nextPeriodStart)}. Vücudunuza bugün ekstra özen gösterin!` : `Day 1 of your cycle. Predicted next period: ${formatDate(P.nextPeriodStart)}. Take extra care today!`}`,
+        title: isTr ? `🩸 Adet Evresi (Döngü ${P.cycleDay}. Gün)` : `🩸 Menstrual Phase (Day ${P.cycleDay})`,
+        body: `${namePrefix}${isTr ? `Bugün adet döneminizin ${P.cycleDay}. günündesiniz. Tahmini sonraki adet tarihiniz: ${formatDate(P.nextPeriodStart)}. Dinlenmeye ve hidrasyona özen gösterin!` : `Day ${P.cycleDay} of your period. Predicted next cycle start: ${formatDate(P.nextPeriodStart)}. Rest and stay hydrated!`}`,
         time: isTr ? 'Bugün' : 'Today',
         read: false
       });
-
+    } else if (P.cycleDay !== undefined && P.cycleDay >= (P.fertileStartDayNum || 9) && P.cycleDay <= (P.ovulationDayNum || 14) + 1) {
       newNotifs.push({
-        id: 'notif_period_pred',
+        id: 'notif_fertile_window',
         type: 'prediction',
-        icon: '🔔',
-        title: isTr ? `Sonraki adete ${P.daysUntilPeriod} gün kaldı 🔔` : `Next period in ${P.daysUntilPeriod} days 🔔`,
-        body: `${namePrefix}${isTr ? `Yeni adet başlangıcınıza göre sonraki adetinizin ${formatDate(P.nextPeriodStart)} tarihinde başlaması bekleniyor.` : `Based on your new period start, next period is predicted for ${formatDate(P.nextPeriodStart)}.`}`,
-        time: isTr ? 'Güncellendi' : 'Updated',
+        icon: '🌸',
+        title: isTr ? `🌸 Yüksek Doğurganlık Penceresi (Ovulasyon)` : `🌸 High Fertility Window (Ovulation)`,
+        body: `${namePrefix}${isTr ? `Yumurtlama gününüz ${formatDate(P.ovulationDate)} olarak öngörülüyor. Doğurganlık şansınız bu günlerde en yüksek seviyededir.` : `Ovulation is predicted on ${formatDate(P.ovulationDate)}. Conception chances are elevated.`}`,
+        time: isTr ? 'Önemli Evre' : 'Key Phase',
         read: false
       });
     } else if (P.daysUntilPeriod !== undefined) {
       const title = isTr
-        ? (P.daysUntilPeriod === 0 ? 'Adet bugün başlıyor! 🩸' : `Adete ${P.daysUntilPeriod} gün kaldı 🔔`)
-        : (P.daysUntilPeriod === 0 ? 'Period starts today! 🩸' : `Period in ${P.daysUntilPeriod} days 🔔`);
+        ? (P.daysUntilPeriod === 0 ? '🩸 Adetiniz Bugün Başlıyor!' : `🔔 Sonraki Adete ${P.daysUntilPeriod} Gün Kaldı`)
+        : (P.daysUntilPeriod === 0 ? '🩸 Period Starts Today!' : `🔔 Period in ${P.daysUntilPeriod} Days`);
       const body = isTr
-        ? (`${namePrefix}Sonraki adetinizin ${formatDate(P.nextPeriodStart)} tarihinde başlaması bekleniyor.`)
-        : (`${namePrefix}Your next period is predicted to start on ${formatDate(P.nextPeriodStart)}.`);
+        ? (`${namePrefix}${P.phaseTr || 'Döngü'} evresindesiniz. Sonraki adetinizin ${formatDate(P.nextPeriodStart)} tarihinde başlaması bekleniyor.`)
+        : (`${namePrefix}You are in ${P.phase || 'cycle'} phase. Next period is predicted for ${formatDate(P.nextPeriodStart)}.`);
       newNotifs.push({
         id: 'notif_period_pred',
         type: 'prediction',
         icon: '🔔',
         title,
         body,
-        time: isTr ? 'Anımsatıcı' : 'Reminder',
+        time: isTr ? 'Döngü Tahmini' : 'Cycle Prediction',
         read: false
       });
     }
@@ -8199,14 +8199,14 @@ function updateDynamicNotifications() {
     newNotifs.push({
       id: 'notif_daily_reminder',
       type: 'reminder',
-      icon: '💊',
-      title: isTr ? `Günlük Kayıt Anımsatıcısı (${dailyTime}) ⏰` : `Daily Log Reminder (${dailyTime}) ⏰`,
-      body: isTr ? `${namePrefix}Saat ${dailyTime}! Bugünkü semptom ve ruh halinizi kaydetmeyi unutmayın.` : `${namePrefix}It is ${dailyTime}! Don't forget to log your symptoms and mood for today!`,
+      icon: '⏰',
+      title: isTr ? `⏰ Günlük Kayıt Anımsatıcısı (${dailyTime})` : `⏰ Daily Log Reminder (${dailyTime})`,
+      body: isTr ? `${namePrefix}Saat ${dailyTime}! Bugünkü semptom ve ruh hali kayıtlarınızı ekleyerek tahminlerinizi güncel tutun.` : `${namePrefix}It's ${dailyTime}! Keep your predictions sharp by logging your symptoms and mood.`,
       time: dailyTime,
       read: false
     });
 
-    // 3. Context-Aware Symptom Notification (triggers when symptoms are logged)
+    // 3. Context-Aware Symptom Notification (triggers dynamically when symptoms are logged today)
     const recentSymptom = (state.symptoms || []).find(s => s.date === (state.logDate || TODAY_STR));
     if (recentSymptom && recentSymptom.symptoms && recentSymptom.symptoms.length > 0) {
       const symCount = recentSymptom.symptoms.length;
@@ -8215,18 +8215,18 @@ function updateDynamicNotifications() {
       let symSummary = '';
       if (isTr) {
         symSummary = `Bugün ${symCount} semptom kaydedildi`;
-        if (stressLvl > 0) symSummary += `, stres seviyesi: ${stressLvl}/5`;
-        if (hasPill) symSummary += ', doğum kontrol hapı alındı';
+        if (stressLvl > 0) symSummary += `, stres: ${stressLvl}/5`;
+        if (hasPill) symSummary += ', hap alındı';
         symSummary += '.';
       } else {
-        symSummary = `${symCount} symptom(s) logged today`;
-        if (stressLvl > 0) symSummary += `, stress level: ${stressLvl}/5`;
+        symSummary = `${symCount} symptom(s) logged`;
+        if (stressLvl > 0) symSummary += `, stress: ${stressLvl}/5`;
         if (hasPill) symSummary += ', birth control taken';
         symSummary += '.';
       }
 
       const aiSymptomNote = state.isPremium 
-        ? (isTr ? ' Yapay Zeka motorumuz tavsiyelerinizi yeni verilerinize göre güncelledi.' : ' Our AI engine has updated your recommendations based on new data.')
+        ? (isTr ? ' YZ motorumuz tavsiyelerinizi güncelledi.' : ' AI engine updated your guidance.')
         : '';
 
       newNotifs.push({
@@ -8240,7 +8240,7 @@ function updateDynamicNotifications() {
       });
     }
 
-    // 4. Context-Aware Mood Notification (triggers when mood is logged)
+    // 4. Context-Aware Mood Notification (triggers dynamically when mood is logged today)
     const recentMood = (state.moods || []).find(m => m.date === (state.logDate || TODAY_STR));
     if (recentMood && recentMood.mood) {
       const moodLabels = isTr
@@ -8249,27 +8249,56 @@ function updateDynamicNotifications() {
       const moodLabel = moodLabels[recentMood.mood] || (isTr ? 'Kaydedildi' : 'Logged');
       const energyLvl = recentMood.energy || 3;
       const aiMoodNote = state.isPremium 
-        ? (isTr ? ' YZ İçgörüleriniz güncellendi.' : ' AI insights updated.')
+        ? (isTr ? ' YZ İçgörüleriniz eşleşti.' : ' AI insights synced.')
         : '';
 
       newNotifs.push({
         id: 'notif_mood_logged_' + (state.logDate || TODAY_STR),
         type: 'insight',
         icon: '😊',
-        title: isTr ? `😊 Ruh Hali Güncellendi: ${moodLabel}` : `😊 Mood Updated: ${moodLabel}`,
-        body: `${namePrefix}${isTr ? `Ruh haliniz "${moodLabel}" olarak kaydedildi. Enerji seviyesi: ${energyLvl}/5.${aiMoodNote}` : `Your mood was logged as "${moodLabel}". Energy level: ${energyLvl}/5.${aiMoodNote}`}`,
+        title: isTr ? `😊 Ruh Hali: ${moodLabel}` : `😊 Mood: ${moodLabel}`,
+        body: `${namePrefix}${isTr ? `Ruh haliniz "${moodLabel}", enerji seviyeniz ${energyLvl}/5 olarak kaydedildi.${aiMoodNote}` : `Mood logged as "${moodLabel}", energy: ${energyLvl}/5.${aiMoodNote}`}`,
         time: timeStr,
         read: false
       });
     }
 
-    // 5. Personalized AI Insights from 24,000-tip engine (Premium Subscribers Only)
+    // 5. Dynamic AI Sports & Fitness Coach Notification (Premium Subscribers Only)
     if (state.isPremium) {
+      const fitLiveNotif = getLiveFitnessInsight();
+      const userSteps = (state.fitnessData && typeof state.fitnessData.steps === 'number') ? state.fitnessData.steps : 0;
+      const hasRealSteps = userSteps > 0;
+
+      let fitTitle = '';
+      let fitBody = '';
+
+      if (hasRealSteps) {
+        fitTitle = isTr 
+          ? `🏃‍♀️ YZ Spor Koçu: ${userSteps.toLocaleString()} Adım` 
+          : `🏃‍♀️ AI Sports Coach: ${userSteps.toLocaleString()} Steps`;
+        fitBody = `${namePrefix}${isTr ? fitLiveNotif.titleTr : fitLiveNotif.titleEn}. ${isTr ? ('Aksiyon: ' + fitLiveNotif.adviceTr) : ('Action: ' + fitLiveNotif.adviceEn)} (${state.fitnessData.activeCalories || fitLiveNotif.calBurn} kcal yakıldı).`;
+      } else {
+        fitTitle = isTr 
+          ? `🏃‍♀️ YZ Spor Koçu: ${fitLiveNotif.badge || 'Günün Egzersiz Rehberi'}` 
+          : `🏃‍♀️ AI Sports Coach: ${fitLiveNotif.badge || 'Daily Fitness Guide'}`;
+        fitBody = `${namePrefix}${isTr ? fitLiveNotif.titleTr : fitLiveNotif.titleEn}. ${isTr ? ('Aksiyon: ' + fitLiveNotif.adviceTr) : ('Action: ' + fitLiveNotif.adviceEn)}`;
+      }
+
+      newNotifs.push({
+        id: 'notif_fitness_activity',
+        type: 'insight',
+        icon: '🏃‍♀️',
+        title: fitTitle,
+        body: fitBody,
+        time: isTr ? 'Spor Koçu' : 'Fitness Coach',
+        read: false
+      });
+
+      // 6. Top Personalized AI Nutrition & Daily Wellness Insights (Premium Subscribers Only)
       const { dynamicList } = runAIInsightEngine();
       if (dynamicList && dynamicList.length > 0) {
-        // Only include the top 3 AI tip cards (nutrition, sport, daily) to avoid notification flooding
-        const aiTipCards = dynamicList.filter(item => item.id && item.id.startsWith('dynamic_ai_'));
-        aiTipCards.forEach((item) => {
+        const nonSportAITips = dynamicList.filter(item => item.id && (item.id === 'dynamic_ai_nutrition' || item.id === 'dynamic_ai_daily'));
+        nonSportAITips.forEach((item) => {
           newNotifs.push({
             id: 'notif_ai_insight_' + (item.id || ''),
             type: 'insight',
@@ -8283,18 +8312,7 @@ function updateDynamicNotifications() {
       }
     }
 
-    // 6. Supplement & Health Tip
-    newNotifs.push({
-      id: 'notif_iron_supp',
-      type: 'reminder',
-      icon: '💊',
-      title: isTr ? 'Demir & C Vitamini Takviyesi' : 'Iron Supplement Advice',
-      body: isTr ? `${namePrefix}Vücudunuzun emilimi artırması için demir takviyenizi C vitamini ile birlikte almayı unutmayın.` : `${namePrefix}Take your iron supplement with vitamin C for maximum absorption.`,
-      time: isTr ? 'Dün' : 'Yesterday',
-      read: true
-    });
-
-    // 7. Monthly Health & Cycle Summary Notification (If monthly report toggle is on in settings)
+    // 7. Monthly Health & Cycle Summary Notification
     if (state.notifMonthlyReport !== false) {
       const hs = calculateHealthScore();
       const currentMonthPrefix = TODAY_STR.slice(0, 7);
@@ -8316,19 +8334,7 @@ function updateDynamicNotifications() {
       });
     }
 
-    // 8. Daily Cycle-Synced Fitness & Activity Notification (500 AI Engine)
-    const fitLiveNotif = getLiveFitnessInsight();
-    newNotifs.push({
-      id: 'notif_fitness_activity',
-      type: 'insight',
-      icon: '🏃‍♀️',
-      title: isTr ? `🏃‍♀️ Günlük Aktivite: ${(state.fitnessData?.steps || 7420).toLocaleString()} Adım` : `🏃‍♀️ Daily Activity: ${(state.fitnessData?.steps || 7420).toLocaleString()} Steps`,
-      body: `${namePrefix}${isTr ? fitLiveNotif.titleTr : fitLiveNotif.titleEn}. ${isTr ? ('Aksiyon: ' + fitLiveNotif.adviceTr) : ('Action: ' + fitLiveNotif.adviceEn)}`,
-      time: isTr ? 'Spor Koçu' : 'Fitness Coach',
-      read: false
-    });
-
-    // Replace state.notifications with dynamic, multi-language translated notifications (filtering user-deleted ones)
+    // Replace state.notifications with dynamic notifications (filtering user-deleted ones)
     const deleted = (state.deletedNotifIds || []).map(id => String(id));
     state.notifications = newNotifs.filter(n => !deleted.includes(String(n.id))).slice(0, 20);
 
