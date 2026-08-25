@@ -658,15 +658,20 @@ function computePredictions(customLastDate, customAvgCycle, customAvgPeriod) {
       avgCycle = Math.round(mean);
     }
   }
-  avgCycle = Math.max(21, Math.min(45, avgCycle));
-  avgPeriod = Math.max(2, Math.min(10, avgPeriod));
+  avgCycle = Math.max(15, Math.min(60, avgCycle));
+  avgPeriod = Math.max(2, Math.min(12, avgPeriod));
 
-  // Clinical Standard Average Cycle Calculation (ACOG / Mayo Clinic / WHO):
-  // Ending bleeding early does not alter follicular development or cycle length.
+  // Clinical Standard Cycle Calculation (ACOG / FIGO / WHO / ESHRE):
+  // - Normal Cycles (21-35 days): Constant ~14-day luteal phase
+  // - Long Cycles (36-60 days, e.g. 45 days): Extended follicular phase, constant ~14-day luteal phase (Ovulation = Day avgCycle - 14)
+  // - Short Cycles (< 21 days, e.g. 15 days): Early post-menses ovulation with condensed follicular phase
   const isEarlyEnd = !!(state && state.periodEndedEarly && state.actualPeriodLength);
   const effectivePeriodLength = isEarlyEnd ? state.actualPeriodLength : avgPeriod;
   const earlyDiff = isEarlyEnd ? Math.max(0, avgPeriod - state.actualPeriodLength) : 0;
-  const adjustedCycleLength = avgCycle; // Standard average cycle duration
+  const adjustedCycleLength = avgCycle;
+
+  // FIGO Clinical Cycle Categorization
+  const cycleCategory = avgCycle < 21 ? 'short' : (avgCycle > 35 ? 'long' : 'normal');
 
   // Current cycle day (1-indexed)
   const todayZero = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate());
@@ -677,12 +682,25 @@ function computePredictions(customLastDate, customAvgCycle, customAvgPeriod) {
   // Period end date
   const periodEnd = addDays(lastPeriodDate, effectivePeriodLength - 1);
 
-  // Clinical standard: Luteal phase is 14 days. Ovulation Day = avgCycle - 14
-  const ovulationDayNum = Math.max(effectivePeriodLength + 1, avgCycle - 14);
-  const ovulationDate  = addDays(lastPeriodDate, ovulationDayNum);
+  // Clinical Standard Ovulation Day calculation based on cycle length:
+  let ovulationDayNum;
+  if (avgCycle >= 24) {
+    // Standard & extended cycles (24-60 days): Luteal phase is 14 days
+    ovulationDayNum = Math.max(effectivePeriodLength + 1, avgCycle - 14);
+  } else if (avgCycle >= 21) {
+    // 21-23 day cycles: 12-13 day luteal phase
+    ovulationDayNum = Math.max(effectivePeriodLength + 1, avgCycle - 13);
+  } else {
+    // Short cycles (< 21 days, e.g. 15-20 days): Post-menses early follicle recruitment
+    const lutealEst = Math.min(10, Math.floor(avgCycle * 0.6));
+    ovulationDayNum = Math.max(effectivePeriodLength + 1, Math.max(4, avgCycle - lutealEst));
+  }
+
+  const ovulationDate = addDays(lastPeriodDate, ovulationDayNum - 1);
 
   // Fertile Window: 5 days prior to ovulation through ovulation day (6-day clinical window)
-  const fertileStart = addDays(ovulationDate, -5);
+  const fertileStartDayNum = Math.max(1, ovulationDayNum - 5);
+  const fertileStart = addDays(lastPeriodDate, fertileStartDayNum - 1);
   const fertileEnd   = ovulationDate;
 
   // Next period dates (based on standard average cycle length)
@@ -693,11 +711,11 @@ function computePredictions(customLastDate, customAvgCycle, customAvgPeriod) {
   const nextMidnight  = new Date(nextPeriodStart.getFullYear(), nextPeriodStart.getMonth(), nextPeriodStart.getDate());
   const daysUntilPeriod = Math.max(0, Math.round((nextMidnight - todayZero) / 86400000));
 
-  // Current phase
+  // Current clinical phase resolution for any cycle length (15 to 60 days)
   let phase;
   if (cycleDay <= effectivePeriodLength) {
     phase = PHASES.menstrual;
-  } else if (cycleDay < ovulationDayNum - 5) {
+  } else if (cycleDay < fertileStartDayNum) {
     phase = PHASES.follicular;
   } else if (cycleDay <= ovulationDayNum + 1) {
     phase = PHASES.ovulation;
@@ -715,7 +733,13 @@ function computePredictions(customLastDate, customAvgCycle, customAvgPeriod) {
   for (let i = 1; i <= 24; i++) {
     const pStart = addDays(lastPeriodDate, cumulativeDays);
     const pEnd   = addDays(pStart, avgPeriod - 1);
-    const ovDate = addDays(pStart, avgCycle - 14);
+    
+    let futureOvDayNum;
+    if (avgCycle >= 24) futureOvDayNum = avgCycle - 14;
+    else if (avgCycle >= 21) futureOvDayNum = avgCycle - 13;
+    else futureOvDayNum = Math.max(4, avgCycle - Math.min(10, Math.floor(avgCycle * 0.6)));
+
+    const ovDate = addDays(pStart, futureOvDayNum - 1);
     const fStart = addDays(ovDate, -5);
     const fEnd   = ovDate;
     futurePeriods.push({
@@ -732,6 +756,8 @@ function computePredictions(customLastDate, customAvgCycle, customAvgPeriod) {
   return {
     lastPeriodDate,
     cycleDay,
+    ovulationDayNum,
+    fertileStartDayNum,
     ovulationDate,
     fertileStart,
     fertileEnd,
@@ -741,6 +767,7 @@ function computePredictions(customLastDate, customAvgCycle, customAvgPeriod) {
     phase,
     avgCycle,
     avgPeriod,
+    cycleCategory,
     effectivePeriodLength,
     earlyDiff,
     adjustedCycleLength,
@@ -1130,20 +1157,24 @@ function clearStorage() {
 function getCyclePhase(cycleDay) {
   const d = (cycleDay !== undefined) ? cycleDay : (PREDICTIONS.cycleDay || 1);
   const avg = PREDICTIONS.avgCycle || 28;
-  const ovDay = avg - 14;
-
-  if (state && state.periodEndedEarly && state.actualPeriodLength) {
-    if (d >= state.actualPeriodLength) {
-      if (d < ovDay) return PHASES.follicular;
-      if (d <= ovDay + 2) return PHASES.ovulation;
-      return PHASES.luteal;
-    }
+  const effectivePeriod = (state && state.periodEndedEarly && state.actualPeriodLength) ? state.actualPeriodLength : (PREDICTIONS.avgPeriod || 5);
+  
+  let ovDay;
+  if (PREDICTIONS.ovulationDayNum) {
+    ovDay = PREDICTIONS.ovulationDayNum;
+  } else if (avg >= 24) {
+    ovDay = Math.max(effectivePeriod + 1, avg - 14);
+  } else if (avg >= 21) {
+    ovDay = Math.max(effectivePeriod + 1, avg - 13);
+  } else {
+    ovDay = Math.max(effectivePeriod + 1, Math.max(4, avg - Math.min(10, Math.floor(avg * 0.6))));
   }
 
-  const per = (PREDICTIONS.avgPeriod || 5);
-  if (d >= 1 && d <= per) return PHASES.menstrual;
-  if (d < ovDay) return PHASES.follicular;
-  if (d <= ovDay + 2) return PHASES.ovulation;
+  const fertileStart = Math.max(1, ovDay - 5);
+
+  if (d <= effectivePeriod) return PHASES.menstrual;
+  if (d < fertileStart) return PHASES.follicular;
+  if (d <= ovDay + 1) return PHASES.ovulation;
   return PHASES.luteal;
 }
 function formatDate(d) {
@@ -2578,9 +2609,9 @@ function renderOnboarding() {
     content = `
     <div class="slider-wrapper">
       <div class="slider-value-display" id="cycle-val">${state.onboardData.cycleLength} ${isTr ? 'gün' : 'days'}</div>
-      <input class="slider-range-input" type="range" min="21" max="40" value="${state.onboardData.cycleLength}" id="cycle-slider"
+      <input class="slider-range-input" type="range" min="15" max="60" value="${state.onboardData.cycleLength}" id="cycle-slider"
         oninput="state.onboardData.cycleLength=+this.value; document.getElementById('cycle-val').textContent=this.value+' ${(isTr?'gün':'days')}'; updateSliderFill(this)"/>
-      <div class="slider-labels"><span>21 ${isTr ? 'gün' : 'days'}</span><span>40 ${isTr ? 'gün' : 'days'}</span></div>
+      <div class="slider-labels"><span>15 ${isTr ? 'gün' : 'days'}</span><span>60 ${isTr ? 'gün' : 'days'}</span></div>
     </div>`;
   } else if (s.type === 'period-slider') {
     content = `
@@ -4211,13 +4242,72 @@ function saveMoodLog() {
 // ============================================================
 function renderFertility() {
   const P = PREDICTIONS;
+  const isTr = (state.lang || 'tr') === 'tr';
   const cd = P.cycleDay || 1;
-  const ovDay = (P.avgCycle || 28) - 14;
+  const avgCycle = P.avgCycle || 28;
   const effectivePeriod = (state && state.periodEndedEarly && state.actualPeriodLength) ? state.actualPeriodLength : (P.avgPeriod || 5);
-  const fertRaw = cd >= 14 && cd <= 16 ? 'Peak' :
-    cd >= 11 && cd <= 17 ? 'High' : 'Low';
-  const chance = t('fert_' + fertRaw.toLowerCase());
+  
+  let ovDay;
+  if (P.ovulationDayNum) {
+    ovDay = P.ovulationDayNum;
+  } else if (avgCycle >= 24) {
+    ovDay = Math.max(effectivePeriod + 1, avgCycle - 14);
+  } else if (avgCycle >= 21) {
+    ovDay = Math.max(effectivePeriod + 1, avgCycle - 13);
+  } else {
+    ovDay = Math.max(effectivePeriod + 1, Math.max(4, avgCycle - Math.min(10, Math.floor(avgCycle * 0.6))));
+  }
+
+  const fertileStartDay = Math.max(1, ovDay - 5);
+  const follicularEndDay = Math.max(effectivePeriod, ovDay - 1);
+  const lutealStartDay = Math.min(avgCycle, ovDay + 1);
+
+  // Dynamic Segment Percentages
+  const mPct = (effectivePeriod / avgCycle) * 100;
+  const fPct = Math.max(0, (follicularEndDay - effectivePeriod) / avgCycle) * 100;
+  const oPct = Math.max(6, (Math.min(avgCycle, ovDay + 1) - fertileStartDay + 1) / avgCycle * 100);
+  const lPct = Math.max(10, (avgCycle - ovDay) / avgCycle * 100);
+
+  const fertRaw = (cd === ovDay) ? 'Peak' :
+    (cd >= ovDay - 2 && cd <= ovDay + 1) ? 'High' :
+    (cd >= fertileStartDay && cd < ovDay - 2) ? 'High' :
+    (cd >= ovDay + 2 && cd <= ovDay + 5) ? 'Low' : 'Very Low';
+  const chance = t('fert_' + fertRaw.toLowerCase().replace(' ', '_'));
   const chanceColor = fertRaw === 'Peak' ? '#66BB6A' : fertRaw === 'High' ? '#FFA726' : '#9E9E9E';
+
+  // Medical cycle category guidance banner
+  let medicalGuidanceHtml = '';
+  if (avgCycle < 21) {
+    medicalGuidanceHtml = `
+      <div style="background:rgba(255,152,0,0.1);border:1px solid rgba(255,152,0,0.3);border-radius:var(--r-lg);padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--text-1);line-height:1.4">
+        <div style="font-weight:700;color:#E65100;margin-bottom:3px;display:flex;align-items:center;gap:6px">
+          <span>⚠️</span> ${(state.lang||'tr')==='tr' ? 'Kısa Döngü Analizi (Polimenore • ' + avgCycle + ' Gün)' : 'Short Cycle Notice (Polymenorrhea • ' + avgCycle + ' Days)'}
+        </div>
+        ${(state.lang||'tr')==='tr'
+          ? `Döngünüz 21 günden kısadır. Foliküler evre çok kısa sürdüğü için yumurtlama kanamanın hemen bitiminde (yaklaşık <strong>${ovDay}. günde</strong>) gerçekleşir. Doğurganlık adetten hemen sonra başlar.`
+          : `Your cycle is shorter than 21 days. Due to rapid follicular recruitment, ovulation occurs early around <strong>Day ${ovDay}</strong> immediately post-menses.`}
+      </div>`;
+  } else if (avgCycle > 35) {
+    medicalGuidanceHtml = `
+      <div style="background:rgba(33,150,243,0.1);border:1px solid rgba(33,150,243,0.3);border-radius:var(--r-lg);padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--text-1);line-height:1.4">
+        <div style="font-weight:700;color:#1565C0;margin-bottom:3px;display:flex;align-items:center;gap:6px">
+          <span>🩺</span> ${(state.lang||'tr')==='tr' ? 'Uzamış Döngü Analizi (Oligomenore • ' + avgCycle + ' Gün)' : 'Extended Cycle Notice (Oligomenorrhea • ' + avgCycle + ' Days)'}
+        </div>
+        ${(state.lang||'tr')==='tr'
+          ? `Döngünüz 35 günden uzundur. Tıbbi standartlara göre (ACOG / FIGO) luteal faz sabit (14 gün) kalırken foliküler faz uzar. Yumurtlama 14. günde değil, <strong>${ovDay}. günde</strong> gerçekleşir.`
+          : `Your cycle is extended (>35 days). Clinically, the luteal phase remains ~14 days while the follicular phase is prolonged. Ovulation occurs on <strong>Day ${ovDay}</strong>.`}
+      </div>`;
+  } else {
+    medicalGuidanceHtml = `
+      <div style="background:rgba(102,187,106,0.1);border:1px solid rgba(102,187,106,0.3);border-radius:var(--r-lg);padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--text-1);line-height:1.4">
+        <div style="font-weight:700;color:#2E7D32;margin-bottom:3px;display:flex;align-items:center;gap:6px">
+          <span>🩺</span> ${(state.lang||'tr')==='tr' ? 'Standart Klinik Döngü (' + avgCycle + ' Gün)' : 'Standard Clinical Cycle (' + avgCycle + ' Days)'}
+        </div>
+        ${(state.lang||'tr')==='tr'
+          ? `Döngünüz ACOG ve FIGO standartlarına göre düzenli aralıktadır. Yumurtlamanız beklenen adetten 14 gün önce (<strong>${ovDay}. günde</strong>) gerçekleşir.`
+          : `Your cycle is in the standard physiological range. Ovulation is expected 14 days before menses (on <strong>Day ${ovDay}</strong>).`}
+      </div>`;
+  }
 
   return `
   <div class="fertility-screen">
@@ -4227,6 +4317,11 @@ function renderFertility() {
       <div class="fertility-globe">🥚</div>
       <div class="fertility-chance-label">${t('conception_chance')}</div>
       <div class="fertility-chance-value" style="color:${chanceColor}">${chance}</div>
+    </div>
+
+    <!-- Medical Cycle Tier Guidance -->
+    <div style="padding:0 16px">
+      ${medicalGuidanceHtml}
     </div>
 
     <!-- Key Dates -->
@@ -4266,17 +4361,17 @@ function renderFertility() {
         </div>
 
         <div style="display:flex;height:12px;border-radius:6px;overflow:hidden;margin-bottom:12px;background:var(--surface-2)">
-          <div style="width:${(5/P.avgCycle)*100}%;background:#EF5350" title="Adet Evresi (1-5 Gün)"></div>
-          <div style="width:${((ovDay - 6)/P.avgCycle)*100}%;background:#42A5F5" title="Foliküler Evre"></div>
-          <div style="width:${(3/P.avgCycle)*100}%;background:#66BB6A" title="Yumurtlama Evresi"></div>
-          <div style="width:${((P.avgCycle - ovDay - 2)/P.avgCycle)*100}%;background:#9B72CF" title="Lüteal Evre"></div>
+          <div style="width:${mPct}%;background:#EF5350" title="Adet Evresi (1-${effectivePeriod} Gün)"></div>
+          <div style="width:${fPct}%;background:#42A5F5" title="Foliküler Evre"></div>
+          <div style="width:${oPct}%;background:#66BB6A" title="Yumurtlama Evresi"></div>
+          <div style="width:${lPct}%;background:#9B72CF" title="Lüteal Evre"></div>
         </div>
 
         <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:600;color:var(--text-3)">
-          <span style="color:#EF5350">🌑 ${(state.lang||'tr')==='tr'?'Adet (1-5g)':'Menstrual'}</span>
+          <span style="color:#EF5350">🌑 ${(state.lang||'tr')==='tr'?'Adet (1-' + effectivePeriod + 'g)':'Menstrual'}</span>
           <span style="color:#42A5F5">🌒 ${(state.lang||'tr')==='tr'?'Foliküler':'Follicular'}</span>
-          <span style="color:#66BB6A">⭐ ${(state.lang||'tr')==='tr'?'Yumurtlama':'Ovulation'}</span>
-          <span style="color:#9B72CF">🌙 ${(state.lang||'tr')==='tr'?'Lüteal':'Luteal'}</span>
+          <span style="color:#66BB6A">⭐ ${(state.lang||'tr')==='tr'?'Yumurtlama (' + ovDay + '.g)':'Ovulation'}</span>
+          <span style="color:#9B72CF">🌙 ${(state.lang||'tr')==='tr'?'Lüteal (14g)':'Luteal'}</span>
         </div>
       </div>
 
@@ -4284,7 +4379,7 @@ function renderFertility() {
       <div style="display:flex;flex-direction:column;gap:12px">
         <!-- 1. Menstrual Phase -->
         <div style="background:var(--surface);border-radius:var(--r-xl);padding:14px;border:1px solid ${cd<=effectivePeriod ? 'var(--primary)' : 'var(--border-light)'};position:relative">
-          ${cd<=P.avgPeriod ? `<span class="badge badge-primary" style="position:absolute;top:12px;right:12px;font-size:10px">${(state.lang||'tr')==='tr' ? 'Mevcut Evre' : 'Current Phase'}</span>` : ''}
+          ${cd<=effectivePeriod ? `<span class="badge badge-primary" style="position:absolute;top:12px;right:12px;font-size:10px">${(state.lang||'tr')==='tr' ? 'Mevcut Evre' : 'Current Phase'}</span>` : ''}
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
             <span style="font-size:22px">🌑</span>
             <div>
@@ -4301,12 +4396,12 @@ function renderFertility() {
         </div>
 
         <!-- 2. Follicular Phase -->
-        <div style="background:var(--surface);border-radius:var(--r-xl);padding:14px;border:1px solid ${(cd>effectivePeriod && cd<ovDay) ? 'var(--follicular)' : 'var(--border-light)'};position:relative">
-          ${(cd>P.avgPeriod && cd<ovDay) ? `<span class="badge" style="position:absolute;top:12px;right:12px;font-size:10px;background:var(--follicular);color:white">${(state.lang||'tr')==='tr' ? 'Mevcut Evre' : 'Current Phase'}</span>` : ''}
+        <div style="background:var(--surface);border-radius:var(--r-xl);padding:14px;border:1px solid ${(cd>effectivePeriod && cd<fertileStartDay) ? 'var(--follicular)' : 'var(--border-light)'};position:relative">
+          ${(cd>effectivePeriod && cd<fertileStartDay) ? `<span class="badge" style="position:absolute;top:12px;right:12px;font-size:10px;background:var(--follicular);color:white">${(state.lang||'tr')==='tr' ? 'Mevcut Evre' : 'Current Phase'}</span>` : ''}
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
             <span style="font-size:22px">🌒</span>
             <div>
-              <div style="font-size:14px;font-weight:700;color:var(--text-1)">${(state.lang||'tr')==='tr' ? 'Foliküler Evre (' + (effectivePeriod+1) + '–' + (ovDay-1) + '. Gün)' : 'Follicular Phase (Days ' + (effectivePeriod+1) + '–' + (ovDay-1) + ')'}</div>
+              <div style="font-size:14px;font-weight:700;color:var(--text-1)">${(state.lang||'tr')==='tr' ? 'Foliküler Evre (' + (effectivePeriod+1) + '–' + (follicularEndDay) + '. Gün)' : 'Follicular Phase (Days ' + (effectivePeriod+1) + '–' + (follicularEndDay) + ')'}</div>
               <div style="font-size:11px;color:#1565C0;font-weight:600">${(state.lang||'tr')==='tr' ? 'Östrojen Yükseliyor • Enerji Artıyor' : 'Estrogen Rising • Energy Surge'}</div>
             </div>
           </div>
@@ -4319,13 +4414,13 @@ function renderFertility() {
         </div>
 
         <!-- 3. Ovulation Phase -->
-        <div style="background:var(--surface);border-radius:var(--r-xl);padding:14px;border:1px solid ${(cd>=ovDay && cd<=ovDay+2) ? 'var(--ovulation)' : 'var(--border-light)'};position:relative">
-          ${(cd>=ovDay && cd<=ovDay+2) ? `<span class="badge" style="position:absolute;top:12px;right:12px;font-size:10px;background:var(--ovulation);color:white">${(state.lang||'tr')==='tr' ? 'Mevcut Evre' : 'Current Phase'}</span>` : ''}
+        <div style="background:var(--surface);border-radius:var(--r-xl);padding:14px;border:1px solid ${(cd>=fertileStartDay && cd<=ovDay+1) ? 'var(--ovulation)' : 'var(--border-light)'};position:relative">
+          ${(cd>=fertileStartDay && cd<=ovDay+1) ? `<span class="badge" style="position:absolute;top:12px;right:12px;font-size:10px;background:var(--ovulation);color:white">${(state.lang||'tr')==='tr' ? 'Mevcut Evre' : 'Current Phase'}</span>` : ''}
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
             <span style="font-size:22px">⭐</span>
             <div>
-              <div style="font-size:14px;font-weight:700;color:var(--text-1)">${(state.lang||'tr')==='tr' ? 'Yumurtlama Evresi (' + ovDay + '–' + (ovDay+2) + '. Gün)' : 'Ovulation Phase (Days ' + ovDay + '–' + (ovDay+2) + ')'}</div>
-              <div style="font-size:11px;color:#2E7D32;font-weight:600">${(state.lang||'tr')==='tr' ? 'LH & Östrojen Zirvede • Maksimum Doğurganlık' : 'LH & Estrogen Peak • Peak Fertility'}</div>
+              <div style="font-size:14px;font-weight:700;color:var(--text-1)">${(state.lang||'tr')==='tr' ? 'Yumurtlama Evresi (' + fertileStartDay + '–' + (ovDay+1) + '. Gün)' : 'Ovulation Phase (Days ' + fertileStartDay + '–' + (ovDay+1) + ')'}</div>
+              <div style="font-size:11px;color:#2E7D32;font-weight:600">${(state.lang||'tr')==='tr' ? 'LH & Östrojen Zirvede • Ovulasyon: ' + ovDay + '. Gün' : 'LH & Estrogen Peak • Ovulation Day: ' + ovDay}</div>
             </div>
           </div>
           <div style="font-size:12px;color:var(--text-2);line-height:1.5;margin-bottom:8px">
@@ -4337,12 +4432,12 @@ function renderFertility() {
         </div>
 
         <!-- 4. Luteal Phase -->
-        <div style="background:var(--surface);border-radius:var(--r-xl);padding:14px;border:1px solid ${cd>ovDay+2 ? 'var(--secondary)' : 'var(--border-light)'};position:relative">
-          ${cd>ovDay+2 ? `<span class="badge" style="position:absolute;top:12px;right:12px;font-size:10px;background:var(--secondary);color:white">${(state.lang||'tr')==='tr' ? 'Mevcut Evre' : 'Current Phase'}</span>` : ''}
+        <div style="background:var(--surface);border-radius:var(--r-xl);padding:14px;border:1px solid ${cd>ovDay+1 ? 'var(--secondary)' : 'var(--border-light)'};position:relative">
+          ${cd>ovDay+1 ? `<span class="badge" style="position:absolute;top:12px;right:12px;font-size:10px;background:var(--secondary);color:white">${(state.lang||'tr')==='tr' ? 'Mevcut Evre' : 'Current Phase'}</span>` : ''}
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
             <span style="font-size:22px">🌙</span>
             <div>
-              <div style="font-size:14px;font-weight:700;color:var(--text-1)">${(state.lang||'tr')==='tr' ? 'Lüteal Evre (' + (ovDay+3) + '–' + P.avgCycle + '. Gün)' : 'Luteal Phase (Days ' + (ovDay+3) + '–' + P.avgCycle + ')'}</div>
+              <div style="font-size:14px;font-weight:700;color:var(--text-1)">${(state.lang||'tr')==='tr' ? 'Lüteal Evre (' + (ovDay+2) + '–' + P.avgCycle + '. Gün)' : 'Luteal Phase (Days ' + (ovDay+2) + '–' + P.avgCycle + ')'}</div>
               <div style="font-size:11px;color:#6A1B9A;font-weight:600">${(state.lang||'tr')==='tr' ? 'Progesteron Zirvede • Rahatlama Evresi' : 'Progesterone Dominant • Recovery Phase'}</div>
             </div>
           </div>
@@ -5971,7 +6066,7 @@ function editAvgCycle() {
   const current = state.user.avgCycle || 28;
 
   const title = isTr ? 'Ortalama Döngü Süresi' : 'Average Cycle Length';
-  const sub = isTr ? '20 ile 45 gün arasında döngü süresi ayarlayın' : 'Set your cycle length between 20 and 45 days';
+  const sub = isTr ? '15 ile 60 gün arasında döngü süresi ayarlayın' : 'Set your cycle length between 15 and 60 days';
   const unitText = isTr ? 'gün (döngü süresi)' : 'days cycle length';
 
   const bodyHtml = `
@@ -5979,10 +6074,10 @@ function editAvgCycle() {
       <div class="number-display-val" id="modal-cycle-val">${current}</div>
       <div class="number-display-unit">${unitText}</div>
     </div>
-    <input type="range" id="modal-cycle-slider" min="20" max="45" value="${current}" class="input-field" style="padding:0;height:10px;accent-color:var(--primary)" oninput="document.getElementById('modal-cycle-val').textContent = this.value">
+    <input type="range" id="modal-cycle-slider" min="15" max="60" value="${current}" class="input-field" style="padding:0;height:10px;accent-color:var(--primary)" oninput="document.getElementById('modal-cycle-val').textContent = this.value">
     <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-3);margin-top:6px;font-weight:600">
-      <span>20 ${isTr ? 'gün' : 'days'}</span>
-      <span>45 ${isTr ? 'gün' : 'days'}</span>
+      <span>15 ${isTr ? 'gün' : 'days'}</span>
+      <span>60 ${isTr ? 'gün' : 'days'}</span>
     </div>`;
 
   openProfileEditModal('🔄', title, sub, bodyHtml, () => {
