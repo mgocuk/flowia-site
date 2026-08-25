@@ -3426,13 +3426,36 @@ function renderHome() {
       </div>
     </div>
 
-    <!-- Apple Health / Google Health Connect Activity Card -->
+    <!-- Apple Health / Google Health Connect Activity Card (Premium Feature) -->
     <div class="section">
       <div class="section-header">
         <span class="section-title">🏃‍♀️ ${(state.lang||'tr')==='tr' ? 'Günlük Aktivite & YZ Koçu' : 'Daily Fitness & AI Coach'}</span>
-        <span class="section-link" onclick="openHealthPermissionModal()">${state.healthKitConnected ? ((state.lang||'tr')==='tr' ? '🍏 Bağlı' : '🍏 Connected') : ((state.lang||'tr')==='tr' ? 'İzin Ver' : 'Connect')}</span>
+        ${!state.isPremium 
+          ? `<span class="badge badge-premium" style="font-size:10px">⭐ PREMIUM</span>` 
+          : `<span class="section-link" onclick="openHealthPermissionModal()">${state.healthKitConnected ? ((state.lang||'tr')==='tr' ? '🍏 Bağlı' : '🍏 Connected') : ((state.lang||'tr')==='tr' ? 'İzin Ver' : 'Connect')}</span>`}
       </div>
 
+      ${!state.isPremium ? `
+      <div class="insight-card" onclick="navigate('premium')" style="border:1.5px dashed rgba(232,120,154,0.45);background:linear-gradient(135deg,rgba(232,120,154,0.08),rgba(155,114,207,0.08));cursor:pointer;padding:16px;border-radius:var(--r-xl)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:26px">📱</span>
+            <div>
+              <div style="font-weight:700;font-size:14px;color:var(--text-1)">${(state.lang||'tr')==='tr' ? 'Mobil Sağlık & 500 YZ Spor Koçu' : 'Apple Health & 500 AI Sports Coach'}</div>
+              <div style="font-size:11px;color:var(--primary);font-weight:600">Apple Health • Google Health Connect</div>
+            </div>
+          </div>
+          <span style="font-size:20px">🔒</span>
+        </div>
+        <p style="font-size:12px;color:var(--text-2);line-height:1.5;margin-bottom:12px">
+          ${(state.lang||'tr')==='tr'
+            ? 'Apple Health ve Health Connect üzerinden günlük adım, aktif kalori ve antrenman verilerinizi döngünüzle eşleştirin. 500 farklı yapay zeka spor ve egzersiz içgörüsünü açmak için Premium\'a geçin.'
+            : 'Sync daily steps, active calories, and workouts via Apple Health & Health Connect. Upgrade to Premium to unlock 500 cycle-synced AI fitness insights.'}
+        </p>
+        <button class="btn btn-sm btn-primary" style="width:100%;font-weight:700;box-shadow:0 4px 14px rgba(232,120,154,0.35)">
+          ⭐ ${(state.lang||'tr')==='tr' ? 'Premium ile Kilidi Aç' : 'Unlock with Premium'} →
+        </button>
+      </div>` : `
       <div class="fitness-card" style="background:linear-gradient(135deg, rgba(232,120,154,0.12), rgba(155,114,207,0.12)); border:1px solid rgba(232,120,154,0.3); border-radius:var(--r-xl); padding:16px; position:relative; overflow:hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
           <div>
@@ -3494,7 +3517,7 @@ function renderHome() {
             </div>
           </div>`;
         })()}
-      </div>
+      </div>`}
     </div>
 
     <!-- Quick Actions -->
@@ -4755,6 +4778,12 @@ function getLiveFitnessInsight() {
 // ------------------------------------------------------------
 function openHealthPermissionModal() {
   const isTr = (state.lang || 'tr') === 'tr';
+  if (!state.isPremium) {
+    navigate('premium');
+    showToast(isTr ? 'Mobil Sağlık Entegrasyonu ve 500 YZ Spor Koçu Premium bir özelliktir ⭐' : 'Apple Health & 500 AI Fitness Coach is a Premium feature ⭐');
+    return;
+  }
+
   const title = isTr ? 'Apple Health & Health Connect İzni' : 'Apple Health & Health Connect Permission';
   const sub = isTr ? 'Günlük sportif aktivite ve döngü analizi için izin' : 'Permission for daily activity & cycle-synced fitness';
 
@@ -4855,6 +4884,12 @@ function setFitModalSteps(val) {
 
 function openFitnessSyncModal() {
   const isTr = (state.lang || 'tr') === 'tr';
+  if (!state.isPremium) {
+    navigate('premium');
+    showToast(isTr ? 'Aktivite takibi ve 500 YZ Spor Koçu Premium bir özelliktir ⭐' : 'Fitness tracking & 500 AI Sports Coach is a Premium feature ⭐');
+    return;
+  }
+
   const fit = state.fitnessData || { steps: 8420, targetSteps: 10000, activeCalories: 340, activeMinutes: 45, distanceKm: 5.8, workoutType: 'walking_nature' };
 
   const title = isTr ? 'Günlük Aktivite & Spor' : 'Daily Activity & Fitness';
@@ -6935,27 +6970,30 @@ function renderSettings() {
       </div>
     </div>
 
-    <!-- APPLE HEALTH & GOOGLE HEALTH CONNECT INTEGRATION -->
+    <!-- APPLE HEALTH & GOOGLE HEALTH CONNECT INTEGRATION (PREMIUM) -->
     <div class="settings-section">
-      <div class="settings-section-title">🏃‍♀️ ${(state.lang||'tr')==='tr' ? 'Mobil Sağlık & Spor Entegrasyonu' : 'Apple Health & Health Connect'}</div>
+      <div class="settings-section-title" style="display:flex;justify-content:space-between;align-items:center">
+        <span>🏃‍♀️ ${(state.lang||'tr')==='tr' ? 'Mobil Sağlık & Spor Entegrasyonu' : 'Apple Health & Health Connect'}</span>
+        ${!state.isPremium ? `<span class="badge badge-premium" style="font-size:10px">⭐ PREMIUM</span>` : ''}
+      </div>
       <div class="settings-item" onclick="openHealthPermissionModal()" style="cursor:pointer">
         <div class="settings-item-left">
-          <div class="settings-item-icon" style="background:#E8F5E9">🍏</div>
+          <div class="settings-item-icon" style="background:#E8F5E9">${!state.isPremium ? '🔒' : '🍏'}</div>
           <div class="settings-item-text">
             <div class="settings-item-label">${(state.lang||'tr')==='tr' ? 'Apple Health & Health Connect İzinleri' : 'Apple Health & Health Connect Permissions'}</div>
-            <div class="settings-item-desc">${state.healthKitConnected ? ((state.lang||'tr')==='tr' ? '🟢 Bağlandı • 500 YZ Spor Tavsiyesi Aktif' : '🟢 Connected • 500 AI Sports Coach Active') : ((state.lang||'tr')==='tr' ? 'Günlük adım, kalori ve egzersiz analizi' : 'Daily steps, calories & workout sync')}</div>
+            <div class="settings-item-desc">${!state.isPremium ? ((state.lang||'tr')==='tr' ? '⭐ Premium ile 500 YZ Spor Koçunu açın' : '⭐ Unlock 500 AI Sports Coach with Premium') : (state.healthKitConnected ? ((state.lang||'tr')==='tr' ? '🟢 Bağlandı • 500 YZ Spor Tavsiyesi Aktif' : '🟢 Connected • 500 AI Sports Coach Active') : ((state.lang||'tr')==='tr' ? 'Günlük adım, kalori ve egzersiz analizi' : 'Daily steps, calories & workout sync'))}</div>
           </div>
         </div>
-        <button class="btn btn-sm ${state.healthKitConnected ? 'btn-ghost' : 'btn-primary'}" style="padding:6px 12px;font-size:12px">
-          ${state.healthKitConnected ? ((state.lang||'tr')==='tr'?'İzinleri Yönet ⚙️':'Manage ⚙️') : ((state.lang||'tr')==='tr'?'Bağlan 🍏':'Connect 🍏')}
+        <button class="btn btn-sm ${state.isPremium && state.healthKitConnected ? 'btn-ghost' : 'btn-primary'}" style="padding:6px 12px;font-size:12px">
+          ${!state.isPremium ? ((state.lang||'tr')==='tr'?'Kilidi Aç ⭐':'Unlock ⭐') : (state.healthKitConnected ? ((state.lang||'tr')==='tr'?'İzinleri Yönet ⚙️':'Manage ⚙️') : ((state.lang||'tr')==='tr'?'Bağlan 🍏':'Connect 🍏'))}
         </button>
       </div>
       <div class="settings-item" onclick="openFitnessSyncModal()" style="cursor:pointer">
         <div class="settings-item-left">
-          <div class="settings-item-icon" style="background:#FFF3E0">👟</div>
+          <div class="settings-item-icon" style="background:#FFF3E0">${!state.isPremium ? '🔒' : '👟'}</div>
           <div class="settings-item-text">
             <div class="settings-item-label">${(state.lang||'tr')==='tr' ? 'Aktivite Verilerini Manuel Düzenle' : 'Edit Daily Fitness Data'}</div>
-            <div class="settings-item-desc">${(state.fitnessData?.steps || 7420).toLocaleString()} ${(state.lang||'tr')==='tr'?'Adım':'Steps'} • ${state.fitnessData?.activeCalories || 320} kcal</div>
+            <div class="settings-item-desc">${!state.isPremium ? ((state.lang||'tr')==='tr' ? 'Adım, kalori ve spor türü girişi (Premium)' : 'Steps, calories and workout logging (Premium)') : `${(state.fitnessData?.steps || 7420).toLocaleString()} ${(state.lang||'tr')==='tr'?'Adım':'Steps'} • ${state.fitnessData?.activeCalories || 320} kcal`}</div>
           </div>
         </div>
         <div class="settings-item-value">›</div>
@@ -7395,6 +7433,8 @@ function renderPremium() {
     { name: isTr ? '3 aylık geçmiş takibi' : '3-month history',                   free: true,  premium: false, new: false },
     { name: isTr ? 'Sınırsız geçmiş döngü kaydı' : 'Unlimited cycle history',    free: false, premium: true,  new: false },
     { name: isTr ? 'Yapay zeka destekli içgörüler' : 'AI-powered insights',        free: false, premium: true,  new: true  },
+    { name: isTr ? '📱 Apple Health & Health Connect Entegrasyonu' : '📱 Apple Health & Health Connect sync', free: false, premium: true, new: true },
+    { name: isTr ? '🏃‍♀️ 500 YZ Spor & Fitness Koçu Tavsiyesi' : '🏃‍♀️ 500 AI Sports & Fitness Coach Tips', free: false, premium: true, new: true },
     { name: isTr ? 'Gelişmiş analizler & grafikler' : 'Advanced analytics & charts', free: false, premium: true,  new: false },
     { name: isTr ? 'Doğurganlık planlama araçları' : 'Fertility planning tools',   free: false, premium: true,  new: false },
     { name: isTr ? 'PDF sağlık raporu çıktısı' : 'PDF report export',             free: false, premium: true,  new: false },
