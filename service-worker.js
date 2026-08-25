@@ -1,10 +1,10 @@
-const CACHE_NAME = 'flowia-v22.0';
+const CACHE_NAME = 'flowia-v24.0';
 const STATIC_ASSETS = [
   './',
   './index.html',
   './app.html',
-  './app.js?v=22.0',
-  './styles.css?v=22.0',
+  './app.js?v=24.0',
+  './styles.css?v=24.0',
   './manifest.json',
   './favicon.png',
   './lily-logo.png',
@@ -30,7 +30,7 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
-        keys.map(k => caches.delete(k))
+        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
       )
     ).then(() => self.clients.claim())
   );
@@ -44,9 +44,9 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   if (url.protocol === 'chrome-extension:') return;
 
-  // Strategy 1: Network-First for JS, CSS, and HTML (ALWAYS fetch latest code!)
+  // Strategy 1: Network-First for JS, CSS, HTML, and JSON (ALWAYS fetch latest code!)
   const isCodeOrApp = (
-    url.pathname.match(/\.(js|css|html)$/) ||
+    url.pathname.match(/\.(js|css|html|json)$/) ||
     url.pathname === '/' ||
     url.pathname.endsWith('/')
   );
@@ -85,45 +85,6 @@ self.addEventListener('fetch', event => {
           caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
           return response;
         }).catch(() => caches.match('./favicon.png'));
-      })
-    );
-    return;
-  }
-
-  if (isStatic) {
-    event.respondWith(
-      caches.match(event.request).then(cached => {
-        if (cached) return cached;
-        return fetch(event.request).then(response => {
-          if (!response || response.status !== 200) return response;
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
-          return response;
-        }).catch(() => caches.match('./icon-192.png'));
-      })
-    );
-    return;
-  }
-
-  // Strategy 2: Network-First for JS and HTML (always try to get latest)
-  const isApp = (
-    url.pathname.match(/\.(js|html)$/) ||
-    url.pathname === '/' ||
-    url.pathname.endsWith('/')
-  );
-
-  if (isApp) {
-    event.respondWith(
-      fetch(event.request).then(response => {
-        if (response && response.status === 200) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
-        }
-        return response;
-      }).catch(() => {
-        return caches.match(event.request).then(cached => {
-          return cached || caches.match('./index.html');
-        });
       })
     );
     return;
