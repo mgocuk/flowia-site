@@ -6159,9 +6159,14 @@ function renderProfile() {
         <span class="profile-item-arrow">›</span>
       </div>
       <div class="profile-item signout-item" onclick="doLogout()">
-        <div class="profile-item-icon" style="background:#FFEBEE">👋</div>
+        <div class="profile-item-icon" style="background:#FFF3E0">👋</div>
         <div class="profile-item-text"><div class="profile-item-label">${t('logout')}</div></div>
         <span class="profile-item-arrow">›</span>
+      </div>
+      <div class="profile-item" onclick="openDeleteAccountModal()" style="cursor:pointer">
+        <div class="profile-item-icon" style="background:#FFEBEE">🗑️</div>
+        <div class="profile-item-text"><div class="profile-item-label" style="color:var(--error);font-weight:700">${(state.lang||'tr')==='tr' ? 'Hesabı Komple Sil' : 'Delete Account Completely'}</div></div>
+        <span class="profile-item-arrow" style="color:var(--error)">›</span>
       </div>
     </div>
   </div>`;
@@ -6466,12 +6471,26 @@ function renderSettings() {
         </div>
         <div class="settings-item-value">›</div>
       </div>
-      <div class="settings-item" onclick="confirmDeleteData()">
+
+      <!-- 1. BUTON: Tüm Sağlık Verilerini Sıfırla (Hesap Açık Kalır) -->
+      <div class="settings-item" onclick="openResetDataModal()" style="cursor:pointer">
+        <div class="settings-item-left">
+          <div class="settings-item-icon" style="background:#FFF3E0">🧹</div>
+          <div class="settings-item-text">
+            <div class="settings-item-label" style="color:#E65100;font-weight:700">${(state.lang||'tr')==='tr' ? 'Tüm Sağlık Verilerini Sıfırla' : 'Reset All Health Data'}</div>
+            <div class="settings-item-desc">${(state.lang||'tr')==='tr' ? 'Hesabınızı kapatmadan geçmiş döngü, semptom ve günlük kayıtlarını temizler' : 'Wipe cycles, symptoms and mood logs while keeping your account'}</div>
+          </div>
+        </div>
+        <div class="settings-item-value" style="color:#E65100">›</div>
+      </div>
+
+      <!-- 2. BUTON: Hesabı Komple Sil (Kalıcı Olarak Yok Etme & Çıkış) -->
+      <div class="settings-item" onclick="openDeleteAccountModal()" style="cursor:pointer">
         <div class="settings-item-left">
           <div class="settings-item-icon" style="background:#FFEBEE">🗑️</div>
           <div class="settings-item-text">
-            <div class="settings-item-label" style="color:var(--error)">${t('delete_data')}</div>
-            <div class="settings-item-desc">${t('delete_desc')}</div>
+            <div class="settings-item-label" style="color:var(--error);font-weight:700">${(state.lang||'tr')==='tr' ? 'Hesabı Komple Sil' : 'Delete Account Completely'}</div>
+            <div class="settings-item-desc">${(state.lang||'tr')==='tr' ? 'Hesabınızı, üyeliğinizi ve bulut verilerinizi kalıcı olarak yok eder (GDPR)' : 'Permanently wipe account and all cloud data (GDPR)'}</div>
           </div>
         </div>
         <div class="settings-item-value" style="color:var(--error)">›</div>
@@ -6512,75 +6531,148 @@ function renderSettings() {
     </div>
   </div>`;
 }
-function confirmDeleteData() {
-  openDeleteDataModal();
-}
 
-function openDeleteDataModal() {
+// ------------------------------------------------------------
+// 1. MODAL: TÜM SAĞLIK VERİLERİNİ SIFIRLA (HESAP AÇIK KALIR)
+// ------------------------------------------------------------
+function openResetDataModal() {
   const isTr = (state.lang || 'tr') === 'tr';
-  const title = isTr ? 'Tüm Verileri Sil (Unutulma Hakkı)' : 'Delete All Data (Right to be Forgotten)';
-  const sub = isTr ? 'Lütfen bu kritik silme işlemini onaylayın' : 'Please confirm this permanent deletion';
+  const title = isTr ? 'Tüm Sağlık Verilerini Sıfırla' : 'Reset All Health Data';
+  const sub = isTr ? 'Hesabınız açık kalır, yalnızca geçmiş veriler temizlenir' : 'Your account stays active, only logged history will be cleared';
 
   const bodyHtml = `
     <div style="text-align:center;padding:6px 0">
-      <div style="font-size:44px;margin-bottom:10px">⚠️</div>
-      <div style="font-size:16px;font-weight:800;color:var(--error);margin-bottom:8px">
-        ${isTr ? 'Tüm Verilerinizi Silmek İstediğinizden Emin Misiniz?' : 'Are You Sure You Want to Delete All Data?'}
+      <div style="font-size:44px;margin-bottom:10px">🧹</div>
+      <div style="font-size:15px;font-weight:800;color:#E65100;margin-bottom:8px">
+        ${isTr ? 'Tüm Sağlık Verilerini Sıfırlamak İstiyor Musunuz?' : 'Reset All Health & Cycle History?'}
       </div>
 
-      <div style="background:rgba(239,83,80,0.12);border:1px solid rgba(239,83,80,0.3);border-radius:var(--r-xl);padding:14px;margin:14px 0;text-align:left">
-        <div style="font-size:13px;font-weight:700;color:var(--error);margin-bottom:6px">
-          🗑️ ${isTr ? 'Silinecek Veri Kategorileri:' : 'Categories to be Wiped:'}
+      <div style="background:rgba(255,152,0,0.1);border:1px solid rgba(255,152,0,0.3);border-radius:var(--r-xl);padding:14px;margin:14px 0;text-align:left">
+        <div style="font-size:13px;font-weight:700;color:#E65100;margin-bottom:6px">
+          📋 ${isTr ? 'Sıfırlanacak Kayıtlar:' : 'Items to be cleared:'}
         </div>
         <div style="font-size:12px;color:var(--text-1);line-height:1.6">
-          • ${isTr ? 'Tüm geçmiş adet ve döngü kayıtları' : 'All period and cycle records'}<br>
-          • ${isTr ? 'Kaydedilen semptomlar ve ruh hali istatistikleri' : 'Logged symptoms and mood history'}<br>
-          • ${isTr ? 'Kişisel günlük yazıları ve etiketler' : 'Personal journal entries and tags'}<br>
-          • ${isTr ? 'Sağlık profili ve hesap tercihleri' : 'Health profile and account preferences'}
+          • ${isTr ? 'Tüm geçmiş adet ve döngü kayıtları' : 'All past period and cycle logs'}<br>
+          • ${isTr ? 'Kaydedilen semptomlar ve ruh halleri' : 'Logged symptoms and mood history'}<br>
+          • ${isTr ? 'Kişisel günlükler ve sağlık bildirimleri' : 'Journal notes and health notifications'}
         </div>
-      </div>
-
-      <div style="font-size:12px;color:var(--error);font-weight:700;margin-bottom:16px">
-        ⚠️ ${isTr ? 'Bu işlem GERİ ALINAMAZ ve veriler kurtarılamaz!' : 'This action CANNOT BE UNDONE!'}
+        <div style="font-size:11px;color:var(--success);font-weight:700;margin-top:8px">
+          ✓ ${isTr ? 'Hesap üyeliğiniz, e-postanız ve ayarlarınız korunur.' : 'Your account login and profile settings will be kept.'}
+        </div>
       </div>
 
       <div style="display:flex;flex-direction:column;gap:8px">
-        <button class="btn btn-ghost" style="color:var(--error);border:1px solid var(--error);padding:12px;font-size:13px;font-weight:800;background:rgba(239,83,80,0.08)" onclick="executeDeleteAllData()">
-          ${isTr ? '🗑️ Evet, Tüm Verilerimi Kalıcı Olarak Sil' : '🗑️ Yes, Permanently Delete All Data'}
+        <button class="btn btn-ghost" style="color:#E65100;border:1px solid #E65100;padding:12px;font-size:13px;font-weight:800;background:rgba(255,152,0,0.08)" onclick="executeResetData()">
+          ${isTr ? '🧹 Evet, Sağlık Verilerimi Sıfırla' : '🧹 Yes, Reset Health Data'}
         </button>
         <button class="btn btn-primary" style="padding:10px;font-size:13px;font-weight:700" onclick="closeProfileEditModal()">
-          ${isTr ? ' İptal Et (Verilerimi Koru)' : ' Cancel (Keep My Data)'}
+          ${isTr ? ' İptal Et (Verilerimi Koru)' : ' Cancel (Keep Data)'}
         </button>
       </div>
     </div>`;
 
-  openProfileEditModal('🗑️', title, sub, bodyHtml, null);
+  openProfileEditModal('🧹', title, sub, bodyHtml, null);
 }
 
-function executeDeleteAllData() {
+function executeResetData() {
   const isTr = (state.lang || 'tr') === 'tr';
 
-  // Wipe health logs and reset user state
+  // Wipe health logs while keeping account and auth
   state.cycles = [];
   state.symptoms = [];
   state.moods = [];
   state.journals = [];
   state.notifications = [];
-  state.isPremium = false;
-  state.autoRenew = false;
-  state.onboardData = null;
+  state.user.lastPeriodDate = '';
+  if (state.onboardData) state.onboardData.lastPeriodDate = '';
+  state.periodEndedEarly = false;
+  state.actualPeriodLength = null;
 
-  // Clear localStorage
+  PREDICTIONS = computePredictions();
+  saveToStorage();
+  closeProfileEditModal();
+  showToast(isTr ? 'Tüm sağlık verileriniz başarıyla sıfırlandı! 🧹' : 'All health data successfully reset! 🧹');
+  navigate('home', 'refresh');
+}
+
+// ------------------------------------------------------------
+// 2. MODAL: HESABI KOMPLE SİL (KALICI SİLME & OTURUM KAPATMA)
+// ------------------------------------------------------------
+function openDeleteAccountModal() {
+  const isTr = (state.lang || 'tr') === 'tr';
+  const title = isTr ? 'Hesabı Komple Sil (GDPR / KVKK)' : 'Delete Account Completely (GDPR)';
+  const sub = isTr ? 'Bu işlem hesabınızı ve tüm verilerinizi kalıcı olarak yok eder' : 'Permanently wipe your account and all associated data';
+
+  const bodyHtml = `
+    <div style="text-align:center;padding:6px 0">
+      <div style="font-size:44px;margin-bottom:10px">⚠️</div>
+      <div style="font-size:16px;font-weight:800;color:var(--error);margin-bottom:8px">
+        ${isTr ? 'Hesabınızı Tamamen Silmek İstediğinizden Emin Misiniz?' : 'Permanently Delete Your Flowia Account?'}
+      </div>
+
+      <div style="background:rgba(239,83,80,0.12);border:1px solid rgba(239,83,80,0.3);border-radius:var(--r-xl);padding:14px;margin:14px 0;text-align:left">
+        <div style="font-size:13px;font-weight:700;color:var(--error);margin-bottom:6px">
+          🗑️ ${isTr ? 'Kalıcı Olarak Yok Edilecekler:' : 'Will Be Permanently Destroyed:'}
+        </div>
+        <div style="font-size:12px;color:var(--text-1);line-height:1.6">
+          • ${isTr ? 'Kullanıcı hesabı, e-posta üyeliği ve profil' : 'User account, email profile & login credentials'}<br>
+          • ${isTr ? 'Tüm döngü, semptom, ruh hali ve günlük verileri' : 'All cycle, symptom, mood and journal history'}<br>
+          • ${isTr ? 'Bulut yedekleme ve cihazdaki tüm yerel kayıtlar' : 'Cloud sync vault and all local storage records'}
+        </div>
+      </div>
+
+      <div style="font-size:12px;color:var(--error);font-weight:800;margin-bottom:16px">
+        🚫 ${isTr ? 'Bu işlem GERİ ALINAMAZ ve veriler kurtarılamaz!' : 'This action is PERMANENT and CANNOT BE UNDONE!'}
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn btn-ghost" style="color:var(--error);border:1px solid var(--error);padding:12px;font-size:13px;font-weight:800;background:rgba(239,83,80,0.08)" onclick="executeDeleteAccount()">
+          ${isTr ? '🗑️ Evet, Hesabımı ve Verilerimi Kalıcı Olarak Sil' : '🗑️ Yes, Permanently Delete My Account'}
+        </button>
+        <button class="btn btn-primary" style="padding:10px;font-size:13px;font-weight:700" onclick="closeProfileEditModal()">
+          ${isTr ? ' Vazgeç (Hesabımı Koru)' : ' Cancel (Keep My Account)'}
+        </button>
+      </div>
+    </div>`;
+
+  openProfileEditModal('⚠️', title, sub, bodyHtml, null);
+}
+
+function executeDeleteAccount() {
+  const isTr = (state.lang || 'tr') === 'tr';
+  const email = state.user ? state.user.email : '';
+
+  // Delete user storage and cloud vault
+  if (email) {
+    SafeStorage.removeItem(getUserStorageKey(email));
+    SafeStorage.removeItem('flowia_cloud_backup_' + email);
+  }
+  SafeStorage.removeItem('flowia_last_email');
+  SafeStorage.removeItem(STORAGE_KEY);
+
   try {
     localStorage.clear();
-  } catch (e) {}
+  } catch(e) {}
+
+  // Reset entire application state to pristine initial state
+  state.isLoggedIn = false;
+  state.isPremium = false;
+  state.user = { name: '', email: '', dob: '', initials: 'F', avgCycle: 28, avgPeriod: 5, lastPeriodDate: '', goals: ['Track my cycle'] };
+  state.cycles = [];
+  state.symptoms = [];
+  state.moods = [];
+  state.journals = [];
+  state.notifications = [];
+  state.onboardData = { lastPeriodDate: '', cycleLength: 28, periodLength: 5, goals: [] };
+  state.onboardStep = 1;
+  PREDICTIONS = computePredictions();
 
   closeProfileEditModal();
-  showToast(isTr ? 'Tüm verileriniz kalıcı olarak silindi! 🗑️' : 'All your data has been permanently deleted! 🗑️');
+  showToast(isTr ? 'Hesabınız ve tüm verileriniz kalıcı olarak silindi. 👋' : 'Your account and all data have been permanently deleted. 👋');
 
   setTimeout(() => {
     navigate('login', 'refresh');
-  }, 1200);
+  }, 1000);
 }
 
 function setUnitSystem(val) {
