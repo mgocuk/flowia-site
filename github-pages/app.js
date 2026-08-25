@@ -4833,68 +4833,130 @@ function grantHealthPermissions() {
   navigate(state.screen || 'home', 'refresh');
 }
 
+function adjustFitModalSteps(delta) {
+  const input = document.getElementById('fit-modal-steps');
+  if (input) {
+    let val = (parseInt(input.value, 10) || 0) + delta;
+    if (val < 0) val = 0;
+    input.value = val;
+    const kmDisp = document.getElementById('fit-modal-km-display');
+    if (kmDisp) kmDisp.textContent = '~' + ((val * 0.00078).toFixed(1)) + ' km';
+  }
+}
+
+function setFitModalSteps(val) {
+  const input = document.getElementById('fit-modal-steps');
+  if (input) {
+    input.value = val;
+    const kmDisp = document.getElementById('fit-modal-km-display');
+    if (kmDisp) kmDisp.textContent = '~' + ((val * 0.00078).toFixed(1)) + ' km';
+  }
+}
+
 function openFitnessSyncModal() {
   const isTr = (state.lang || 'tr') === 'tr';
   const fit = state.fitnessData || { steps: 8420, targetSteps: 10000, activeCalories: 340, activeMinutes: 45, distanceKm: 5.8, workoutType: 'walking_nature' };
 
-  const title = isTr ? 'Günlük Aktivite & Spor Düzenle' : 'Edit Daily Activity & Fitness';
+  const title = isTr ? 'Günlük Aktivite & Spor' : 'Daily Activity & Fitness';
   const sub = isTr ? 'Adım, kalori ve egzersiz türünü güncelleyin' : 'Update daily steps, calories and workout modality';
 
   const bodyHtml = `
-    <div style="padding:4px 0">
-      <div style="margin-bottom:12px">
-        <label style="font-size:12px;font-weight:700;color:var(--text-1);display:block;margin-bottom:4px">
-          👟 ${isTr ? 'Bugünkü Adım Sayısı' : 'Steps Today'}
-        </label>
-        <input type="number" id="fit-modal-steps" class="input-field" value="${fit.steps || 8420}" min="0" max="100000" style="width:100%" />
+    <div style="display:flex;flex-direction:column;gap:12px;padding:2px 0;">
+      <!-- 1. Step Counter Card -->
+      <div style="background:linear-gradient(135deg, rgba(232,120,154,0.08), rgba(155,114,207,0.08));border:1px solid rgba(232,120,154,0.25);border-radius:var(--r-lg);padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div style="font-size:12px;font-weight:700;color:var(--text-1);display:flex;align-items:center;gap:6px;">
+            <span>👟</span> ${(isTr ? 'Bugünkü Adım Sayısı' : 'Steps Today')}
+          </div>
+          <span id="fit-modal-km-display" style="font-size:11px;font-weight:700;color:var(--primary);background:var(--primary-light);padding:2px 8px;border-radius:12px;">
+            ~${((fit.steps||8420)*0.00078).toFixed(1)} km
+          </span>
+        </div>
+        <div style="position:relative;display:flex;align-items:center;">
+          <input type="number" id="fit-modal-steps" value="${fit.steps || 8420}" min="0" max="100000" step="100" class="input-field" style="font-size:22px;font-weight:800;color:var(--primary);text-align:center;padding:10px 12px;border:1.5px solid var(--primary);border-radius:var(--r-md);background:var(--surface);" oninput="document.getElementById('fit-modal-km-display').textContent = '~' + ((parseInt(this.value||0,10)*0.00078).toFixed(1)) + ' km'" />
+        </div>
+        <div style="display:flex;gap:6px;margin-top:10px;justify-content:center;">
+          <button type="button" class="chip" onclick="adjustFitModalSteps(-1000)" style="font-size:11px;padding:5px 10px;cursor:pointer;background:var(--surface);">-1.000</button>
+          <button type="button" class="chip" onclick="adjustFitModalSteps(1000)" style="font-size:11px;padding:5px 10px;cursor:pointer;background:var(--surface);">+1.000</button>
+          <button type="button" class="chip" onclick="adjustFitModalSteps(2500)" style="font-size:11px;padding:5px 10px;cursor:pointer;background:var(--surface);">+2.500</button>
+          <button type="button" class="chip chip-primary" onclick="setFitModalSteps(10000)" style="font-size:11px;padding:5px 10px;cursor:pointer;">10.000</button>
+        </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-        <div>
-          <label style="font-size:12px;font-weight:700;color:var(--text-1);display:block;margin-bottom:4px">
-            🔥 ${isTr ? 'Aktif Kalori (kcal)' : 'Active Calories'}
+      <!-- 2. Dual Metrics (Calories & Minutes) -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="background:var(--surface-2);border:1px solid var(--border-light);border-radius:var(--r-lg);padding:12px;">
+          <label style="font-size:11.5px;font-weight:700;color:var(--text-1);display:flex;align-items:center;gap:4px;margin-bottom:6px;">
+            <span>🔥</span> ${(isTr ? 'Aktif Kalori' : 'Active Calories')}
           </label>
-          <input type="number" id="fit-modal-cal" class="input-field" value="${fit.activeCalories || 340}" min="0" max="10000" style="width:100%" />
+          <div style="display:flex;align-items:center;gap:6px;">
+            <input type="number" id="fit-modal-cal" class="input-field" value="${fit.activeCalories || 340}" min="0" max="10000" step="10" style="font-size:16px;font-weight:800;color:var(--text-1);padding:8px 10px;text-align:center;background:var(--surface);" />
+            <span style="font-size:11px;color:var(--text-3);font-weight:600;">kcal</span>
+          </div>
         </div>
-        <div>
-          <label style="font-size:12px;font-weight:700;color:var(--text-1);display:block;margin-bottom:4px">
-            ⏱️ ${isTr ? 'Aktif Süre (Dk)' : 'Active Mins'}
+
+        <div style="background:var(--surface-2);border:1px solid var(--border-light);border-radius:var(--r-lg);padding:12px;">
+          <label style="font-size:11.5px;font-weight:700;color:var(--text-1);display:flex;align-items:center;gap:4px;margin-bottom:6px;">
+            <span>⏱️</span> ${(isTr ? 'Aktif Süre' : 'Active Mins')}
           </label>
-          <input type="number" id="fit-modal-mins" class="input-field" value="${fit.activeMinutes || 45}" min="0" max="600" style="width:100%" />
+          <div style="display:flex;align-items:center;gap:6px;">
+            <input type="number" id="fit-modal-mins" class="input-field" value="${fit.activeMinutes || 45}" min="0" max="600" step="5" style="font-size:16px;font-weight:800;color:var(--text-1);padding:8px 10px;text-align:center;background:var(--surface);" />
+            <span style="font-size:11px;color:var(--text-3);font-weight:600;">${isTr ? 'dk' : 'min'}</span>
+          </div>
         </div>
       </div>
 
-      <div style="margin-bottom:12px">
-        <label style="font-size:12px;font-weight:700;color:var(--text-1);display:block;margin-bottom:4px">
-          🎯 ${isTr ? 'Hedeflenen Spor / Egzersiz Türü' : 'Target Workout Modality'}
+      <!-- 3. Workout Modality Selection -->
+      <div style="background:var(--surface-2);border:1px solid var(--border-light);border-radius:var(--r-lg);padding:12px;">
+        <label style="font-size:11.5px;font-weight:700;color:var(--text-1);display:flex;align-items:center;gap:4px;margin-bottom:6px;">
+          <span>🎯</span> ${(isTr ? 'Hedeflenen Spor / Egzersiz Türü' : 'Target Workout Modality')}
         </label>
-        <select id="fit-modal-type" class="input-field" style="width:100%">
-          <option value="walking_nature" ${fit.workoutType==='walking_nature'?'selected':''}>👟 ${isTr ? 'Açık Hava & Tempolu Yürüyüş' : 'Outdoor & Power Walk'}</option>
-          <option value="strength" ${fit.workoutType==='strength'?'selected':''}>🏋️‍♀️ ${isTr ? 'Kuvvet & Ağırlık Antrenmanı' : 'Strength & Weightlifting'}</option>
-          <option value="cardio" ${fit.workoutType==='cardio'?'selected':''}>🏃‍♀️ ${isTr ? 'Kardiyo, Koşu & HIIT' : 'Cardio, Run & HIIT'}</option>
-          <option value="pilates_core" ${fit.workoutType==='pilates_core'?'selected':''}>🤸‍♀️ ${isTr ? 'Pilates (Mat & Reformer)' : 'Pilates (Core & Mat)'}</option>
-          <option value="yoga_mobility" ${fit.workoutType==='yoga_mobility'?'selected':''}>🧘‍♀️ ${isTr ? 'Yoga, Esneme & Mobilite' : 'Yoga, Stretch & Mobility'}</option>
+        <select id="fit-modal-type" class="input-field" style="width:100%;font-weight:600;font-size:13px;padding:9px 12px;background:var(--surface);cursor:pointer;">
+          <option value="walking_nature" ${fit.workoutType==='walking_nature'?'selected':''}>👟 ${(isTr ? 'Açık Hava & Tempolu Yürüyüş' : 'Outdoor & Power Walk')}</option>
+          <option value="strength" ${fit.workoutType==='strength'?'selected':''}>🏋️‍♀️ ${(isTr ? 'Kuvvet & Ağırlık Antrenmanı' : 'Strength & Weightlifting')}</option>
+          <option value="cardio" ${fit.workoutType==='cardio'?'selected':''}>🏃‍♀️ ${(isTr ? 'Kardiyo, Koşu & HIIT' : 'Cardio, Run & HIIT')}</option>
+          <option value="pilates_core" ${fit.workoutType==='pilates_core'?'selected':''}>🤸‍♀️ ${(isTr ? 'Pilates (Mat & Reformer)' : 'Pilates (Core & Mat)')}</option>
+          <option value="yoga_mobility" ${fit.workoutType==='yoga_mobility'?'selected':''}>🧘‍♀️ ${(isTr ? 'Yoga, Esneme & Mobilite' : 'Yoga, Stretch & Mobility')}</option>
         </select>
       </div>
 
-      <div style="margin-bottom:16px">
-        <label style="font-size:12px;font-weight:700;color:var(--text-1);display:block;margin-bottom:4px">
-          🏆 ${isTr ? 'Günlük Adım Hedefi' : 'Daily Step Target'}
-        </label>
-        <input type="number" id="fit-modal-target" class="input-field" value="${fit.targetSteps || 10000}" min="1000" max="50000" style="width:100%" />
+      <!-- 4. Daily Step Target -->
+      <div style="background:var(--surface-2);border:1px solid var(--border-light);border-radius:var(--r-lg);padding:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <label style="font-size:11.5px;font-weight:700;color:var(--text-1);display:flex;align-items:center;gap:4px;">
+            <span>🏆</span> ${(isTr ? 'Günlük Adım Hedefi' : 'Daily Step Target')}
+          </label>
+          <span style="font-size:10px;color:var(--text-3);font-weight:600;">${isTr ? 'Önerilen: 8K - 10K' : 'Rec: 8K - 10K'}</span>
+        </div>
+        <input type="number" id="fit-modal-target" class="input-field" value="${fit.targetSteps || 10000}" min="1000" max="50000" step="500" style="font-size:15px;font-weight:700;color:var(--text-1);padding:8px 12px;background:var(--surface);" />
+        <div style="display:flex;gap:6px;margin-top:8px;">
+          <button type="button" class="chip" onclick="document.getElementById('fit-modal-target').value = 6000" style="flex:1;text-align:center;font-size:11px;padding:4px 0;cursor:pointer;background:var(--surface);">6.000</button>
+          <button type="button" class="chip" onclick="document.getElementById('fit-modal-target').value = 8000" style="flex:1;text-align:center;font-size:11px;padding:4px 0;cursor:pointer;background:var(--surface);">8.000</button>
+          <button type="button" class="chip chip-primary" onclick="document.getElementById('fit-modal-target').value = 10000" style="flex:1;text-align:center;font-size:11px;padding:4px 0;cursor:pointer;">10.000</button>
+          <button type="button" class="chip" onclick="document.getElementById('fit-modal-target').value = 12000" style="flex:1;text-align:center;font-size:11px;padding:4px 0;cursor:pointer;background:var(--surface);">12.000</button>
+        </div>
       </div>
 
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-primary" style="flex:1;padding:12px;font-weight:700" onclick="saveManualFitnessData()">
-          💾 ${isTr ? 'Kaydet & YZ Koçunu Güncelle' : 'Save & Update AI Coach'}
-        </button>
-        <button class="btn btn-ghost" style="padding:12px" onclick="closeProfileEditModal()">
-          ${isTr ? 'İptal' : 'Cancel'}
-        </button>
+      <!-- 5. AI Coach Sync Info Note -->
+      <div style="background:rgba(232,120,154,0.08);border:1px solid rgba(232,120,154,0.2);border-radius:var(--r-md);padding:10px 12px;display:flex;align-items:flex-start;gap:8px;">
+        <span style="font-size:16px;line-height:1;">✨</span>
+        <div style="font-size:11px;color:var(--text-2);line-height:1.4;">
+          ${(isTr
+            ? 'Kaydettiğiniz veriler anında döngü fazınızla eşleşir ve <strong>500 farklı YZ spor tavsiyesi</strong> dinamik olarak güncellenir.'
+            : 'Your logged metrics sync instantly with your cycle phase to update <strong>500 distinct AI workout insights</strong>.')}
+        </div>
       </div>
     </div>`;
 
-  openProfileEditModal('🏃‍♀️', title, sub, bodyHtml, null);
+  openProfileEditModal('🏃‍♀️', title, sub, bodyHtml, () => {
+    saveManualFitnessData();
+  });
+
+  const saveBtn = document.getElementById('pem-save-btn');
+  if (saveBtn) {
+    saveBtn.innerHTML = `💾 ${isTr ? 'Kaydet & YZ Koçunu Güncelle' : 'Save & Update AI Coach'}`;
+    saveBtn.style.display = 'block';
+  }
 }
 
 function saveManualFitnessData() {
