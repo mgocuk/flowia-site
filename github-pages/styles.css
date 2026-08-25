@@ -158,7 +158,12 @@
 
 /* 2. Reset & Base */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; font-family: var(--font); background: #1a0a22; overflow: hidden; }
+html, body {
+  height: 100%; width: 100%; font-family: var(--font); background: #1a0a22;
+  overflow: hidden !important; overflow-x: hidden !important;
+  overscroll-behavior: none !important; overscroll-behavior-x: none !important;
+  touch-action: pan-y !important; position: fixed; inset: 0;
+}
 button { font-family: var(--font); border: none; cursor: pointer; background: transparent; }
 input, textarea, select { font-family: var(--font); }
 a { text-decoration: none; color: inherit; }
@@ -169,13 +174,16 @@ img { max-width: 100%; display: block; }
   display: flex; align-items: center; justify-content: center;
   width: 100%; height: 100vh; height: 100dvh;
   min-height: 100vh; background: linear-gradient(135deg, #1a0a22 0%, #2d1b35 50%, #0d0818 100%);
-  overflow: hidden;
+  overflow: hidden !important; overflow-x: hidden !important;
+  overscroll-behavior: none !important; overscroll-behavior-x: none !important;
+  touch-action: pan-y !important;
 }
 .device-frame {
   width: 390px; height: 844px; max-height: 100vh; background: var(--bg); border-radius: 44px;
-  position: relative; overflow: hidden; display: flex; flex-direction: column;
+  position: relative; overflow: hidden !important; overflow-x: hidden !important; display: flex; flex-direction: column;
   box-shadow: 0 0 0 10px #1a0a22, 0 0 0 12px #333, var(--sh-xl), 0 40px 80px rgba(0,0,0,0.6);
-  flex-shrink: 0;
+  flex-shrink: 0; overscroll-behavior: none !important; overscroll-behavior-x: none !important;
+  touch-action: pan-y !important;
 }
 @media (max-width: 500px) {
   #app { align-items: stretch; justify-content: stretch; background: var(--bg); height: 100vh; height: 100dvh; width: 100vw; }
@@ -194,15 +202,19 @@ img { max-width: 100%; display: block; }
 
 /* 5. Screen Container */
 #screen {
-  flex: 1; min-height: 0; overflow: hidden; position: relative;
+  flex: 1; min-height: 0; overflow: hidden !important; overflow-x: hidden !important; position: relative;
   margin-top: 44px; /* status bar height */
-  width: 100%;
+  width: 100%; max-width: 100%;
+  overscroll-behavior: none !important; overscroll-behavior-x: none !important;
 }
 .screen {
-  position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden;
+  position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden !important;
+  width: 100%; max-width: 100%;
   background: var(--bg);
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none !important; overscroll-behavior-x: none !important;
+  touch-action: pan-y !important;
 }
 .screen::-webkit-scrollbar { display: none; }
 
@@ -605,9 +617,10 @@ select option {
    SCREEN: HOME
    ============================================================ */
 .home-screen {
-  height: 100%; display: flex; flex-direction: column; justify-content: space-between;
-  padding-bottom: clamp(6px, 1.2vh, 14px); box-sizing: border-box; overflow-y: auto;
-  scrollbar-width: none;
+  height: 100%; width: 100%; max-width: 100%; display: flex; flex-direction: column; justify-content: space-between;
+  padding-bottom: clamp(6px, 1.2vh, 14px); box-sizing: border-box; overflow-y: auto; overflow-x: hidden !important;
+  scrollbar-width: none; overscroll-behavior: none !important; overscroll-behavior-x: none !important;
+  touch-action: pan-y !important;
 }
 .home-screen::-webkit-scrollbar { display: none; }
 .home-header {

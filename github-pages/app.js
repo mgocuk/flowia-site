@@ -3392,11 +3392,11 @@ function renderHome() {
 
     <!-- Early Period End Action / Status Banner -->
     ${(!P.noData && !state.periodEndedEarly && (phaseRaw.cls.includes('menstrual') || P.cycleDay <= (P.avgPeriod || 5))) ? `
-    <div style="margin: -4px 16px 16px; background: linear-gradient(135deg, rgba(232,120,154,0.14), rgba(156,39,176,0.1)); border: 1px solid rgba(232,120,154,0.35); border-radius: var(--r-md); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; animation: fadeInUp 0.3s ease both">
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <span style="font-size: 22px;">🩸</span>
-        <div>
-          <div style="font-weight: 700; font-size: 13px; color: var(--text-1);">${t('period_ended_early_title')}</div>
+    <div style="margin: -4px 16px 16px; width: calc(100% - 32px); max-width: calc(100% - 32px); box-sizing: border-box; background: linear-gradient(135deg, rgba(232,120,154,0.14), rgba(156,39,176,0.1)); border: 1px solid rgba(232,120,154,0.35); border-radius: var(--r-md); padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; animation: fadeInUp 0.3s ease both">
+      <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;">
+        <span style="font-size: 22px; flex-shrink: 0;">🩸</span>
+        <div style="min-width: 0;">
+          <div style="font-weight: 700; font-size: 13px; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${t('period_ended_early_title')}</div>
           <div style="font-size: 11px; color: var(--text-2); line-height: 1.3;">${t('period_ended_early_sub')}</div>
         </div>
       </div>
@@ -3404,7 +3404,7 @@ function renderHome() {
         ${t('mark_period_ended_btn')}
       </button>
     </div>` : (state.periodEndedEarly ? `
-    <div style="margin: -4px 16px 16px; background: rgba(102,187,106,0.12); border: 1px solid rgba(102,187,106,0.35); border-radius: var(--r-md); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 8px; animation: fadeInUp 0.3s ease both">
+    <div style="margin: -4px 16px 16px; width: calc(100% - 32px); max-width: calc(100% - 32px); box-sizing: border-box; background: rgba(102,187,106,0.12); border: 1px solid rgba(102,187,106,0.35); border-radius: var(--r-md); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 8px; animation: fadeInUp 0.3s ease both">
       <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--success); font-weight: 700;">
         <span>✨</span>
         <span>${(state.lang||'tr')==='tr' ? 'Adet Bitişi Kaydedildi' : 'Period End Logged'} (${state.actualPeriodLength} ${(state.lang||'tr')==='tr'?'Gün':'Days'})</span>
