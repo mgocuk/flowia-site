@@ -7120,8 +7120,13 @@ function renderNotifications() {
         <div style="font-size:16px;font-weight:600;color:var(--text-1)">${isTr ? 'Tüm bildirimleri okudunuz!' : 'All caught up!'}</div>
         <div style="font-size:14px;color:var(--text-2);text-align:center">${isTr ? 'Yeni bildiriminiz bulunmuyor' : 'You have no new notifications'}</div>
       </div>` :
-    state.notifications.map(n => `
-      <div style="display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border-light);background:${n.read?'transparent':'rgba(232,120,154,0.05)'}">
+    state.notifications.map(n => {
+      let clickHandler = '';
+      if (n.type === 'report' || n.action === 'reports') clickHandler = `onclick="navigate('reports')"`;
+      else if (n.type === 'prediction') clickHandler = `onclick="navigate('calendar')"`;
+      else if (n.type === 'insight' && state.isPremium) clickHandler = `onclick="navigate('insights')"`;
+      return `
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border-light);background:${n.read?'transparent':'rgba(232,120,154,0.05)'};cursor:${clickHandler?'pointer':'default'}" ${clickHandler}>
         <div style="width:42px;height:42px;border-radius:var(--r-md);background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;margin-top:2px">${n.icon}</div>
         <div style="flex:1">
           <div style="font-size:14px;font-weight:600;color:var(--text-1);margin-bottom:3px">${n.title}</div>
@@ -7129,7 +7134,8 @@ function renderNotifications() {
           <div style="font-size:11px;color:var(--text-3);margin-top:4px">${n.time}</div>
         </div>
         <button class="notif-delete-btn" onclick="event.stopPropagation(); deleteNotification('${n.id}', event)" title="${isTr ? 'Bildirimi Sil' : 'Delete Notification'}">✕</button>
-      </div>`).join('')}
+      </div>`;
+    }).join('')}
   </div>`;
 }
 
@@ -7659,6 +7665,28 @@ function updateDynamicNotifications() {
       time: isTr ? 'Dün' : 'Yesterday',
       read: true
     });
+
+    // 7. Monthly Health & Cycle Summary Notification (If monthly report toggle is on in settings)
+    if (state.notifMonthlyReport !== false) {
+      const hs = calculateHealthScore();
+      const currentMonthPrefix = TODAY_STR.slice(0, 7);
+      const mSymCount = (state.symptoms || []).filter(s => s.date && s.date.startsWith(currentMonthPrefix)).length;
+      const mMoodCount = (state.moods || []).filter(m => m.date && m.date.startsWith(currentMonthPrefix)).length;
+      const monthName = TODAY.toLocaleDateString(isTr ? 'tr-TR' : 'en-US', { month: 'long' });
+
+      newNotifs.push({
+        id: 'notif_monthly_report_' + currentMonthPrefix,
+        type: 'report',
+        icon: '📋',
+        title: isTr ? `📋 ${monthName} Ayı Sağlık Raporunuz Hazır` : `📋 Your ${monthName} Health Report is Ready`,
+        body: isTr
+          ? `${namePrefix}${monthName} döngü ve sağlık özetiniz hazırlandı. Sağlık Skoru: ${hs.score}/100. Bu ay ${mSymCount + mMoodCount} sağlık kaydı tutuldu.`
+          : `${namePrefix}Your ${monthName} cycle & health summary is ready. Health Score: ${hs.score}/100 with ${mSymCount + mMoodCount} logs recorded.`,
+        time: isTr ? 'Aylık Rapor' : 'Monthly Report',
+        action: 'reports',
+        read: false
+      });
+    }
 
     // Replace state.notifications with dynamic, multi-language translated notifications (filtering user-deleted ones)
     const deleted = (state.deletedNotifIds || []).map(id => String(id));
