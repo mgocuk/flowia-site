@@ -5770,15 +5770,6 @@ function renderInsights() {
         </div>
       </div>`;
 
-  const connectionBanner = isOnline
-    ? `<div style="margin:0 16px 12px;background:rgba(102,187,106,0.14);border:1px solid rgba(102,187,106,0.35);border-radius:var(--r-md);padding:8px 14px;font-size:12px;color:var(--success);display:flex;align-items:center;gap:8px;font-weight:600">
-        <span style="font-size:8px">🟢</span>
-        <span>${t('ai_live_connected')} • 24.000 Kişiselleştirilmiş Tavsiye Motoru Aktif</span>
-      </div>`
-    : `<div style="margin:0 16px 12px;background:rgba(255,167,38,0.14);border:1px solid rgba(255,167,38,0.35);border-radius:var(--r-md);padding:8px 14px;font-size:12px;color:#FFA726;display:flex;align-items:center;gap:8px;font-weight:600">
-        <span>🟡 ${t('ai_offline_mode')}</span>
-      </div>`;
-
   const tabsHtml = `
     <div class="tabs" style="margin:0 16px 14px;overflow-x:auto;display:flex;gap:6px;padding-bottom:4px">
       <div class="tab ${activeTab==='all'?'active':''}" onclick="setInsightsTab('all')">${isTr?'✨ Tümü':'✨ All'}</div>
@@ -5808,7 +5799,6 @@ function renderInsights() {
         <div class="insights-hero-sub">${t('insights_hero_sub')}</div>
       </div>
     </div>
-    ${connectionBanner}
     ${metricsChips}
     ${tabsHtml}
     <div class="insight-cards">${insightCards}</div>
