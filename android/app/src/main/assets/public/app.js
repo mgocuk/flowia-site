@@ -7422,9 +7422,9 @@ function saveConsentPreferences() {
 function renderPremium() {
   const isTr = (state.lang || 'tr') === 'tr';
   const isAnnual = state.premiumTab === 'annual';
-  const price = isAnnual ? '$1.00' : '$0.00';
+  const price = isAnnual ? '$1.49' : '$0.00';
   const period = isAnnual 
-    ? (isTr ? '/ay, yıllık $12.00 faturalandırılır' : '/month, billed $12.00/year')
+    ? (isTr ? '/ay, yıllık $17.88 faturalandırılır' : '/month, billed $17.88/year')
     : (isTr ? '1. Ay Ücretsiz • Sonra $2.00 / ay' : '1st Month Free • Then $2.00 / month');
 
   const features = [
@@ -7450,16 +7450,16 @@ function renderPremium() {
 
   const tabMonthly = isTr ? 'Aylık' : 'Monthly';
   const tabAnnual = isTr ? 'Yıllık' : 'Annual';
-  const saveLabel = isTr ? '%50 Tasarruf' : 'Save 50%';
+  const saveLabel = isTr ? '%25 Tasarruf' : 'Save 25%';
   const freeMonthBadge = isTr ? '🎁 1. Ay Ücretsiz' : '🎁 1st Mo Free';
-  const saveYearlyBadge = isTr ? 'Yılda $12.00 tasarruf edin' : 'Save $12.00/year';
+  const saveYearlyBadge = isTr ? 'Aylık $1.49 • Yılda $6.12 tasarruf edin' : 'Only $1.49/mo • Save $6.12/year';
 
   const btnText = isAnnual 
-    ? (isTr ? '🌟 Yıllık Planı Başlat ($1.00/ay)' : '🌟 Start Annual Plan ($1.00/mo)')
+    ? (isTr ? '🌟 Yıllık Planı Başlat ($1.49/ay)' : '🌟 Start Annual Plan ($1.49/mo)')
     : (isTr ? '🌟 1 Ay Ücretsiz Başlat (Sonra $2.00/ay)' : '🌟 Start 1-Month Free Trial (Then $2.00/mo)');
 
   const subCommit = isAnnual
-    ? (isTr ? '7 gün ücretsiz deneme • Yılda $12.00 tasarruf • İstediğin zaman iptal et' : '7-day free trial • Save $12.00/year • Cancel anytime')
+    ? (isTr ? '7 gün ücretsiz deneme • Yıllık $17.88 • İstediğin zaman iptal et' : '7-day free trial • $17.88/year • Cancel anytime')
     : (isTr ? 'İlk 30 gün tamamen ücretsiz • Sonrasında aylık $2.00 • İstediğin zaman iptal et' : 'First 30 days 100% free • Then $2.00/month • Cancel anytime');
 
   const incLabel = isTr ? 'Neler dahil:' : 'What\'s included:';
@@ -7558,15 +7558,15 @@ function openPaymentCheckoutModal() {
     : (isTr ? '1 AY ÜCRETSİZ' : '1 MONTH FREE');
 
   const planPriceAfter = isAnnual 
-    ? '$12.00 / yıl ($1.00/ay)' 
+    ? '$17.88 / yıl ($1.49/ay)' 
     : '$2.00 / ay (İlk ay sonrası)';
 
   const securityNote = isAnnual
-    ? (isTr ? '🛡️ İlk 7 gün boyunca hiçbir ücret alınmayacaktır. İptal etmediğiniz takdirde 7 gün sonra yıllık $12.00 olarak devam eder.' : '🛡️ You will not be charged today. Auto-renews in 7 days at $12.00/year unless cancelled.')
+    ? (isTr ? '🛡️ İlk 7 gün boyunca hiçbir ücret alınmayacaktır. İptal etmediğiniz takdirde 7 gün sonra yıllık $17.88 olarak devam eder.' : '🛡️ You will not be charged today. Auto-renews in 7 days at $17.88/year unless cancelled.')
     : (isTr ? '🛡️ İlk 30 gün boyunca hiçbir ücret alınmayacaktır. İptal etmediğiniz takdirde 1 ay sonra aylık $2.00 olarak devam eder.' : '🛡️ You will not be charged today. Auto-renews in 30 days at $2.00/month unless cancelled.');
 
   const btnText = isAnnual
-    ? (isTr ? '🔒 💳 Yıllık Planı Başlat ($12.00/yıl)' : '🔒 💳 Start Annual Plan ($12.00/year)')
+    ? (isTr ? '🔒 💳 Yıllık Planı Başlat ($17.88/yıl)' : '🔒 💳 Start Annual Plan ($17.88/year)')
     : (isTr ? '🔒 💳 1 Ay Ücretsiz Başlat (Sonra $2.00/ay)' : '🔒 💳 Start 1-Month Free (Then $2.00/mo)');
 
   const title = isTr ? 'Ödeme Sayfası (Google Play / App Store)' : 'Payment Checkout (Google Play / App Store)';
