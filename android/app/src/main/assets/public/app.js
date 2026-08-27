@@ -837,6 +837,9 @@ let state = {
     source: 'Apple Health / Google Health Connect',
     lastSynced: null
   },
+  totalUsageSeconds: 0,
+  appRated: false,
+  lastRatingPromptDate: null,
   user: { name: '', email: '', dob: '', initials: 'F', avgCycle: 28, avgPeriod: 5, lastPeriodDate: '', goals: ['Track my cycle'] },
   charts: {},
 };
@@ -1075,6 +1078,9 @@ function saveToStorage() {
       healthKitConnected: state.healthKitConnected || false,
       fitnessData: state.fitnessData || null,
       healthPermissions: state.healthPermissions || null,
+      totalUsageSeconds:    Number(state.totalUsageSeconds) || 0,
+      appRated:             !!state.appRated,
+      lastRatingPromptDate: state.lastRatingPromptDate || null,
     };
     SafeStorage.setItem(key, JSON.stringify(data));
     CloudSync.pushCloudState();
@@ -1097,6 +1103,9 @@ function loadUserSession(email, name = '', dob = '') {
       if (typeof data.healthKitConnected !== 'undefined') state.healthKitConnected = data.healthKitConnected;
       if (data.fitnessData) state.fitnessData = { ...data.fitnessData };
       if (data.healthPermissions) state.healthPermissions = { ...data.healthPermissions };
+      if (typeof data.totalUsageSeconds !== 'undefined') state.totalUsageSeconds = Number(data.totalUsageSeconds) || 0;
+      if (typeof data.appRated !== 'undefined') state.appRated = !!data.appRated;
+      if (typeof data.lastRatingPromptDate !== 'undefined') state.lastRatingPromptDate = data.lastRatingPromptDate;
       if (Array.isArray(data.cycles)) {
         state.cycles = data.cycles.map(c => ({
           ...c,
@@ -1152,6 +1161,9 @@ function loadFromStorage() {
     if (data.user) state.user = { ...state.user, ...data.user };
     if (typeof data.periodEndedEarly !== 'undefined') state.periodEndedEarly = data.periodEndedEarly;
     if (typeof data.actualPeriodLength !== 'undefined') state.actualPeriodLength = data.actualPeriodLength;
+    if (typeof data.totalUsageSeconds !== 'undefined') state.totalUsageSeconds = Number(data.totalUsageSeconds) || 0;
+    if (typeof data.appRated !== 'undefined') state.appRated = !!data.appRated;
+    if (typeof data.lastRatingPromptDate !== 'undefined') state.lastRatingPromptDate = data.lastRatingPromptDate;
     if (data.user?.email) loadUserSession(data.user.email);
     return true;
   } catch (e) { console.warn('[Flowia] Storage load failed:', e); return false; }
@@ -5875,6 +5887,203 @@ function closeProfileEditModal() {
 }
 
 // ============================================================
+// PLAY STORE & APP STORE RATING & IN-APP ENGAGEMENT ENGINE
+// Triggers 30s after entry for users with >= 30m usage, once per day
+// ============================================================
+function initUsageTracker() {
+  if (typeof window === 'undefined') return;
+  if (window._flowiaUsageTrackerInterval) return;
+  window._flowiaUsageTrackerInterval = setInterval(() => {
+    try {
+      if (typeof document === 'undefined' || document.visibilityState !== 'hidden') {
+        state.totalUsageSeconds = (Number(state.totalUsageSeconds) || 0) + 5;
+        // Periodically sync to storage every 60 seconds
+        if (state.totalUsageSeconds % 60 === 0) {
+          saveToStorage();
+        }
+      }
+    } catch(e) {}
+  }, 5000);
+}
+
+function scheduleRatingPromptCheck() {
+  if (typeof window === 'undefined') return;
+  if (window._flowiaRatingTimeout) clearTimeout(window._flowiaRatingTimeout);
+  window._flowiaRatingTimeout = setTimeout(() => {
+    checkAndTriggerStoreRating();
+  }, 30000); // 30 seconds after app entry
+}
+
+function checkAndTriggerStoreRating() {
+  try {
+    // 1. User has already reviewed
+    if (state.appRated) return;
+
+    // 2. Cumulative usage must be at least 30 minutes (1800 seconds)
+    const usageSec = Number(state.totalUsageSeconds) || 0;
+    if (usageSec < 1800) return;
+
+    // 3. Rate limit: At most once per day
+    if (state.lastRatingPromptDate === TODAY_STR) return;
+
+    // Mark prompt triggered today
+    state.lastRatingPromptDate = TODAY_STR;
+    saveToStorage();
+
+    // Show themed rating modal & dynamic notification
+    openStoreRatingModal();
+    if (typeof updateDynamicNotifications === 'function') {
+      updateDynamicNotifications();
+    }
+  } catch(e) {
+    console.warn('[Flowia] Rating prompt check error:', e);
+  }
+}
+
+function openStoreRatingModal() {
+  const isTr = (state.lang || 'tr') === 'tr';
+  const title = isTr ? "Flowia'yı Değerlendirin ⭐" : 'Rate Flowia ⭐';
+  const sub = isTr 
+    ? '30 dakikadır bizimlesiniz! 💖 Görüşleriniz kadın sağlığı asistanımızı geliştirmemize yardımcı olur.' 
+    : 'You have been using Flowia for 30+ minutes! 💖 Your review helps us build a better cycle assistant.';
+
+  const starFeedbacksTr = {
+    1: 'Geliştirmemiz gereken çok şey var 🛠️',
+    2: 'Daha iyi olabilir 💭',
+    3: 'Fena değil, memnunum 🙂',
+    4: 'Çok iyi bir uygulama! ✨',
+    5: 'Harika! Hayatımı kolaylaştırdı 💖'
+  };
+
+  const starFeedbacksEn = {
+    1: 'Needs improvement 🛠️',
+    2: 'Could be better 💭',
+    3: 'Decent and useful 🙂',
+    4: 'Very good app! ✨',
+    5: 'Loved it! Life-changing 💖'
+  };
+
+  const bodyHtml = `
+    <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:4px 0;">
+      <div style="font-size:46px;margin-bottom:8px;animation:pulse 2s infinite">🌸</div>
+      <div style="font-size:15px;font-weight:700;color:var(--text-1);margin-bottom:4px">
+        ${isTr ? 'Flowia Deneyiminizi Nasıl Buldunuz?' : 'How is your experience with Flowia?'}
+      </div>
+      <div style="font-size:12px;color:var(--text-2);line-height:1.4;margin-bottom:16px;max-width:280px">
+        ${isTr ? 'Google Play Store ve Apple App Store mağaza puanlamanız bizim için çok değerli.' : 'Your 5-star rating on Google Play & App Store keeps us independent and growing.'}
+      </div>
+
+      <!-- 5 Interactive Stars -->
+      <div id="rating-stars-container" style="display:flex;gap:8px;font-size:36px;cursor:pointer;margin-bottom:10px;user-select:none;">
+        <span class="rating-star" data-rating="1" onclick="selectRatingStars(1)" style="transition:transform 0.2s">⭐</span>
+        <span class="rating-star" data-rating="2" onclick="selectRatingStars(2)" style="transition:transform 0.2s">⭐</span>
+        <span class="rating-star" data-rating="3" onclick="selectRatingStars(3)" style="transition:transform 0.2s">⭐</span>
+        <span class="rating-star" data-rating="4" onclick="selectRatingStars(4)" style="transition:transform 0.2s">⭐</span>
+        <span class="rating-star" data-rating="5" onclick="selectRatingStars(5)" style="transition:transform 0.2s">⭐</span>
+      </div>
+
+      <div id="rating-feedback-text" style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:18px;min-height:20px;">
+        ${isTr ? starFeedbacksTr[5] : starFeedbacksEn[5]}
+      </div>
+
+      <!-- Primary Review Button -->
+      <button class="btn btn-primary" style="width:100%;font-weight:700;padding:12px;font-size:14px;box-shadow:0 4px 14px rgba(232,120,154,0.35);margin-bottom:10px;" onclick="goToStoreReview()">
+        ⭐ ${isTr ? "Play Store / App Store'da Değerlendir" : 'Submit Review on Store'}
+      </button>
+
+      <!-- Secondary Action Buttons -->
+      <div style="display:flex;justify-content:space-between;width:100%;gap:10px;margin-top:4px;">
+        <button class="btn btn-sm" style="flex:1;background:var(--surface-2);color:var(--text-2);border:1px solid var(--border-light);font-size:12px;border-radius:var(--r-md);padding:8px 0;" onclick="remindRatingLater()">
+          ${isTr ? 'Daha Sonra Hatırlat' : 'Remind Later'}
+        </button>
+        <button class="btn btn-sm" style="flex:1;background:var(--surface-2);color:var(--text-3);border:1px solid var(--border-light);font-size:12px;border-radius:var(--r-md);padding:8px 0;" onclick="markAlreadyRated()">
+          ${isTr ? 'Zaten Puanladım' : 'Already Rated'}
+        </button>
+      </div>
+    </div>`;
+
+  openProfileEditModal('⭐', title, sub, bodyHtml, null);
+  const saveBtn = document.getElementById('pem-save-btn');
+  if (saveBtn) saveBtn.style.display = 'none';
+}
+
+function selectRatingStars(num) {
+  const isTr = (state.lang || 'tr') === 'tr';
+  const starFeedbacksTr = {
+    1: 'Geliştirmemiz gereken çok şey var 🛠️',
+    2: 'Daha iyi olabilir 💭',
+    3: 'Fena değil, memnunum 🙂',
+    4: 'Çok iyi bir uygulama! ✨',
+    5: 'Harika! Hayatımı kolaylaştırdı 💖'
+  };
+  const starFeedbacksEn = {
+    1: 'Needs improvement 🛠️',
+    2: 'Could be better 💭',
+    3: 'Decent and useful 🙂',
+    4: 'Very good app! ✨',
+    5: 'Loved it! Life-changing 💖'
+  };
+
+  const container = document.getElementById('rating-stars-container');
+  if (container) {
+    const stars = container.querySelectorAll('.rating-star');
+    stars.forEach((star, idx) => {
+      if (idx < num) {
+        star.style.opacity = '1';
+        star.style.transform = 'scale(1.15)';
+        star.textContent = '⭐';
+      } else {
+        star.style.opacity = '0.35';
+        star.style.transform = 'scale(1)';
+        star.textContent = '★';
+      }
+    });
+  }
+
+  const feedback = document.getElementById('rating-feedback-text');
+  if (feedback) {
+    feedback.textContent = isTr ? starFeedbacksTr[num] : starFeedbacksEn[num];
+  }
+}
+
+function goToStoreReview() {
+  const isTr = (state.lang || 'tr') === 'tr';
+  const isIOS = (typeof navigator !== 'undefined') && (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
+  const storeUrl = isIOS
+    ? 'https://apps.apple.com/app/flowia-cycle-tracker/id6471234567?action=write-review'
+    : 'https://play.google.com/store/apps/details?id=com.cyclecare.app';
+
+  try {
+    if (typeof window !== 'undefined') {
+      window.open(storeUrl, '_blank');
+    }
+  } catch(e) {}
+
+  state.appRated = true;
+  state.lastRatingPromptDate = TODAY_STR;
+  saveToStorage();
+  closeProfileEditModal();
+  showToast(isTr ? 'Değerlendirmeniz için çok teşekkür ederiz! ❤️' : 'Thank you so much for your review! ❤️');
+}
+
+function remindRatingLater() {
+  const isTr = (state.lang || 'tr') === 'tr';
+  state.lastRatingPromptDate = TODAY_STR; // Do not prompt again today
+  saveToStorage();
+  closeProfileEditModal();
+  showToast(isTr ? 'Hatırlatıcı kaydedildi. Teşekkürler!' : 'Reminder saved. Thank you!');
+}
+
+function markAlreadyRated() {
+  const isTr = (state.lang || 'tr') === 'tr';
+  state.appRated = true;
+  state.lastRatingPromptDate = TODAY_STR;
+  saveToStorage();
+  closeProfileEditModal();
+  showToast(isTr ? 'Flowia ailesi olarak teşekkür ederiz! 🌸' : 'Thank you from the Flowia team! 🌸');
+}
+
+// ============================================================
 // FLOWIA CUSTOM INTERACTIVE DATE PICKER MODAL
 // ============================================================
 let flowiaDatePickerState = {
@@ -7774,7 +7983,8 @@ function renderNotifications() {
       </div>` :
     state.notifications.map(n => {
       let clickHandler = '';
-      if (n.type === 'report' || n.action === 'reports') clickHandler = `onclick="navigate('reports')"`;
+      if (n.id === 'notif_store_rating' || n.action === 'rating' || n.type === 'rating') clickHandler = `onclick="openStoreRatingModal()"`;
+      else if (n.type === 'report' || n.action === 'reports') clickHandler = `onclick="navigate('reports')"`;
       else if (n.type === 'prediction') clickHandler = `onclick="navigate('calendar')"`;
       else if (n.type === 'insight' && state.isPremium) clickHandler = `onclick="navigate('insights')"`;
       return `
@@ -8368,6 +8578,22 @@ function updateDynamicNotifications() {
       });
     }
 
+    // 8. Play Store & App Store Rating Prompt Notification (for users with >= 30m usage and not rated yet)
+    if (!state.appRated && (Number(state.totalUsageSeconds) || 0) >= 1800) {
+      newNotifs.push({
+        id: 'notif_store_rating',
+        type: 'rating',
+        icon: '⭐',
+        title: isTr ? '⭐ Flowia Deneyiminizi Puanlayın' : '⭐ Rate Your Flowia Experience',
+        body: isTr 
+          ? '30 dakikayı aşkın süredir Flowia ile birliktesiniz. Play Store & App Store\'da görüşlerinizi paylaşarak bize destek olun!' 
+          : 'You have reached 30+ minutes of tracking. Share your review on Play Store & App Store to support us!',
+        time: isTr ? 'Özel' : 'Featured',
+        action: 'rating',
+        read: false
+      });
+    }
+
     // Replace state.notifications with dynamic notifications (filtering user-deleted ones)
     const deleted = (state.deletedNotifIds || []).map(id => String(id));
     state.notifications = newNotifs.filter(n => !deleted.includes(String(n.id))).slice(0, 20);
@@ -8396,6 +8622,10 @@ function init() {
 
   // Restore user data from localStorage if present
   loadFromStorage();
+
+  // Initialize in-app usage tracker and rating prompt timer (30s after entry)
+  initUsageTracker();
+  scheduleRatingPromptCheck();
 
   // Apply dark mode theme
   applyTheme();
