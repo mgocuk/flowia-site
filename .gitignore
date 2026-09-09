@@ -1,4 +1,4 @@
-﻿# OS & IDE
+# OS & IDE
 .DS_Store
 Thumbs.db
 .idea/
@@ -15,9 +15,10 @@ signing-key-info.txt
 
 # Native mobile & backend source code (Private - never expose publicly)
 android/
-cyclecare_backend/
-cyclecare_flutter/
-cyclecare_documentation/
+flowia_backend/
+flowia_flutter/
+flowia_documentation/
+cyclecare_*/
 extracted_*/
 
 # Core application engine & frontend source
@@ -54,3 +55,10 @@ github-pages/
 MASTER_APP_PLAYBOOK.md
 splash-*.png
 *.svg
+
+# Firebase local deploy
+.firebase/
+.firebaserc
+firebase.json
+public/
+*.bat
