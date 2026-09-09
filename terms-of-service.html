@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kullanım Koşulları — Flowia</title>
+  <meta name="description" content="Flowia uygulaması kullanım koşulları. Hizmet şartları, sorumluluk reddi ve kullanıcı hakları.">
+  <link rel="icon" href="./favicon.png" type="image/png">
+  <style>
+    :root {
+      --primary: #E8789A; --primary-dark: #C85C7E;
+      --bg: #FDF8FA; --surface: #FFFFFF;
+      --text-1: #2D1B35; --text-2: #7A6B7E;
+      --border: #F0E6EF; --radius: 16px;
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text-1); line-height: 1.7; }
+    header { background: linear-gradient(135deg, #9C27B0, var(--primary)); color: white; padding: 40px 20px; text-align: center; }
+    header .logo { font-size: 48px; margin-bottom: 12px; }
+    header h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+    header p { font-size: 15px; opacity: 0.9; }
+    .lang-toggle { display: flex; justify-content: center; gap: 12px; padding: 20px; background: var(--surface); border-bottom: 1px solid var(--border); }
+    .lang-btn { padding: 8px 20px; border-radius: 20px; border: 2px solid var(--primary); background: transparent; color: var(--primary); font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .lang-btn.active { background: var(--primary); color: white; }
+    .container { max-width: 800px; margin: 0 auto; padding: 40px 20px 80px; }
+    .update-date { background: rgba(232,120,154,0.1); border: 1px solid rgba(232,120,154,0.3); border-radius: var(--radius); padding: 12px 16px; font-size: 13px; color: var(--primary-dark); font-weight: 600; margin-bottom: 32px; display: flex; align-items: center; gap: 8px; }
+    .warning-box { background: rgba(255,152,0,0.1); border: 2px solid rgba(255,152,0,0.4); border-radius: var(--radius); padding: 20px; margin-bottom: 32px; }
+    .warning-box h3 { color: #E65100; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .warning-box p { color: #5D4037; font-size: 14px; }
+    section { margin-bottom: 36px; }
+    section h2 { font-size: 20px; font-weight: 700; color: var(--primary-dark); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 2px solid var(--border); display: flex; align-items: center; gap: 10px; }
+    section p { font-size: 15px; color: var(--text-2); margin-bottom: 12px; }
+    section ul { padding-left: 20px; color: var(--text-2); font-size: 15px; }
+    section ul li { margin-bottom: 8px; }
+    .contact-card { background: linear-gradient(135deg, rgba(232,120,154,0.12), rgba(156,39,176,0.08)); border: 1px solid rgba(232,120,154,0.3); border-radius: var(--radius); padding: 24px; text-align: center; margin-top: 40px; }
+    .contact-card h2 { border: none; justify-content: center; }
+    .contact-card a { color: var(--primary); font-weight: 700; text-decoration: none; font-size: 16px; }
+    footer { text-align: center; padding: 24px; color: var(--text-2); font-size: 13px; border-top: 1px solid var(--border); }
+    footer a { color: var(--primary); text-decoration: none; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">📋</div>
+  <h1>Flowia — Kullanım Koşulları</h1>
+  <p>Terms of Service</p>
+</header>
+
+<div class="lang-toggle">
+  <button class="lang-btn active" onclick="showLang('tr', this)">🇹🇷 Türkçe</button>
+  <button class="lang-btn" onclick="showLang('en', this)">🇬🇧 English</button>
+</div>
+
+<!-- TURKISH -->
+<div id="lang-tr" class="container">
+  <div class="update-date">📅 Son güncelleme: 3 Ağustos 2026 — Sürüm 1.1</div>
+
+  <div class="warning-box">
+    <h3>⚕️ Önemli Tıbbi Uyarı</h3>
+    <p>Flowia, bir tıbbi cihaz veya doğum kontrol yöntemi <strong>DEĞİLDİR</strong>. Uygulama yalnızca bilgilendirme amaçlıdır. Sağlık kararları için lütfen lisanslı bir sağlık profesyoneline danışın.</p>
+  </div>
+
+  <section>
+    <h2>📋 Sözleşmeyi Kabul</h2>
+    <p>Flowia uygulamasını indirerek, yükleyerek veya kullanarak bu Kullanım Koşulları'nı kabul etmiş olursunuz. Bu koşulları kabul etmiyorsanız uygulamayı kullanmayın.</p>
+  </section>
+
+  <section>
+    <h2>🔞 Yaş Gereksinimi</h2>
+    <p>Flowia'i kullanmak için <strong>en az 13 yaşında</strong> olmanız gerekmektedir. 13 yaşından küçük kullanıcıların uygulamayı kullanmasına izin verilmez. 13-18 yaş arası kullanıcıların ebeveyn veya vasi onayı alması önerilir.</p>
+  </section>
+
+  <section>
+    <h2>✅ İzin Verilen Kullanım</h2>
+    <ul>
+      <li>Kişisel sağlık verilerinizi takip etmek</li>
+      <li>Adet döngünüzü ve doğurganlık pencerenizi izlemek</li>
+      <li>Semptom ve ruh halini kaydetmek</li>
+      <li>AI içgörülerinden faydalanmak (bilgilendirme amaçlı)</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>🚫 Yasaklanan Kullanım</h2>
+    <ul>
+      <li>Uygulamayı tersine mühendislik veya kopyalamak</li>
+      <li>Uygulamayı doğum kontrolü veya tıbbi tanı için kullanmak</li>
+      <li>Başkalarının verilerine yetkisiz erişim sağlamak</li>
+      <li>Uygulamayı ticari amaçla yeniden dağıtmak</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>⚕️ Sağlık ve Tıbbi Sorumluluk Reddi</h2>
+    <p>Flowia tarafından sağlanan tüm bilgiler, tahminler ve içgörüler <strong>yalnızca bilgilendirme amaçlıdır</strong> ve profesyonel tıbbi tavsiyenin, teşhisin veya tedavinin yerini tutmaz.</p>
+    <p>Uygulama, <strong>doğum kontrol yöntemi olarak kullanılmamalıdır</strong>. Doğurganlık tahminleri %100 güvenilir değildir.</p>
+    <p>Herhangi bir sağlık sorunuz veya endişeniz varsa, daima nitelikli bir sağlık uzmanına danışın.</p>
+  </section>
+
+  <section>
+    <h2>🔐 Hesap Güvenliği</h2>
+    <p>Hesabınızın güvenliğinden siz sorumlusunuz. Güçlü ve benzersiz bir şifre kullanın. Şifrenizi başkalarıyla paylaşmayın. Hesabınızda yetkisiz erişim fark ederseniz derhal bizimle iletişime geçin.</p>
+  </section>
+
+  <section>
+    <h2>📱 Fikri Mülkiyet</h2>
+    <p>Flowia uygulaması, tasarımı, logosu ve içeriği Flowia Health'e aittir ve telif hakkı yasaları tarafından korunmaktadır. Uygulamayı kullanmanız, size herhangi bir mülkiyet hakkı vermez.</p>
+  </section>
+
+  <section>
+    <h2>⚖️ Sorumluluk Sınırlaması</h2>
+    <p>Flowia, yasaların izin verdiği azami ölçüde, uygulamanın kullanımından kaynaklanan dolaylı, tesadüfi, özel veya sonuç olarak ortaya çıkan zararlardan sorumlu değildir. Sağlık kararlarınızın sorumluluğu tamamen size aittir.</p>
+  </section>
+
+  <section>
+    <h2>🔄 Koşullardaki Değişiklikler</h2>
+    <p>Bu koşullar zaman zaman güncellenebilir. Önemli değişiklikler için uygulama içi bildirim ve e-posta bildirimi yapılır. Değişikliklerden sonra uygulamayı kullanmaya devam etmek, yeni koşulları kabul ettiğiniz anlamına gelir.</p>
+  </section>
+
+  <div class="contact-card">
+    <h2>📧 İletişim</h2>
+    <p style="margin:12px 0;color:var(--text-2)">Kullanım koşulları hakkında sorularınız için:</p>
+    <a href="mailto:legal@flowia.app">legal@flowia.app</a>
+    <p style="margin-top:12px;font-size:13px;color:var(--text-2)">Flowia Health · İstanbul, Türkiye</p>
+  </div>
+</div>
+
+<!-- ENGLISH -->
+<div id="lang-en" class="container hidden">
+  <div class="update-date">📅 Last updated: August 3, 2026 — Version 1.1</div>
+
+  <div class="warning-box">
+    <h3>⚕️ Important Medical Disclaimer</h3>
+    <p>Flowia is <strong>NOT</strong> a medical device or birth control method. The app is for informational purposes only. Please consult a licensed healthcare professional for medical decisions.</p>
+  </div>
+
+  <section>
+    <h2>📋 Acceptance of Terms</h2>
+    <p>By downloading, installing, or using Flowia, you agree to these Terms of Service. If you do not agree, do not use the app.</p>
+  </section>
+
+  <section>
+    <h2>🔞 Age Requirement</h2>
+    <p>You must be at least <strong>13 years old</strong> to use Flowia. Users between 13-18 are encouraged to obtain parental consent.</p>
+  </section>
+
+  <section>
+    <h2>⚕️ Medical Disclaimer</h2>
+    <p>All information, predictions, and insights provided by Flowia are <strong>for informational purposes only</strong> and do not constitute medical advice, diagnosis, or treatment.</p>
+    <p>The app <strong>must not be used as a birth control method</strong>. Fertility predictions are not 100% reliable.</p>
+    <p>Always consult a qualified healthcare professional for any health concerns.</p>
+  </section>
+
+  <section>
+    <h2>⚖️ Limitation of Liability</h2>
+    <p>To the maximum extent permitted by law, Flowia is not liable for any indirect, incidental, special, or consequential damages arising from use of the application. You are solely responsible for your health decisions.</p>
+  </section>
+
+  <div class="contact-card">
+    <h2>📧 Contact</h2>
+    <p style="margin:12px 0;color:var(--text-2)">For questions about these terms:</p>
+    <a href="mailto:legal@flowia.app">legal@flowia.app</a>
+    <p style="margin-top:12px;font-size:13px;color:var(--text-2)">Flowia Health · Istanbul, Turkey</p>
+  </div>
+</div>
+
+<footer>
+  <p>© 2026 Flowia Health · <a href="./privacy-policy.html">Gizlilik Politikası / Privacy Policy</a> · <a href="./index.html">Uygulamaya Dön / Back to App</a></p>
+</footer>
+
+<script>
+function showLang(lang, btn) {
+  document.getElementById('lang-tr').classList.toggle('hidden', lang !== 'tr');
+  document.getElementById('lang-en').classList.toggle('hidden', lang !== 'en');
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

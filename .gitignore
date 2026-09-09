@@ -1,0 +1,56 @@
+﻿# OS & IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Build outputs & Packages
+*.apk
+*.aab
+*.zip
+*.jks
+*.keystore
+node_modules/
+signing-key-info.txt
+
+# Native mobile & backend source code (Private - never expose publicly)
+android/
+cyclecare_backend/
+cyclecare_flutter/
+cyclecare_documentation/
+extracted_*/
+
+# Core application engine & frontend source
+src/
+dist/
+app.html
+app.js
+styles.css
+sw.js
+service-worker.js
+manifest.json
+capacitor.config.json
+
+# Development & Build Automation Scripts
+build.js
+build_aab.js
+create_feature_graphic.js
+fix_early_period_gap.js
+generate_insights*.js
+process_screenshots.ps1
+package.json
+package-lock.json
+tunnel*.txt
+
+# AI datasets & temporary artifacts
+ai_insights*
+0.569620253164557
+1620
+1650
+github-pages/
+
+# Logs
+*.log
+MASTER_APP_PLAYBOOK.md
+splash-*.png
+*.svg
